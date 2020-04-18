@@ -1,11 +1,11 @@
 import StdUtil from "../../Base/Util/StdUtil";
 import SWPeer from "../../Base/WebRTC/SWPeer";
 import LocalCache from "../../Contents/Cache/LocalCache";
-import HomeInstanceController from "./HomeInstanceController";
+import GijiLockController from "./GijiLockController";
 
 if (StdUtil.IsSupoortPlatform()) {
 
-    let bootid = LocalCache.BootHomeInstancePeerID;
+    let bootid = LocalCache.BootGijiLockPeerID;
 
     if (bootid && bootid.length > 0) {
 
@@ -14,7 +14,7 @@ if (StdUtil.IsSupoortPlatform()) {
 
         //  強制起動
         document.getElementById('sbj-home-instance-force-boot').onclick = () => {
-            LocalCache.BootHomeInstancePeerID = "";
+            LocalCache.BootGijiLockPeerID = "";
             location.reload();
         }
     }
@@ -31,7 +31,7 @@ if (StdUtil.IsSupoortPlatform()) {
         }, 5000);
 
         //  通常起動
-        let server = new HomeInstanceController();
+        let server = new GijiLockController();
         server.SwPeer = new SWPeer(server, null, () => {
             isBoot = true;
             BootSucceed();

@@ -3,7 +3,7 @@ module.exports = {
   mode: 'development',
 
   entry: {
-    homeinstance: './src/Page/HomeInstance/Script.ts',
+    gijilock: './src/Page/GijiLock/Script.ts',
     homevisitor: './src/Page/HomeVisitor/Script.ts',
   },
   output: {

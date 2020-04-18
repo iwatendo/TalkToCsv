@@ -3,9 +3,9 @@ import { Room } from "../../Contents/IndexedDB/Home";
 
 import AbstractServiceController from "../../Base/AbstractServiceController";
 
-import HomeInstanceReceiver from "./HomeInstanceReceiver";
-import HomeInstanceView from "./HomeInstanceView";
-import HomeInstanceModel from "./HomeInstanceModel";
+import GijiLockReceiver from "./GijiLockReceiver";
+import GijiLockView from "./GijiLockView";
+import GijiLockModel from "./GijiLockModel";
 
 import ManagerController from "./Manager/ManagerController";
 import LocalCache from "../../Contents/Cache/LocalCache";
@@ -15,9 +15,9 @@ import RoomSender from "../../Contents/Sender/RoomSender";
 /**
  * 
  */
-export default class HomeInstanceController extends AbstractServiceController<HomeInstanceView, HomeInstanceModel> {
+export default class GijiLockController extends AbstractServiceController<GijiLockView, GijiLockModel> {
 
-    public ControllerName(): string { return "HomeInstance"; }
+    public ControllerName(): string { return "GijiLock"; }
 
     public PeerID: string;
     public Manager: ManagerController;
@@ -28,7 +28,7 @@ export default class HomeInstanceController extends AbstractServiceController<Ho
      */
     constructor() {
         super();
-        this.Receiver = new HomeInstanceReceiver(this);
+        this.Receiver = new GijiLockReceiver(this);
     };
 
 
@@ -37,8 +37,8 @@ export default class HomeInstanceController extends AbstractServiceController<Ho
      */
     public ClearBootInfo() {
         //  インスタンスが正常終了した場合、接続情報はクリアする
-        if (this.PeerID === LocalCache.BootHomeInstancePeerID) {
-            LocalCache.BootHomeInstancePeerID = "";
+        if (this.PeerID === LocalCache.BootGijiLockPeerID) {
+            LocalCache.BootGijiLockPeerID = "";
         }
     }
 
@@ -51,18 +51,18 @@ export default class HomeInstanceController extends AbstractServiceController<Ho
      */
     public OnPeerOpen(peer: PeerJs.Peer) {
 
-        //  HomeInstanceIDをLocalCacheに保持
-        LocalCache.BootHomeInstancePeerID = peer.id;
+        //  GijiLockIDをLocalCacheに保持
+        LocalCache.BootGijiLockPeerID = peer.id;
         this.PeerID = peer.id;
 
         //  DB接続
-        this.Model = new HomeInstanceModel(this, () => {
+        this.Model = new GijiLockModel(this, () => {
 
             //  タイムラインメッセージの読込
             this.Manager = new ManagerController(this, () => {
 
                 //  UI初期化
-                this.View = new HomeInstanceView(this, () => {
+                this.View = new GijiLockView(this, () => {
 
                 });
 

@@ -2,15 +2,14 @@
 import * as Home from "../../Contents/IndexedDB/Home";
 import * as Timeline from "../../Contents/IndexedDB/Timeline";
 
-import LinkUtil from "../../Base/Util/LinkUtil";
 import StdUtil from "../../Base/Util/StdUtil";
 import AbstractServiceModel, { OnModelLoad, OnRead, OnWrite } from "../../Base/AbstractServiceModel";
 
-import HomeInstanceController from "./HomeInstanceController";
+import GijiLockController from "./GijiLockController";
 import ImageInfo from "../../Base/Container/ImageInfo";
 
 
-export default class HomeInstanceModel extends AbstractServiceModel<HomeInstanceController> {
+export default class GijiLockModel extends AbstractServiceModel<GijiLockController> {
 
     private _homeDB: Home.DB;
     private _timelineDB: Timeline.DB;

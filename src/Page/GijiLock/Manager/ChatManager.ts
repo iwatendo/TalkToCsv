@@ -2,7 +2,7 @@ import * as Timeline from "../../../Contents/IndexedDB/Timeline";
 
 import StdUtil from "../../../Base/Util/StdUtil";
 
-import HomeInstanceController from "../HomeInstanceController";
+import GijiLockController from "../GijiLockController";
 import RoomManager from "./RoomManager";
 import ChatMessageSender from "../../../Contents/Sender/ChatMessageSender";
 import TimelineSender from "../../../Contents/Sender/TimelineSender";
@@ -11,7 +11,7 @@ import ChatInfoSender from "../../../Contents/Sender/ChatInfoSender";
 
 export default class ChatManager {
 
-    private _controller: HomeInstanceController;
+    private _controller: GijiLockController;
     private _roomManager: RoomManager;
     private _tlmsgs: Array<Timeline.Message>;
     private _inputMap: Map<string, ChatInfoSender>;
@@ -20,7 +20,7 @@ export default class ChatManager {
      * コンストラクタ
      * @param controller 
      */
-    constructor(controller: HomeInstanceController, roomManager: RoomManager, callback) {
+    constructor(controller: GijiLockController, roomManager: RoomManager, callback) {
 
         this._controller = controller;
         this._roomManager = roomManager;

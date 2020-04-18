@@ -1,12 +1,12 @@
-import HomeInstanceController from "../HomeInstanceController";
+import GijiLockController from "../GijiLockController";
 import RoomManager from "./RoomManager";
 
 export default class ServentManager {
 
-    private _controller: HomeInstanceController;
+    private _controller: GijiLockController;
 
 
-    public get Controller(): HomeInstanceController {
+    public get Controller(): GijiLockController {
         return this._controller;
     }
 
@@ -16,7 +16,7 @@ export default class ServentManager {
      * @param controller 
      * @param roomManager 
      */
-    constructor(controller: HomeInstanceController, roomManager: RoomManager) {
+    constructor(controller: GijiLockController, roomManager: RoomManager) {
         this._controller = controller;
     }
 

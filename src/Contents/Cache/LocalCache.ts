@@ -22,8 +22,8 @@ export default class LocalCache {
     /**
      *  起動しているインスタンスのPeerID
      */
-    public static set BootHomeInstancePeerID(val: string) { localStorage.setItem('home-instance-id', val); }
-    public static get BootHomeInstancePeerID(): string { return localStorage.getItem('home-instance-id'); }
+    public static set BootGijiLockPeerID(val: string) { localStorage.setItem('home-instance-id', val); }
+    public static get BootGijiLockPeerID(): string { return localStorage.getItem('home-instance-id'); }
 
 
     /**

@@ -4,13 +4,13 @@ import AbstractServiceView, { OnViewLoad } from "../../Base/AbstractServiceView"
 import StdUtil from "../../Base/Util/StdUtil";
 import LinkUtil from "../../Base/Util/LinkUtil";
 
-import HomeInstanceController from "./HomeInstanceController";
+import GijiLockController from "./GijiLockController";
 import LocalCache from "../../Contents/Cache/LocalCache";
 import ClearTimelineSender from "../../Contents/Sender/ClearTimelineSender";
 import MdlUtil from "../../Contents/Util/MdlUtil";
 
 
-export default class HomeInstanceView extends AbstractServiceView<HomeInstanceController> {
+export default class GijiLockView extends AbstractServiceView<GijiLockController> {
 
     private _roomFrame = document.getElementById('sbj-room-frame') as HTMLFrameElement;
 
@@ -27,7 +27,7 @@ export default class HomeInstanceView extends AbstractServiceView<HomeInstanceCo
             this.StartVisitor();
         };
 
-        let linkurl = LinkUtil.CreateLink("../HomeVisitor/", LocalCache.BootHomeInstancePeerID);
+        let linkurl = LinkUtil.CreateLink("../HomeVisitor/", LocalCache.BootGijiLockPeerID);
         let clipcopybtn = document.getElementById('sbj-start-linkcopy') as HTMLButtonElement;
 
         //  「接続URLのコピー」
@@ -77,7 +77,7 @@ export default class HomeInstanceView extends AbstractServiceView<HomeInstanceCo
      * 
      */
     public StartVisitor() {
-        let url = LinkUtil.CreateLink("../HomeVisitor/", LocalCache.BootHomeInstancePeerID);
+        let url = LinkUtil.CreateLink("../HomeVisitor/", LocalCache.BootGijiLockPeerID);
         window.open(url, '_blank');
     }
 

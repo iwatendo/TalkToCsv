@@ -13,7 +13,7 @@
       // lanunchまたはattachを指定
       "request": "launch",
       // Webサーバー上にあるデバッグ対象のURLを指定
-      "url": "http://localhost:8080/index.html",
+      "url": "http://localhost:8080/gijilock/index.html",
       // マッピングするローカルファイルが配置されているディレクトリを指定
       "webRoot": "${workspaceRoot}",
       // ソースマップの有効・無効の指定（true/false）

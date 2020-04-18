@@ -1,7 +1,7 @@
 ﻿import AbstractServiceReceiver from "../../Base/AbstractServiceReceiver";
 import Sender from "../../Base/Container/Sender";
 
-import HomeInstanceController from "./HomeInstanceController";
+import GijiLockController from "./GijiLockController";
 
 import ClientBootSender from "../../Contents/Sender/ClientBootSender";
 import GetRoomSender from "../../Contents/Sender/GetRoomSender";
@@ -14,7 +14,7 @@ import UpdateTimelineSender from "../../Contents/Sender/UpdateTimelineSender";
 import ChatInfoSender from "../../Contents/Sender/ChatInfoSender";
 
 
-export default class HomeInstanceReceiver extends AbstractServiceReceiver<HomeInstanceController> {
+export default class GijiLockReceiver extends AbstractServiceReceiver<GijiLockController> {
 
     /**
      * 
