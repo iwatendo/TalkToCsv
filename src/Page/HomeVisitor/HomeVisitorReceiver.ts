@@ -4,7 +4,6 @@ import SpeechUtil from "../../Base/Util/SpeechUtil";
 import StdUtil from "../../Base/Util/StdUtil";
 
 import Sender from "../../Base/Container/Sender";
-import * as Personal from "../../Contents/IndexedDB/Personal";
 import ActorInfo from "../../Contents/Struct/ActorInfo";
 
 import HomeVisitorController from "./HomeVisitorController";
@@ -16,9 +15,7 @@ import TimelineSender from "../../Contents/Sender/TimelineSender";
 import ClearTimelineSender from "../../Contents/Sender/ClearTimelineSender";
 import GetProfileSender from "../../Contents/Sender/GetProfileSender";
 import GetActorSender from "../../Contents/Sender/GetActorSender";
-import GetIconSender from "../../Contents/Sender/GetIconSender";
 import ActorInfoSender from "../../Contents/Sender/ActorInfoSender";
-import IconSender from "../../Contents/Sender/IconSender";
 import ProfileSender from "../../Contents/Sender/ProfileSender";
 
 
@@ -83,7 +80,6 @@ export default class HomeVisitorReceiver extends AbstractServiceReceiver<HomeVis
         if (sender.type === TimelineSender.ID) {
             let tl = (sender as TimelineSender);
             this.Controller.View.SetTimeline(tl.msgs, tl.ings);
-            this.Controller.Bot.CheckTimeline(tl.msgs);
         }
 
 
@@ -102,19 +98,9 @@ export default class HomeVisitorReceiver extends AbstractServiceReceiver<HomeVis
             this.GetActor(conn, sender as GetActorSender);
         }
 
-        //  アイコン要求
-        if (sender.type === GetIconSender.ID) {
-            this.GetIcon(conn, sender as GetIconSender);
-        }
-
         //  アクター取得
         if (sender.type === ActorInfoSender.ID) {
             this.Controller.ActorCache.SetActor(conn.remoteId, (sender as ActorInfoSender).actorInfo);
-        }
-
-        //  アイコン取得
-        if (sender.type === IconSender.ID) {
-            this.Controller.IconCache.SetOtherUserIcon(conn.remoteId, (sender as IconSender).icon);
         }
     }
 
@@ -140,29 +126,6 @@ export default class HomeVisitorReceiver extends AbstractServiceReceiver<HomeVis
         this.Controller.Model.GetActor(sender.aid, (actor) => {
             let result = new ActorInfoSender();
             result.actorInfo = new ActorInfo(this.Controller.PeerId, StdUtil.UserID, actor);
-            this.Controller.SwPeer.SendTo(conn, result);
-        });
-    }
-
-
-    /**
-     * 他クライアントからのアイコン要求通知
-     * @param conn 
-     * @param sender 
-     */
-    public GetIcon(conn: PeerJs.DataConnection, sender: GetIconSender) {
-
-        this.Controller.Model.GetIcon(sender.iid, (icon) => {
-            let result = new IconSender();
-            if (icon) {
-                result.icon = icon;
-            }
-            else {
-                //  削除済みのアイコンの場合、空データを返す。
-                result.icon = new Personal.Icon();
-                result.icon.iid = sender.iid;
-            }
-
             this.Controller.SwPeer.SendTo(conn, result);
         });
     }

@@ -40,14 +40,6 @@ export default class HomeVisitorView extends AbstractServiceView<HomeVisitorCont
 
         this.SetSplitPane();
 
-        window.onresize = (e) => {
-            this.DoResize();
-        };
-
-        window.onfocus = (e) => {
-            this.DoResize();
-        }
-
         document.getElementById('sbj-home-visitor-timeline-component').onscroll = (e) => {
             this.OnTimelineScroll();
         };
@@ -199,9 +191,6 @@ export default class HomeVisitorView extends AbstractServiceView<HomeVisitorCont
 
         //  部屋の背景画像変更
         ImageInfo.SetCss("sbj-home-visitor-main", room.background);
-
-        //  部屋情報の再描画
-        this.InputPane.DisplayUnreadCount();
     }
 
 
@@ -254,28 +243,13 @@ export default class HomeVisitorView extends AbstractServiceView<HomeVisitorCont
 
             ReactDOM.render(<TimelineComponent key={"timeline"} controller={this.Controller} messages={dispTlmsgs} inputs={ings} />, this._timelineElement, () => {
 
-                controller.TimelineCache.SetTimelineIcon(dispTlmsgs);
                 this.InputPane.SetUnreadCount(tlms);
 
                 if (isScrollMax) {
                     this.MoveLastTimeline();
                 }
-                else {
-                    this.InputPane.DisplayUnreadCount();
-                }
             });
         });
-    }
-
-
-    /**
-     * リサイズ時イベント
-     */
-    private DoResize() {
-        this.MoveLastTimeline();
-        if(this.InputPane){
-            this.InputPane.UserSettingChange();
-        }
     }
 
 
@@ -296,7 +270,6 @@ export default class HomeVisitorView extends AbstractServiceView<HomeVisitorCont
         this._timelineElement.scrollTop = 4294967295;
         if (this.InputPane) {
             this.InputPane.ClearUnreadCount();
-            this.InputPane.DisplayUnreadCount();
         }
     }
 

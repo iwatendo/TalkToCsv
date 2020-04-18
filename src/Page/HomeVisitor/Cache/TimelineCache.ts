@@ -1,9 +1,7 @@
 
-import * as Home from "../../../Contents/IndexedDB/Home";
 import * as Timeline from "../../../Contents/IndexedDB/Timeline";
 
 import HomeVisitorController from "../HomeVisitorController";
-import ChatInfoSender from "../../../Contents/Sender/ChatInfoSender";
 
 
 export default class TimelineCache {
@@ -73,31 +71,6 @@ export default class TimelineCache {
             return result;
         }
 
-    }
-
-
-    /**
-     * 
-     * @param tlmsgs 
-     * @param ings 
-     */
-    public SetTimelineIcon(tlmsgs: Array<Timeline.Message>) {
-
-        let iidmap = new Map<string, Array<string>>();
-
-        tlmsgs.forEach((tlm) => {
-            if (!iidmap.has(tlm.peerid)) {
-                iidmap.set(tlm.peerid, new Array<string>());
-            }
-            let iids = iidmap.get(tlm.peerid);
-            if (iids.indexOf(tlm.iid) < 0) {
-                iids.push(tlm.iid);
-            }
-        });
-
-        iidmap.forEach((iids, peerid) => {
-            this._controller.IconCache.GetIcons(peerid, iids);
-        });
     }
 
 
