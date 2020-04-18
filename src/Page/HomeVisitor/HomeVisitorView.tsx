@@ -6,12 +6,10 @@ import { Icon } from "../../Contents/IndexedDB/Personal";
 import * as Timeline from "../../Contents/IndexedDB/Timeline";
 
 import AbstractServiceView, { OnViewLoad } from "../../Base/AbstractServiceView";
-import StdUtil from "../../Base/Util/StdUtil";
 import ImageInfo from "../../Base/Container/ImageInfo";
 
 import { TimelineComponent } from "./Timeline/TimelineComponent";
 import HomeVisitorController from "./HomeVisitorController";
-import RoomMemberComponent from "./RoomMember/RoomMemberComponent";
 import InputPaneController from "./InputPane/InputPaneController";
 import LinkUtil from '../../Base/Util/LinkUtil';
 import ChatInfoSender from '../../Contents/Sender/ChatInfoSender';
@@ -166,7 +164,6 @@ export default class HomeVisitorView extends AbstractServiceView<HomeVisitorCont
 
         if (this.Controller.CurrentHid === room.hid) {
             this.RefreshTimeline();
-            this.SetRoomMember(room);
         }
         else {
             //  ルームの変更があった場合は
@@ -174,7 +171,6 @@ export default class HomeVisitorView extends AbstractServiceView<HomeVisitorCont
             this.Controller.CurrentHid = room.hid;
             this.SetRoomDisplay(room);
             this.Controller.GetTimeline(room.hid);
-            this.SetRoomMember(room);
         }
     }
 
@@ -191,27 +187,6 @@ export default class HomeVisitorView extends AbstractServiceView<HomeVisitorCont
 
         //  部屋の背景画像変更
         ImageInfo.SetCss("sbj-home-visitor-main", room.background);
-    }
-
-
-    /**
-     * 
-     * @param room 
-     */
-    public SetRoomMember(room: Home.Room) {
-
-        //  ルームメンバーの取得
-        this.Controller.RoomCache.GetMember(room.hid, (ram) => {
-
-            //  ルーム内の接続人数表示
-            let peerList = new Array<string>();
-            ram.members.forEach((ap) => peerList.push(ap.peerid));
-            this._headTitleAccountCountElement.setAttribute("data-badge", StdUtil.Uniq(peerList).length.toString());
-
-            //  メンバー詳細の設定
-            let key = StdUtil.CreateUuid();
-            ReactDOM.render(<RoomMemberComponent key={key} controller={this.Controller} roomActorMember={ram} />, this._headRoomMemberElement);
-        });
     }
 
 
