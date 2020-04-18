@@ -27,7 +27,7 @@ export class TimelineInputingItemComponent extends React.Component<TimelineInput
         let isMine = this.IsMyChatMessage();
 
         //
-        let image_div = (iid ? (<div className='sbj-timeline-img-empty'></div>) : (<div></div>));
+        let image_div = (<div></div>);
 
         //
         let msg_div = (

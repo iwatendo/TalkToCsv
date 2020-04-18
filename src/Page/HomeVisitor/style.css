@@ -104,8 +104,15 @@
  *---------------------------*/
 
 
-.split-pane{
+.timeline-pane{
     background-color: var(--sbj-color-room-default-background);
+    position: relative;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    z-index: 0;    
+    margin: auto;
+    max-width: 1200px;
 }
 
 .sbj-split-pane-component-left{
@@ -373,29 +380,6 @@ textarea.sbj-inputpanel-text {
     margin: 0px 0px 0px 18px;
     clear: both;
     float: left;
-}
-
-.sbj-timeline-img-box {
-    width: 72px;
-    height: 72px;
-    min-width: 72px;
-    margin: 4px;
-    background-size: cover;
-}
-
-.sbj-timeline-img {
-    width: 100%;
-    height: 100%;
-    border-radius: 8px;
-    background-color: var(--sbj-color-edge-background);
-}
-
-
-.sbj-timeline-img-empty {
-    width: 72px;
-    height: 16px;
-    min-width: 72px;
-    margin:4px;
 }
 
 .sbj-timeline-adjust{
