@@ -92,20 +92,6 @@ export default class InputPaneController {
             return;
         }
 
-        //  
-        let isCtrlAltShift = e.ctrlKey || e.altKey || e.shiftKey;
-
-        if (isCtrlAltShift) {
-
-            if (LocalCache.ActorChangeKeyMode === 1) {
-                if (!e.altKey || !e.shiftKey) return;
-            }
-            else {
-                if (!e.ctrlKey) return;
-            }
-
-        }
-
     }
 
 
@@ -147,7 +133,10 @@ export default class InputPaneController {
      * @param text 
      */
     private SendVoiceText(text) {
-        switch (LocalCache.VoiceRecognitionMode) {
+
+        let sendVoiceType = 1;
+
+        switch (sendVoiceType) {
             case 0:
                 //  チャットのテキストエリアにセット
                 let start = this._textareaElement.value.length;
@@ -187,26 +176,6 @@ export default class InputPaneController {
 
         let chm = this.CreateChatMessage(text, isVoiceRecognition);
         this._controller.SendChatMessage(chm);
-
-        switch (LocalCache.ChatMessageCopyMode) {
-            case 1:
-                StdUtil.ClipBoardCopy(text);
-                break;
-            case 2:
-                try {
-                    if (this._controller.VoiceCode.length > 0) {
-                        let json = JSON.parse(this._controller.VoiceCode);
-                        json.Message = text;
-                        JSON.stringify(json)
-                        StdUtil.ClipBoardCopy(JSON.stringify(json));
-                    }
-                    break;
-                }
-                catch (e) {
-                    let msg = "VoiceCode Error\n" + e.toString();
-                    alert(msg);
-                }
-        }
     }
 
 
