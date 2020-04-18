@@ -1,10 +1,6 @@
 import StdUtil from "../../../Base/Util/StdUtil";
-import LinkUtil from "../../../Base/Util/LinkUtil";
 import SpeechUtil from "../../../Base/Util/SpeechUtil";
-
 import LocalCache from '../../../Contents/Cache/LocalCache';
-import * as Timeline from "../../../Contents/IndexedDB/Timeline";
-
 import HomeVisitorController from "../HomeVisitorController";
 import ChatMessageSender from '../../../Contents/Sender/ChatMessageSender';
 import ChatInfoSender from '../../../Contents/Sender/ChatInfoSender';
@@ -13,23 +9,12 @@ import IntervalSend from '../../../Base/Util/IntervalSend';
 export default class InputPaneController {
 
     private _textareaElement = document.getElementById('sbj-inputpanel-text') as HTMLInputElement;
-    private _selectActorButton = document.getElementById('sbj-inputpanel-select-actor-button');
     private _sendMessageButton = document.getElementById('sbj-inputpanel-send-message-button') as HTMLInputElement;
-
-    private _voiceSpeech = document.getElementById('sbj-inputpanel-speech');
-    private _voiceSpeechOn = document.getElementById('sbj-inputpanel-speech-on');
-    private _voiceSpeechOff = document.getElementById('sbj-inputpanel-speech-off');
 
     private _voiceRecognition = document.getElementById('sbj-inputpanel-send-message-recognition');
     private _voiceRecognitionOn = document.getElementById('sbj-inputpanel-send-message-recognition-on');
     private _voiceRecognitionOff = document.getElementById('sbj-inputpanel-send-message-recognition-off');
-
-    private _voiceMic = document.getElementById('sbj-inputpanel-voicechatmic') as HTMLInputElement;
-    private _profileFrame = document.getElementById('sbj-profile-frame') as HTMLFrameElement;
-
     private _controller: HomeVisitorController;
-    private _unreadMap: Map<string, number>;
-    private _lastTlmCtime: number;
 
     private _isVoiceSpeech: boolean;
     private _isVoiceRecognition: boolean;
@@ -40,28 +25,20 @@ export default class InputPaneController {
      * @param controller 
      */
     constructor(controller: HomeVisitorController) {
+
         this._controller = controller;
-        this._unreadMap = new Map<string, number>();
-        this._lastTlmCtime = 0;
 
         document.onkeyup = this.OnOtherKeyPress;
 
         //  イベント設定
         this._textareaElement.onkeydown = (e) => { this.OnKeyDown(e); };
-        //  this._textareaElement.onkeyup = (e) => { this.OnTextChange(); }
         this._textareaElement.oninput = (e) => { this.OnTextChange(); }
-        this._selectActorButton.onclick = (e) => { this.DoShowActorSelectPanel(); };
         this._sendMessageButton.onclick = (e) => { this.SendInputMessage(); };
-
-        this._voiceSpeech.onclick = (e) => {
-            this.ChangeVoiceSpeech();
-        }
 
         this._voiceRecognition.onclick = (e) => {
             this.ChangeVoiceRecognition();
         }
 
-        this._voiceMic.hidden = true;
         this.ClearText();
     }
 
@@ -252,70 +229,6 @@ export default class InputPaneController {
         chm.iid = actor.dispIid;
         chm.isInputing = isInput;
         this._intervalSend.Send(chm, (s) => { this._controller.SwPeer.SendToOwner(s); });
-    }
-
-
-    /**
-     * アクター選択パネルの表示
-     */
-    private DoShowActorSelectPanel() {
-
-        let controller = this._controller;
-        let useActors = controller.UseActors;
-        let aid = controller.CurrentAid;
-
-        let src = LinkUtil.CreateLink("../SelectActor/") + "?aid=" + aid;
-
-        this._profileFrame.src = null;
-        this._profileFrame.onload = () => {
-            this._profileFrame.hidden = false;
-            this._profileFrame.onload = null;
-        }
-        this._profileFrame.src = src;
-    }
-
-
-    /**
-     * 未読メッセージ数の表示
-     * @param tlms 
-     */
-    public SetUnreadCount(tlms: Array<Timeline.Message>) {
-
-        if (!tlms) {
-            return;
-        }
-
-        let map = this._unreadMap;
-        tlms.forEach((tlm) => {
-
-            if (this._lastTlmCtime < tlm.ctime) {
-                //  新規発言データのみを対象とする（訂正データは対象外）
-                if (tlm.ctime === tlm.utime) {
-                    let hid = tlm.hid;
-                    let count = (map.has(hid) ? map.get(hid) + 1 : 1);
-                    map.set(hid, count);
-                    this._lastTlmCtime = tlm.ctime;
-                }
-            }
-        });
-    }
-
-
-    /**
-     * 
-     */
-    public ClearUnreadCount() {
-        this._unreadMap.set(this._controller.CurrentHid, 0);
-    }
-
-
-    /**
-     * チャットのテキスト読上げ有無
-     */
-    private ChangeVoiceSpeech() {
-        this._isVoiceSpeech = !this._isVoiceSpeech;
-        this._voiceSpeechOn.hidden = !this._isVoiceSpeech;
-        this._voiceSpeechOff.hidden = this._isVoiceSpeech;
     }
 
 

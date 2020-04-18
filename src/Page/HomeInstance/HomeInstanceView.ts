@@ -1,13 +1,10 @@
 
 import AbstractServiceView, { OnViewLoad } from "../../Base/AbstractServiceView";
 
-import * as Home from "../../Contents/IndexedDB/Home";
-
 import StdUtil from "../../Base/Util/StdUtil";
 import LinkUtil from "../../Base/Util/LinkUtil";
 
 import HomeInstanceController from "./HomeInstanceController";
-import { RoomView } from "./Room/RoomView";
 import LocalCache from "../../Contents/Cache/LocalCache";
 import ClearTimelineSender from "../../Contents/Sender/ClearTimelineSender";
 import MdlUtil from "../../Contents/Util/MdlUtil";
@@ -40,36 +37,15 @@ export default class HomeInstanceView extends AbstractServiceView<HomeInstanceCo
             this.ClearTimeline();
         };
 
-        document.getElementById('sbj-home-instance-room-add-button').onclick = (e) => {
-            //  新規追加
-            let hid = StdUtil.CreateUuid();
-            this.DoShowRoomEditDialog(hid);
-        }
-
-        //  プロフィール画面からのダイアログクローズ通知
-        document.getElementById('sbj-room-frame-close').onclick = (e) => {
-            this._roomFrame.hidden = true;
-            this.Controller.Model.GetRooms((rooms) => {
-                this.Controller.Room.ChangeRoomInfo(rooms);
-            });
-        }
-
-        //  ルーム情報を表示
-        let roomViewSet = (rooms) => {
-            let element = document.getElementById("sbj-home-instance-rooms");
-            this.Controller.Room = new RoomView(this.Controller, element, rooms);
-            callback();
-        }
-
         this.Controller.Model.GetRooms((rooms) => {
             if (rooms && rooms.length > 0) {
-                roomViewSet(rooms);
+                callback();
             }
             else {
                 //  ルーム情報が存在しない場合、デフォルトデータをセットして表示
                 this.Controller.Model.CreateDefaultData(() => {
                     this.Controller.Model.GetRooms((rooms) => {
-                        roomViewSet(rooms);
+                        callback();
                     });
                 });
             }

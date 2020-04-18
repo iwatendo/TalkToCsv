@@ -1,5 +1,4 @@
 import { Actor } from "../IndexedDB/Personal";
-import StdUtil from "../../Base/Util/StdUtil";
 
 /**
  * アクター情報

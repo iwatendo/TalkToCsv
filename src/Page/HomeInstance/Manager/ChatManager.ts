@@ -2,12 +2,8 @@ import * as Timeline from "../../../Contents/IndexedDB/Timeline";
 
 import StdUtil from "../../../Base/Util/StdUtil";
 
-import { OnRead } from "../../../Base/AbstractServiceModel";
-
-import HomeInstanceModel from "../HomeInstanceModel";
 import HomeInstanceController from "../HomeInstanceController";
 import RoomManager from "./RoomManager";
-
 import ChatMessageSender from "../../../Contents/Sender/ChatMessageSender";
 import TimelineSender from "../../../Contents/Sender/TimelineSender";
 import ChatInfoSender from "../../../Contents/Sender/ChatInfoSender";
@@ -179,7 +175,6 @@ export default class ChatManager {
      */
     public GetBeforeMessages(hid: string, count: number): Array<Timeline.Message> {
 
-        let result = new Array<Timeline.Message>();
         let list = this._tlmsgs.filter(tlm => tlm.hid === hid);
 
         let end = list.length;

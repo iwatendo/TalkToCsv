@@ -2,19 +2,14 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
 import * as Home from "../../Contents/IndexedDB/Home";
-import { Icon } from "../../Contents/IndexedDB/Personal";
 import * as Timeline from "../../Contents/IndexedDB/Timeline";
 
 import AbstractServiceView, { OnViewLoad } from "../../Base/AbstractServiceView";
-import ImageInfo from "../../Base/Container/ImageInfo";
 
 import { TimelineComponent } from "./Timeline/TimelineComponent";
 import HomeVisitorController from "./HomeVisitorController";
 import InputPaneController from "./InputPane/InputPaneController";
-import LinkUtil from '../../Base/Util/LinkUtil';
 import ChatInfoSender from '../../Contents/Sender/ChatInfoSender';
-import StyleCache from '../../Contents/Cache/StyleCache';
-import MdlUtil from '../../Contents/Util/MdlUtil';
 
 
 export default class HomeVisitorView extends AbstractServiceView<HomeVisitorController> {
@@ -25,9 +20,6 @@ export default class HomeVisitorView extends AbstractServiceView<HomeVisitorCont
     private _disconnectElement = document.getElementById('sbj-home-visitor-disconnect');
     private _timelineElement = document.getElementById('sbj-home-visitor-timeline-component');
     private _headElement = document.getElementById('sbj-home-visitor-header');
-    private _headTitleElement = document.getElementById('sbj-home-visitor-title');
-    private _headTitleAccountCountElement = document.getElementById('sbj-home-visitor-account-count');
-    private _headRoomMemberElement = document.getElementById('sbj-home-visitor-room-member');
 
     public InputPane: InputPaneController;
 
@@ -36,21 +28,9 @@ export default class HomeVisitorView extends AbstractServiceView<HomeVisitorCont
      */
     protected Initialize(callback: OnViewLoad) {
 
-        this.SetSplitPane();
-
         document.getElementById('sbj-home-visitor-timeline-component').onscroll = (e) => {
             this.OnTimelineScroll();
         };
-
-        //  「ユーザー設定」のタブを開く
-        document.getElementById('sbj-user-settings').onclick = (e) => {
-            window.open("../usersettings/");
-        };
-
-        //  「接続URLのコピー」
-        let linkurl = LinkUtil.CreateLink("../HomeVisitor/", LinkUtil.GetPeerID());
-        let clipcopybtn = document.getElementById('sbj-home-visitor-linkcopy') as HTMLButtonElement;
-        MdlUtil.SetCopyLinkButton(linkurl, "接続URL", clipcopybtn);
 
         //  切断時の「再接続」ボタン
         document.getElementById('sbj-home-visitor-disconnect-retry').onclick = (e) => {
@@ -68,32 +48,8 @@ export default class HomeVisitorView extends AbstractServiceView<HomeVisitorCont
             }
         }, 10000);
 
-        this.SetServiceListEvent(this.Controller.SwPeer.PeerId);
-
-        //  カーソルのCSSキャッシュエレメント指定
-        StyleCache.SetCacheElement(document.getElementById('sbj-home-visitor-main'));
-
         //  
         callback();
-    }
-
-
-    /**
-     * 連動サービスの選択時イベント設定
-     * @param peerid 
-     */
-    public SetServiceListEvent(peerid: string) {
-
-        let clickevent = (url: string) => {
-            let link = LinkUtil.CreateLink(url, peerid);
-            window.open(link, "_blank");
-        }
-
-        document.getElementById('sbj-service-castinstance').onclick = (e) => { clickevent("../CastInstance/"); }
-        document.getElementById('sbj-service-castinstance-screenshare').onclick = (e) => { clickevent("../CastInstanceScreenShare/"); }
-        document.getElementById('sbj-service-castinstance-mobile').onclick = (e) => { clickevent("../CastInstanceMobileQR/"); }
-        document.getElementById('sbj-service-gadgetinstance-youtube').onclick = (e) => { clickevent("../GadgetInstance/"); }
-        document.getElementById('sbj-service-livehtml').onclick = (e) => { clickevent("../LiveHTMLInstance/"); }
     }
 
 
@@ -104,34 +60,6 @@ export default class HomeVisitorView extends AbstractServiceView<HomeVisitorCont
         document.getElementById('sbj-home-visitor-connection-timeout').hidden = true;
         document.getElementById('sbj-home-visitor-multi-boot').hidden = false;
         this._isBooting = false;
-    }
-
-
-    /**
-     * スプリットパネルの「仕切り」の移動をスムーズにさせる為の制御
-     * ※移動中に他パネルにフォーカスが行かないように一時的InnerDivの幅を広げる
-     */
-    public SetSplitPane() {
-        //  スプリットパネルのスライド時に
-        //  他フレームにフォーカスが当たらないようにする
-        let splitDivider = document.getElementById('sbj-home-visitor-divider');
-        splitDivider.onmousedown = (e) => {
-            let elements = document.getElementsByClassName("split-pane-divider-inner");
-            if (elements.item.length > 0) {
-                let ele = elements.item(0) as HTMLElement;
-                ele.style.width = "2048px";
-                ele.style.left = "-1048px";
-            }
-        };
-
-        splitDivider.onmouseup = (e) => {
-            let elements = document.getElementsByClassName("split-pane-divider-inner");
-            if (elements.item.length > 0) {
-                let ele = elements.item(0) as HTMLElement;
-                ele.style.width = "10px";
-                ele.style.left = "-5px";
-            }
-        };
     }
 
 
@@ -169,24 +97,8 @@ export default class HomeVisitorView extends AbstractServiceView<HomeVisitorCont
             //  ルームの変更があった場合は
             //  変更先のルーム情報の取得と再描画
             this.Controller.CurrentHid = room.hid;
-            this.SetRoomDisplay(room);
             this.Controller.GetTimeline(room.hid);
         }
-    }
-
-
-    /**
-     * 部屋の表示変更
-     * @param room 
-     */
-    public SetRoomDisplay(room: Home.Room) {
-
-        //  上部タイトル変更
-        let title = room.name;
-        this._headTitleElement.textContent = title;
-
-        //  部屋の背景画像変更
-        ImageInfo.SetCss("sbj-home-visitor-main", room.background);
     }
 
 
@@ -218,8 +130,6 @@ export default class HomeVisitorView extends AbstractServiceView<HomeVisitorCont
 
             ReactDOM.render(<TimelineComponent key={"timeline"} controller={this.Controller} messages={dispTlmsgs} inputs={ings} />, this._timelineElement, () => {
 
-                this.InputPane.SetUnreadCount(tlms);
-
                 if (isScrollMax) {
                     this.MoveLastTimeline();
                 }
@@ -243,9 +153,6 @@ export default class HomeVisitorView extends AbstractServiceView<HomeVisitorCont
      */
     public MoveLastTimeline() {
         this._timelineElement.scrollTop = 4294967295;
-        if (this.InputPane) {
-            this.InputPane.ClearUnreadCount();
-        }
     }
 
 
@@ -257,21 +164,5 @@ export default class HomeVisitorView extends AbstractServiceView<HomeVisitorCont
         this.SetTimeline(new Array<Timeline.Message>(), new Array<ChatInfoSender>());
     }
 
-
-    /**
-     * アイコン画像のCSS設定
-     * @param icon 
-     */
-    public SetIconCss(icon: Icon) {
-
-        if (icon) {
-            //  チャットの文字色 / 背景色設定
-            StyleCache.SetTimelineMsgStyle(icon.iid, icon);
-            //  アイコン設定
-            if (icon.img) {
-                StyleCache.SetIconStyle(icon.iid, icon.img);
-            }
-        }
-    }
 
 }

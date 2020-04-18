@@ -1,9 +1,6 @@
-
-import { Actor } from "../../../Contents/IndexedDB/Personal";
 import LogUtil from "../../../Base/Util/LogUtil";
 import { OnRead } from "../../../Base/AbstractServiceModel";
 
-import HomeInstanceModel from "../HomeInstanceModel";
 import HomeInstanceController from "../HomeInstanceController";
 import ActorInfo from "../../../Contents/Struct/ActorInfo";
 import UseActorSender from "../../../Contents/Sender/UseActorSender";
@@ -223,9 +220,6 @@ export default class RoomManager {
             //  各ユーザーへ通知
             this._controller.SwPeer.SendTo(peerid, rmi);
         });
-
-        //  RoomViewへの通知
-        this._controller.Room.ChangeRoomMember(rmi.hid, rmi.members);
     }
 
     /**

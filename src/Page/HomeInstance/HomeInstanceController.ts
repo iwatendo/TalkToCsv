@@ -8,7 +8,6 @@ import HomeInstanceView from "./HomeInstanceView";
 import HomeInstanceModel from "./HomeInstanceModel";
 
 import ManagerController from "./Manager/ManagerController";
-import { RoomView } from "./Room/RoomView";
 import LocalCache from "../../Contents/Cache/LocalCache";
 import GetRoomSender from "../../Contents/Sender/GetRoomSender";
 import RoomSender from "../../Contents/Sender/RoomSender";
@@ -22,7 +21,6 @@ export default class HomeInstanceController extends AbstractServiceController<Ho
 
     public PeerID: string;
     public Manager: ManagerController;
-    public Room: RoomView;
 
 
     /**

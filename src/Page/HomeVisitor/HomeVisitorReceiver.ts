@@ -54,10 +54,6 @@ export default class HomeVisitorReceiver extends AbstractServiceReceiver<HomeVis
         if (sender.type === RoomSender.ID) {
             let room = (sender as RoomSender).room;
             this.Controller.RoomCache.Set(room);
-
-            if (this.Controller.CurrentHid === room.hid) {
-                this.Controller.View.SetRoomDisplay(room);
-            }
         }
 
         //  ルーム内のアクターの変更
