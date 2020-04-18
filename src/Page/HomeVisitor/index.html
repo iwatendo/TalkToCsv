@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="ja-jp">
+
+<head>
+	<title>Skybeje-ChatClient</title>
+	<meta charset='utf-8'>
+	<link rel="icon" type="image/vnd.microsoft.icon" href="/image/favicon_chat.ico">
+	<script src='/lib/jquery-2.2.3.min.js'></script>
+	<script src='/lib/forcedtimer.js'></script>
+	<script src='/lib/skyway.min.js'></script>
+	<link rel='stylesheet' href='/lib/material.min.css' />
+	<link rel="stylesheet" href="/lib/split-pane.css" />
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+	<link rel='stylesheet' href='../common.css?v={version}' />
+	<link rel='stylesheet' href='../common.dialog.css?v={version}' />
+	<link rel='stylesheet' href='style.css?v={version}' />
+	<script src="/lib/split-pane.js"></script>
+	<script src="/lib/material.min.js"></script>
+	<script>
+		$(function () {
+			$('div.split-pane').splitPane();
+		});
+	</script>
+</head>
+
+<body>
+
+	<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+		<header id="sbj-home-visitor-header" class="mdl-layout__header mdl-color--grey-100 mdl-color-text--grey-600" hidden>
+			<div class="sbj-home-visitor-header-row mdl-layout__header-row">
+
+				<span id="sbj-home-visitor-title" class="mdl-layout-title"></span>
+				<div id="sbj-home-visitor-account-count" class="material-icons mdl-badge mdl-badge--overlap" data-badge="0">person</div>
+				<div class="mdl-tooltip" data-mdl-for="sbj-home-visitor-account-count">
+					この部屋への接続数
+				</div>
+				<button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" id="sbj-home-visitor-room-member-disp">
+					<i class="material-icons">arrow_drop_down</i>
+				</button>
+				<ul id="sbj-home-visitor-room-member" class="mdl-menu mdl-js-menu mdl-js-ripple-effect mdl-menu--bottom-left" for="sbj-home-visitor-room-member-disp">
+				</ul>
+				<button id='sbj-home-visitor-linkcopy' class="mdl-button mdl-js-button mdl-button--colored">
+					&nbsp; 接続URLのコピー &nbsp;
+				</button>
+				<div class="mdl-layout-spacer"></div>
+
+				<button id='sbj-home-visitor-servent-list-disp' class="mdl-button mdl-js-button mdl-button--colored mdl-menu--bottom-right">
+					&nbsp; 表示中のサービス一覧 &nbsp;
+				</button>
+				<ul id="sbj-home-visitor-servent-list" class="mdl-menu mdl-js-menu mdl-js-ripple-effect mdl-menu--bottom-right" for="sbj-home-visitor-servent-list-disp">
+				</ul>
+
+				<span>
+					&nbsp; &nbsp;
+				</span>
+
+				<button id='sbj-service-list-disp' class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
+					<i class="material-icons">apps</i>
+					&nbsp; 連動サービス &nbsp;
+				</button>
+
+				<ul id="sbj-service-list" class="mdl-menu mdl-js-menu mdl-js-ripple-effect mdl-menu--bottom-right" for="sbj-service-list-disp">
+					<div>
+						<li class="sbj-service-list-item mdl-list__item" id="sbj-service-castinstance">
+							<i class="material-icons">videocam</i>
+							&nbsp; ライブキャスト
+						</li>
+						<li class="sbj-service-list-item mdl-list__item" id="sbj-service-castinstance-mobile">
+							<i class="material-icons">smartphone</i>
+							&nbsp; ライブキャスト（モバイル）
+						</li>
+						<li class="sbj-service-list-item mdl-list__item" id="sbj-service-castinstance-screenshare">
+							<i class="material-icons">screen_share</i>
+							&nbsp; スクリーンシェア
+						</li>
+						<li class="sbj-service-list-item mdl-list__item" id="sbj-service-gadgetinstance-youtube">
+							<i class="material-icons">ondemand_video</i>
+							&nbsp; YouTube同期再生
+						</li>
+						<li class="sbj-service-list-item mdl-list__item" id="sbj-service-livehtml">
+							<i class="material-icons">web</i>
+							&nbsp; ライブHTML
+						</li>
+					</div>
+				</ul>
+
+			</div>
+		</header>
+
+		<div class="sbj-home-visitor mdl-color-text--grey-600" id="sbj-home-visitor">
+			<!---->
+			<div>
+				<h4 class="sbj-home-visitor-connecting">接続しています</h4>
+			</div>
+			<div class="mdl-card__supporting-text">
+				<div id="sbj-home-visitor-console-log"></div>
+			</div>
+			<div id="sbj-home-visitor-multi-boot" hidden>
+				<h4 class="sbj-home-visitor-connecting">
+					接続に失敗しました
+				</h4>
+				<h5 class="sbj-home-visitor-connecting">
+					・クライアントの多重起動が検出されました。</br>
+					・同一端末からの複数クライアントの起動はできません。</br>
+					</br>
+					<a href="" onclick="location.reload()">再接続</a>
+				</h5>
+			</div>
+			<div id="sbj-home-visitor-connection-timeout" hidden>
+				<h4 class="sbj-home-visitor-connecting">
+					接続に失敗しました
+				</h4>
+				<h5 class="sbj-home-visitor-connecting">
+					</br>
+					以下のいずれかの理由により、接続できなかった可能性があります</br>
+					</br>
+					・接続先のチャットサーバーインスタンスが既に閉じられている</br>
+					・同一端末からの複数クライアントの起動</br>
+					・接続先／接続元のどちらかの、ファイヤーウォールでの接続のブロック(※)</br>
+					・ネットワークの不調または切断によるタイムアウト</br>
+				</h5>
+				<h6 class="sbj-home-visitor-connecting">
+					※SkyWay(WebRTC)は通信プロトコルとして TCP(WebSocket,HTTPS)及びUDPを使用しています。</br>
+					ファイヤーウォールにて使用するプロトコルまたはポートがブロックされている場合、当サービスは利用できません。</br>
+					詳細については
+					<a href="https://support.skyway.io/hc/ja/articles/115002273767-SkyWay%E3%81%AE%E9%80%9A%E4%BF%A1%E8%A6%81%E4%BB%B6%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6"
+					 target="_blank">SkyWayの通信要件</a>を確認してください。</br>
+				</h6>
+			</div>
+		</div>
+
+		<div class="split-pane fixed-left" id="sbj-home-visitor-main" hidden>
+
+			<div class="split-pane-component sbj-split-pane-component-left">
+
+				<div id="sbj-home-visitor-timeline-component">
+					<!---->
+				</div>
+
+				<div id="sbj-home-visitor-inputpane">
+					<div class="sbj-inputpanel" id="sbj-inputpanel">
+						<div class="mdl-card__actions sbj-inputpanel-action">
+
+							<span class="sbj-inputpanel-actor-name" id="sbj-inputpanel-actor-name"></span>
+							<div class="sbj-unread-count">
+								<div id="sbj-inputpanel-noread-other-room-count" class="sbj-inputpanel-noread-icon material-icons mdl-badge mdl-badge--overlap"
+								 data-badge="0">chat</div>
+								<div class="mdl-tooltip" data-mdl-for="sbj-inputpanel-noread-other-room-count">
+									未表示メッセージ数
+								</div>
+								<button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" id="sbj-inputpanel-other-room-button">
+									<i class="material-icons">arrow_drop_up</i>
+								</button>
+								<div class="mdl-tooltip" data-mdl-for="sbj-inputpanel-other-room-button">
+									参加ルーム
+								</div>
+								<ul id="sbj-inputpanel-other-room-list" class="mdl-menu mdl-js-menu mdl-menu--top-right" for="sbj-inputpanel-other-room-button">
+								</ul>
+							</div>
+						</div>
+						<div class="sbj-inputpanel-icontext">
+							<div class='sbj-inputpanel-actor-icon' id='sbj-inputpanel-actor-icon'>
+							</div>
+							<div class="mdl-tooltip" data-mdl-for="sbj-inputpanel-actor-icon">
+								複数アイコン登録時
+								<br/>クリックでアイコン変更
+							</div>
+							<textarea class='sbj-inputpanel-text' id='sbj-inputpanel-text' maxLength=1024 rows=3 spellCheck='false'>
+							</textarea>
+						</div>
+						<div class="mdl-card__actions sbj-inputpanel-action">
+							<button id='sbj-user-settings' class="mdl-button mdl-js-button mdl-button--colored">
+								<i class="material-icons">settings</i>設定
+								<div class="mdl-tooltip" data-mdl-for="sbj-user-settings">ユーザー設定</div>
+							</button>
+							<button class="sbj-inputpanel-button mdl-button mdl-button--colored" id="sbj-inputpanel-actor-edit-button">
+								<i class="material-icons">account_box</i>プロフィール
+							</button>
+							<button class="sbj-inputpanel-button mdl-button mdl-button--colored" id="sbj-inputpanel-select-actor-button" hidden>
+								<i class="material-icons">recent_actors</i>アクター
+							</button>
+							<button class="sbj-inputpanel-button mdl-button mdl-button--colored" id="sbj-inputpanel-speech" hidden>
+								<span id="sbj-inputpanel-speech-on" hidden>
+									<i class="material-icons">record_voice_over</i>テキスト読上</span>
+								<span id="sbj-inputpanel-speech-off">
+									<i class="material-icons">volume_off</i>テキスト読上</span>
+							</button>
+							<button class="sbj-inputpanel-button mdl-button" id="sbj-inputpanel-send-message-recognition">
+								<span id="sbj-inputpanel-send-message-recognition-on" hidden>
+									<i class="material-icons">speaker_notes</i>音声認識ON</span>
+								<span id="sbj-inputpanel-send-message-recognition-off">
+									<i class="material-icons">speaker_notes_off</i>音声認識OFF</span>
+							</button>
+							<button class="sbj-inputpanel-button-right mdl-button mdl-button--colored" id="sbj-inputpanel-send-message-button">
+								<i class="material-icons">send</i>送信
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<!-- SkybejeチャットのVoiceChatは廃止（内部的に処理は残す）-->
+				<div class="sbj-speechpanel" id="sbj-speechpanel" hidden>
+					<div class="mdl-card__actions sbj-inputpanel-action">
+						<div class="sbj-inpupanel-voicechat-member" id="sbj-inpupanel-voicechat-member"></div>
+						<button class="sbj-inputpanel-button-right mdl-button mdl-button--colored" id="sbj-inputpanel-voicechat">
+							<span id="sbj-inputpanel-voicechat-on" hidden>
+								<i class="material-icons">phone_missed</i>通話中</span>
+							<span id="sbj-inputpanel-voicechat-off">
+								<i class="material-icons">phone_in_talk</i>グループ通話</span>
+						</button>
+						<button class="sbj-inputpanel-button-right mdl-button mdl-button--colored" id="sbj-inputpanel-voicechat-settings">
+							<span id="sbj-inputpanel-voicechatmic-settings-label">
+								<i class="material-icons">settings</i>マイク設定</span>
+						</button>
+						<button class="sbj-inputpanel-button-right mdl-button mdl-button--colored" id="sbj-inputpanel-voicechatmic">
+							<span id="sbj-inputpanel-voicechatmic-on" hidden>
+								<i class="material-icons">mic</i>マイク</span>
+							<span id="sbj-inputpanel-voicechatmic-off">
+								<i class="material-icons">mic_off</i>マイク</span>
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="split-pane-divider" id="sbj-home-visitor-divider"></div>
+
+			<div class="split-pane-component sbj-split-pane-component-right" id="sbj-home-visitor-gadget-component">
+				<div id="sbj-home-visitor-castfrmae-pane">
+						<iframe class="sbj-home-visitor-livecast" id="sbj-home-visitor-livecast-0"></iframe>
+						<iframe class="sbj-home-visitor-livecast" id="sbj-home-visitor-livecast-1"></iframe>
+						<iframe class="sbj-home-visitor-livecast" id="sbj-home-visitor-livecast-2"></iframe>
+						<iframe class="sbj-home-visitor-livecast" id="sbj-home-visitor-livecast-3"></iframe>
+						<iframe class="sbj-home-visitor-livecast" id="sbj-home-visitor-livecast-4"></iframe>
+						<iframe class="sbj-home-visitor-livecast" id="sbj-home-visitor-livecast-5"></iframe>
+					</div>
+				</div>
+			</div>
+
+		<div class="sbj-home-visitor mdl-color-text--grey-600" id="sbj-home-visitor-disconnect" hidden>
+			<div class="mdl-card__supporting-text">
+				<h4>
+					接続先のチャットサーバーインスタンスが閉じられました。
+					<br /> または、ネットワークが切断されました。
+					<br />
+				</h4>
+			</div>
+			<div class="sbj-home-visitor-disconnect-action mdl-card__actions">
+				<button id='sbj-home-visitor-disconnect-retry' class="mdl-button mdl-button--raised mdl-button--colored">
+					<i class="material-icons">exit_to_app</i>
+					&nbsp; 再接続 &nbsp;
+				</button>
+			</div>
+		</div>
+
+	</div>
+
+	<!-- Profile -->
+	<iframe id="sbj-profile-frame" class="sbj-profile-frame" hidden>
+	</iframe>
+
+	<!--Common Dialog-->
+	<dialog id='sbj-dialog' class='sbj-dialog'>
+		<div class="sbj-dialog-background" id="sbj-dialog-background">
+
+			<div id="sbj-dialog-card" class="sbj-dialog-card mdl-card mdl-shadow--2dp flexiblebox">
+
+				<!-- 上部ボタン郡 -->
+				<div class="mdl-card__actions">
+					<div class="sbj-dialog-attach-action-left mdl-card__subtitle-text">
+						<i id="sbj-dialog-title-icon" class="material-icons sbj-dialog-title-icon"></i>
+						<h4 class="sbj-dialog-title">
+							<span id="sbj-dialog-title-value"></span>
+						</h4>
+					</div>
+					<div class="sbj-dialog-attach-action-right">
+						<button id='sbj-dialog-close' class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect sbj-dialog-close">
+							<i class="material-icons">close</i>
+						</button>
+					</div>
+				</div>
+
+				<!--表示エリア-->
+				<div id="sbj-dialog-view" class="sbj-dialog-view mdl-card__supporting-text mdl-card--expand">
+					<!--Reactで生成-->
+				</div>
+
+				<!-- 下部ボタン郡 -->
+				<div class="mdl-card__actions">
+					<div class="sbj-dialog-attach-action-left">
+					</div>
+
+					<div class="sbj-dialog-attach-action-right">
+						<button id='sbj-dialog-delete' tabindex=-1 class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+							<i class="material-icons">delete_forever</i>&nbsp;削除&nbsp;
+						</button>
+						<button id='sbj-dialog-update' class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">
+							<i class="material-icons">done</i>&nbsp;更新&nbsp;
+						</button>
+						<button id='sbj-dialog-done' class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">
+							<i class="material-icons">done</i>&nbsp;追加&nbsp;
+						</button>
+						<button id='sbj-dialog-select' class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">
+							<i class="material-icons">done</i>&nbsp;選択&nbsp;
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</dialog>
+
+	<!--sbj-voicechat-setting Dialog-->
+	<dialog id='sbj-voicechat-setting-dialog' class='sbj-dialog'>
+		<div id="sbj-voicechat-setting-background" class="sbj-dialog-background">
+
+			<div class="sbj-voicechat-setting-card mdl-card mdl-shadow--2dp flexiblebox">
+				<div class="sbj-voicechat-device">
+					<!-- Mic -->
+					<div class="sbj-voicechat-device-select mdl-textfield mdl-js-textfield mdl-textfield--floating-label mdl-select" id="mic-select-div">
+						<input class="mdl-textfield__input" type="text" spellcheck="false" readonly id="mic-select" />
+						<label class="mdl-textfield__label" for="mic-select" maxlength='40'>マイク</label>
+						<ul id="mic-list" class="mdl-menu mdl-menu--top-left mdl-js-menu mdl-js-ripple-effect" for="mic-select">
+							<li class="mdl-menu__item"></li>
+						</ul>
+					</div>
+					<!-- トラブルシュート -->
+					<div>
+						<a href="https://github.com/iwatendo/skybeje/wiki/Troubleshooting" target="_blunk">グループ通話ができない場合</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</dialog>
+
+	<script src="/lib/react.min.js"></script>
+	<script src="/lib/react-dom.min.js"></script>
+	<script src="bundle.js?v={version}"></script>
+
+</body>
+
+</html>

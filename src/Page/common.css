@@ -1,0 +1,120 @@
+﻿html, body {
+    height: 100%;
+}
+
+body {
+    margin: 0px;
+    border: 0px;
+    padding: 0;
+    width: 100%;
+    font-family: "Roboto","Hiragino Kaku Gothic ProN","Meiryo", sans-serif;
+}
+
+:root{
+    --sbj-color-default-text: #555;
+    --sbj-color-highlight-text: whitesmoke;
+    --sbj-color-link-text: #0099ff;
+    --sbj-color-warning-text: #FF3333;
+    
+    --sbj-color-default-chatroom: rgb(245,245,245);
+    --sbj-color-default-background:  rgba(255,255,255,.75);
+    --sbj-color-edge-background:  rgba(0,0,0,.3);
+    --sbj-color-cast-background:  rgba(255,255,255,.3);
+    --sbj-color-timeline-panel:  rgba(255,255,255,.3);
+    --sbj-color-room-default-background: #F5F5F5;
+    --sbj-color-livecast-background:  rgba(255,255,255,.2);
+
+    --sbj-color-inputarea-background: rgba(230,236,240,.75);
+    --sbj-color-inputarea-border: darkgray;
+    
+    --sbj-color-menu-navi: rgba(255, 255, 255, 0.56);
+    --sbj-color-menu-navi-text: #37474F;
+    --sbj-color-menu-navi-border: darkgray;
+    --sbj-color-menu-navi-background: #00BCD4;
+    --sbj-color-menu-navi-background-hover: rgba(0, 188, 212, 0.90);
+    --sbj-color-menu-profile-grid: whitesmoke;
+
+    --sbj-color-timeline-ballon: #191970;
+    --sbj-color-timeline-inputing-ballon: #4169e1;
+    --sbj-color-timeline-message: whitesmoke;
+    --sbj-color-timeline-message-ignore: #444;
+    --sbj-color-timeline-name: #BBB;
+    --sbj-color-timeline-name-background: #333;
+
+    --sbj-color-image-dialog-text: #808080;
+    --sbj-color-image-dialog-append: #46B6AC;
+    --sbj-color-image-dialog-css-select: rgba(237,164,158,.9);
+
+    --sbj-color-gadget-dialog-append: #46B6AC;
+
+    --sbj-color-actor-selection: lightblue;
+    --sbj-color-cast-cursor: whitesmoke;
+    --sbj-color-icon-selection: #3f51b5;
+    --sbj-color-label: #3f51b5;
+
+    --sbj-color-qrcode-background: white;
+}
+
+
+iframe {
+    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    position: relative;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    border: 0px;
+}
+
+textarea{
+    resize: none;
+}
+
+a{
+    text-decoration: none;
+}
+
+h1, h2, h3, h4, h5, h6,
+.mdl-button,
+.mdl-textfield__input,
+.mdl-list__item,
+.mdl-tooltip {
+    font-family: "Roboto","Hiragino Kaku Gothic ProN","Meiryo", sans-serif;
+}
+
+.mdl-button{
+    text-transform: none;
+}
+
+.mdl-tabs__tab{
+    text-transform: none;
+}
+
+.mdl-tooltip{
+    font-size: 14px;
+}
+
+.mdl-layout__container{
+    overflow: hidden;
+}
+
+
+.full{
+    position: absolute;
+    height:100%;
+    width:100%;
+}
+
+.fit{
+    object-fit: contain;
+    position: absolute;
+    height:100%;
+    width:100%;
+}
+
+.voicechat{
+    width: 420px;
+    height: 52px;
+}
