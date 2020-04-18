@@ -17,11 +17,11 @@ import LogController from "./Log/LogController";
 
 import ActorInfo from "../../Contents/Struct/ActorInfo";
 import ClientBootSender from "../../Contents/Sender/ClientBootSender";
-import ServentCloseSender from "../../Contents/Sender/ServentCloseSender";
 import UseActorSender from "../../Contents/Sender/UseActorSender";
 import ChatMessageSender from "../../Contents/Sender/ChatMessageSender";
 import GetTimelineSender from "../../Contents/Sender/GetTimelineSender";
 import UpdateTimelineSender from "../../Contents/Sender/UpdateTimelineSender";
+import ServentCloseSender from "../../Contents/Sender/ServentCloseSender";
 
 /**
  * 

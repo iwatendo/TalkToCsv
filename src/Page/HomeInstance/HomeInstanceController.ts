@@ -2,7 +2,6 @@
 import { Room } from "../../Contents/IndexedDB/Home";
 
 import AbstractServiceController from "../../Base/AbstractServiceController";
-import LogUtil from "../../Base/Util/LogUtil";
 
 import HomeInstanceReceiver from "./HomeInstanceReceiver";
 import HomeInstanceView from "./HomeInstanceView";
@@ -11,7 +10,6 @@ import HomeInstanceModel from "./HomeInstanceModel";
 import ManagerController from "./Manager/ManagerController";
 import { RoomView } from "./Room/RoomView";
 import LocalCache from "../../Contents/Cache/LocalCache";
-import ForcedTerminationSender from "../../Contents/Sender/ForcedTerminationSender";
 import GetRoomSender from "../../Contents/Sender/GetRoomSender";
 import RoomSender from "../../Contents/Sender/RoomSender";
 
@@ -122,8 +120,6 @@ export default class HomeInstanceController extends AbstractServiceController<Ho
         super.OnDataConnectionClose(conn);
         this.Manager.Chat.RemoveConnection(conn.remoteId);
         this.Manager.Room.RemoveConnection(conn.remoteId);
-        this.Manager.Servent.CloseServentOwner(conn.remoteId);
-        this.Manager.VoiceChat.RemoveConnection(conn.remoteId);
         conn.close();
         this.View.SetPeerCount(this.SwPeer.GetAliveConnectionCount());
     }
@@ -142,13 +138,6 @@ export default class HomeInstanceController extends AbstractServiceController<Ho
             //  ルーム情報の通知
             sender.room = room;
             this.SwPeer.SendTo(conn, sender);
-
-            //  ルーム内のサーバント情報の通知
-            let sssender = this.Manager.Servent.GetServent(req.hid);
-            this.SwPeer.SendTo(conn, sssender);
-
-            //  ボイスチャットのメンバー通知
-            this.Manager.VoiceChat.SendMemberList();
         });
     }
 

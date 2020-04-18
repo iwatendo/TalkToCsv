@@ -359,5 +359,4 @@ export default class InputPaneController {
         }
     }
 
-
 }

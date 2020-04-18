@@ -2,8 +2,6 @@
 import Sender from "../../Base/Container/Sender";
 
 import HomeInstanceController from "./HomeInstanceController";
-import ChatManager from "./Manager/ChatManager";
-import LogUtil from "../../Base/Util/LogUtil";
 
 import ClientBootSender from "../../Contents/Sender/ClientBootSender";
 import GetRoomSender from "../../Contents/Sender/GetRoomSender";
@@ -13,10 +11,6 @@ import ChatMessageSender from "../../Contents/Sender/ChatMessageSender";
 import GetTimelineSender from "../../Contents/Sender/GetTimelineSender";
 import TimelineSender from "../../Contents/Sender/TimelineSender";
 import UpdateTimelineSender from "../../Contents/Sender/UpdateTimelineSender";
-import ServentSender from "../../Contents/Sender/ServentSender";
-import ServentCloseSender from "../../Contents/Sender/ServentCloseSender";
-import ForcedTerminationSender from "../../Contents/Sender/ForcedTerminationSender";
-import VoiceChatMemberSender from "../../Contents/Sender/VoiceChatMemberSender";
 import ChatInfoSender from "../../Contents/Sender/ChatInfoSender";
 
 
@@ -75,22 +69,6 @@ export default class HomeInstanceReceiver extends AbstractServiceReceiver<HomeIn
             let utl = sender as UpdateTimelineSender;
             this.Controller.Manager.Chat.UpdateTimeline(utl.message);
         }
-
-        //  サーバントの起動/更新通知
-        if (sender.type === ServentSender.ID) {
-            this.Controller.Manager.Servent.SetServent(sender as ServentSender);
-        }
-
-        //  サーバントの終了通知
-        if (sender.type === ServentCloseSender.ID) {
-            this.Controller.Manager.Servent.CloseServent(sender as ServentCloseSender);
-        }
-
-        //  ボイスチャットルームのメンバー通知
-        if (sender.type === VoiceChatMemberSender.ID) {
-            this.Controller.Manager.VoiceChat.SetMember(sender as VoiceChatMemberSender);
-        }
-
     }
 
 
