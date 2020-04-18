@@ -221,9 +221,8 @@
 }
 
 .sbj-inputpanel-action{
-    padding:0px;
+    padding: 4px;
     clear:both;
-    margin: 0px 0px 0px -8px;
 }
 
 .sbj-inputpanel-button{
@@ -232,7 +231,7 @@
 }
 
 .sbj-inputpanel-button-right{
-    padding: 0px 8px 0px 0px;    
+    padding: 0px 20px 0px 0px;    
     float: right;
 }
 
@@ -278,7 +277,7 @@
 }
 
 textarea.sbj-inputpanel-text {
-    width: calc(100% - 124px);
+    width: calc(100% - 40px);
     height: 62px;
     margin: 4px;
     border-radius: 8px;
