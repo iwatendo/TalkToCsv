@@ -1,7 +1,7 @@
 
 import * as Timeline from "../../../Contents/IndexedDB/Timeline";
 
-import HomeVisitorController from "../HomeVisitorController";
+import GijiLockClientController from "../GijiLockClientController";
 
 
 export default class TimelineCache {
@@ -10,7 +10,7 @@ export default class TimelineCache {
     private MAX_DISP_MESSAGE = 512;
 
     //
-    private _controller: HomeVisitorController;
+    private _controller: GijiLockClientController;
 
     //  タイムラインメッセージMAP
     private _tlmsgMap = new Map<string, Map<string, Timeline.Message>>();
@@ -20,7 +20,7 @@ export default class TimelineCache {
      * コンストラクタ
      * @param controller 
      */
-    public constructor(controller: HomeVisitorController) {
+    public constructor(controller: GijiLockClientController) {
         this._controller = controller;
     }
 

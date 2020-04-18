@@ -7,12 +7,12 @@ import * as Timeline from "../../Contents/IndexedDB/Timeline";
 import AbstractServiceView, { OnViewLoad } from "../../Base/AbstractServiceView";
 
 import { TimelineComponent } from "./Timeline/TimelineComponent";
-import HomeVisitorController from "./HomeVisitorController";
+import GijiLockClientController from "./GijiLockClientController";
 import InputPaneController from "./InputPane/InputPaneController";
 import ChatInfoSender from '../../Contents/Sender/ChatInfoSender';
 
 
-export default class HomeVisitorView extends AbstractServiceView<HomeVisitorController> {
+export default class GijiLockClientView extends AbstractServiceView<GijiLockClientController> {
 
     private _isBooting: boolean = true;
     private _bootElement = document.getElementById('sbj-home-visitor');

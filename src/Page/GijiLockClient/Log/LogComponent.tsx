@@ -1,6 +1,6 @@
 ﻿import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import HomeVisitorController from "../HomeVisitorController";
+import GijiLockClientController from "../GijiLockClientController";
 import { Log } from "../../../Base/Util/LogUtil";
 
 
@@ -8,7 +8,7 @@ import { Log } from "../../../Base/Util/LogUtil";
  * プロパティ
  */
 export interface LogProp {
-    controller: HomeVisitorController;
+    controller: GijiLockClientController;
     logs: Array<Log>
 }
 

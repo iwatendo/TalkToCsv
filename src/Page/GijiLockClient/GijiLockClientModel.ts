@@ -3,13 +3,13 @@ import * as Personal from "../../Contents/IndexedDB/Personal";
 
 import AbstractServiceModel, { OnModelLoad, OnRead, OnWrite } from "../../Base/AbstractServiceModel";
 
-import HomeVisitorController from "./HomeVisitorController";
+import GijiLockClientController from "./GijiLockClientController";
 import StdUtil from "../../Base/Util/StdUtil";
 import ImageInfo from "../../Base/Container/ImageInfo";
 import LocalCache from "../../Contents/Cache/LocalCache";
 
 
-export default class HomeVisitorModel extends AbstractServiceModel<HomeVisitorController> {
+export default class GijiLockClientModel extends AbstractServiceModel<GijiLockClientController> {
 
     private _personalDB: Personal.DB;
 

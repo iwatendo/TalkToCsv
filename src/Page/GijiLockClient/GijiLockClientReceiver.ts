@@ -6,7 +6,7 @@ import StdUtil from "../../Base/Util/StdUtil";
 import Sender from "../../Base/Container/Sender";
 import ActorInfo from "../../Contents/Struct/ActorInfo";
 
-import HomeVisitorController from "./HomeVisitorController";
+import GijiLockClientController from "./GijiLockClientController";
 
 import ConnInfoSender from "../../Contents/Sender/ConnInfoSender";
 import RoomSender from "../../Contents/Sender/RoomSender";
@@ -19,7 +19,7 @@ import ActorInfoSender from "../../Contents/Sender/ActorInfoSender";
 import ProfileSender from "../../Contents/Sender/ProfileSender";
 
 
-export default class HomeVisitorReceiver extends AbstractServiceReceiver<HomeVisitorController> {
+export default class GijiLockClientReceiver extends AbstractServiceReceiver<GijiLockClientController> {
 
     /**
      * 

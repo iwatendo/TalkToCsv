@@ -1,7 +1,6 @@
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 
-import HomeVisitorController from "../HomeVisitorController";
+import GijiLockClientController from "../GijiLockClientController";
 import ChatInfoSender from '../../../Contents/Sender/ChatInfoSender';
 
 
@@ -9,7 +8,7 @@ import ChatInfoSender from '../../../Contents/Sender/ChatInfoSender';
  *  
  */
 interface TimelineInputingItemProp {
-    controller: HomeVisitorController;
+    controller: GijiLockClientController;
     chatInputing: ChatInfoSender;
 }
 

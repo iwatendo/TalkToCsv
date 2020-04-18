@@ -2,14 +2,14 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
 
-import HomeVisitorController from "../HomeVisitorController";
+import GijiLockClientController from "../GijiLockClientController";
 import LogUtil, { ILogListener, Log } from "../../../Base/Util/LogUtil";
 import LogComponent from "./LogComponent";
 
 
 export default class LogController implements ILogListener {
 
-    private _controller: HomeVisitorController;
+    private _controller: GijiLockClientController;
     private _logElement = document.getElementById('sbj-home-visitor-console-log');
     private _logs = new Array<Log>();
 
@@ -17,7 +17,7 @@ export default class LogController implements ILogListener {
      * コンストラクタ
      * @param controller 
      */
-    constructor(controller: HomeVisitorController) {
+    constructor(controller: GijiLockClientController) {
         this._controller = controller;
         LogUtil.AddListener(this);
     }

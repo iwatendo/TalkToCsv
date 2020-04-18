@@ -4,7 +4,7 @@ module.exports = {
 
   entry: {
     gijilock: './src/Page/GijiLock/Script.ts',
-    homevisitor: './src/Page/HomeVisitor/Script.ts',
+    gijilockclient: './src/Page/GijiLockClient/Script.ts',
   },
   output: {
     path: __dirname + '/dist',

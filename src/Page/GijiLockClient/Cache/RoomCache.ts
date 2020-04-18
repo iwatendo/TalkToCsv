@@ -1,8 +1,6 @@
 import * as Home from "../../../Contents/IndexedDB/Home";
-import * as Personal from "../../../Contents/IndexedDB/Personal";
 
-import HomeVisitorController from "../HomeVisitorController";
-import StdUtil from "../../../Base/Util/StdUtil";
+import GijiLockClientController from "../GijiLockClientController";
 import RoomActorMemberSender from "../../../Contents/Sender/RoomActorMemberSender";
 import GetRoomSender from "../../../Contents/Sender/GetRoomSender";
 
@@ -14,7 +12,7 @@ interface RoomActorMemberFunc { (ram: RoomActorMemberSender): void }
 export default class RoomCache {
 
     //
-    private _controller: HomeVisitorController;
+    private _controller: GijiLockClientController;
     //  hid / Room
     private _roomCache = new Map<string, Home.Room>();
     //  hid / RoomActorMember
@@ -29,7 +27,7 @@ export default class RoomCache {
      * コンストラクタ
      * @param controller 
      */
-    public constructor(controller: HomeVisitorController) {
+    public constructor(controller: GijiLockClientController) {
         this._controller = controller;
     }
 

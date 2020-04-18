@@ -3,7 +3,7 @@ import * as ReactDOM from 'react-dom';
 
 import * as Timeline from "../../../Contents/IndexedDB/Timeline";
 
-import HomeVisitorController from "../HomeVisitorController";
+import GijiLockClientController from "../GijiLockClientController";
 import { TimelineMsgItemComponent } from "./TimelineMsgItemComponent";
 import ChatInfoSender from '../../../Contents/Sender/ChatInfoSender';
 import { TimelineInputingItemComponent } from './TimelineInputingItemComponent';
@@ -13,7 +13,7 @@ import { TimelineInputingItemComponent } from './TimelineInputingItemComponent';
  *  メッセージプロパティ
  */
 interface TimelineProp {
-    controller: HomeVisitorController;
+    controller: GijiLockClientController;
     messages: Array<Timeline.Message>;
     inputs: Array<ChatInfoSender>;
 }

@@ -10,9 +10,9 @@ import { Order } from "../../Base/Container/Order";
 import TimelineCache from "./Cache/TimelineCache";
 import ActorCache from "./Cache/ActorCache";
 import RoomCache from "./Cache/RoomCache";
-import HomeVisitorReceiver from "./HomeVisitorReceiver";
-import HomeVisitorView from "./HomeVisitorView";
-import HomeVisitorModel from "./HomeVisitorModel";
+import GijiLockClientReceiver from "./GijiLockClientReceiver";
+import GijiLockClientView from "./GijiLockClientView";
+import GijiLockClientModel from "./GijiLockClientModel";
 import LogController from "./Log/LogController";
 
 import ActorInfo from "../../Contents/Struct/ActorInfo";
@@ -26,9 +26,9 @@ import ServentCloseSender from "../../Contents/Sender/ServentCloseSender";
 /**
  * 
  */
-export default class HomeVisitorController extends AbstractServiceController<HomeVisitorView, HomeVisitorModel> {
+export default class GijiLockClientController extends AbstractServiceController<GijiLockClientView, GijiLockClientModel> {
 
-    public ControllerName(): string { return "HomeVisitor"; }
+    public ControllerName(): string { return "GijiLockClient"; }
 
     public PeerId: string;
     public ConnStartTime: number;
@@ -58,7 +58,7 @@ export default class HomeVisitorController extends AbstractServiceController<Hom
         super();
         this.HasError = false;
         this.Log = new LogController(this);
-        this.Receiver = new HomeVisitorReceiver(this);
+        this.Receiver = new GijiLockClientReceiver(this);
         this.ActorCache = new ActorCache(this);
         this.RoomCache = new RoomCache(this);
         this.TimelineCache = new TimelineCache(this);
@@ -77,9 +77,9 @@ export default class HomeVisitorController extends AbstractServiceController<Hom
         this.UseActors = new Array<Personal.Actor>();
 
         //  DB接続
-        this.Model = new HomeVisitorModel(this, () => {
+        this.Model = new GijiLockClientModel(this, () => {
             //  UI初期化
-            this.View = new HomeVisitorView(this, () => {
+            this.View = new GijiLockClientView(this, () => {
 
             });
         });

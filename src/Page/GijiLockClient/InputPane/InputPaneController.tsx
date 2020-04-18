@@ -1,7 +1,6 @@
-import StdUtil from "../../../Base/Util/StdUtil";
 import SpeechUtil from "../../../Base/Util/SpeechUtil";
 import LocalCache from '../../../Contents/Cache/LocalCache';
-import HomeVisitorController from "../HomeVisitorController";
+import GijiLockClientController from "../GijiLockClientController";
 import ChatMessageSender from '../../../Contents/Sender/ChatMessageSender';
 import ChatInfoSender from '../../../Contents/Sender/ChatInfoSender';
 import IntervalSend from '../../../Base/Util/IntervalSend';
@@ -14,7 +13,7 @@ export default class InputPaneController {
     private _voiceRecognition = document.getElementById('sbj-inputpanel-send-message-recognition');
     private _voiceRecognitionOn = document.getElementById('sbj-inputpanel-send-message-recognition-on');
     private _voiceRecognitionOff = document.getElementById('sbj-inputpanel-send-message-recognition-off');
-    private _controller: HomeVisitorController;
+    private _controller: GijiLockClientController;
 
     private _isVoiceSpeech: boolean;
     private _isVoiceRecognition: boolean;
@@ -24,7 +23,7 @@ export default class InputPaneController {
      * コンストラクタ
      * @param controller 
      */
-    constructor(controller: HomeVisitorController) {
+    constructor(controller: GijiLockClientController) {
 
         this._controller = controller;
 

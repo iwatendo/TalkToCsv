@@ -27,7 +27,7 @@ export default class GijiLockView extends AbstractServiceView<GijiLockController
             this.StartVisitor();
         };
 
-        let linkurl = LinkUtil.CreateLink("../HomeVisitor/", LocalCache.BootGijiLockPeerID);
+        let linkurl = LinkUtil.CreateLink("../GijiLockClient/", LocalCache.BootGijiLockPeerID);
         let clipcopybtn = document.getElementById('sbj-start-linkcopy') as HTMLButtonElement;
 
         //  「接続URLのコピー」
@@ -77,7 +77,7 @@ export default class GijiLockView extends AbstractServiceView<GijiLockController
      * 
      */
     public StartVisitor() {
-        let url = LinkUtil.CreateLink("../HomeVisitor/", LocalCache.BootGijiLockPeerID);
+        let url = LinkUtil.CreateLink("../GijiLockClient/", LocalCache.BootGijiLockPeerID);
         window.open(url, '_blank');
     }
 

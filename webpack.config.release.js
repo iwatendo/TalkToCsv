@@ -5,8 +5,8 @@ module.exports = {
   mode: 'production',
 
   entry: {
-    homeinstance: './src/Page/HomeInstance/Script.ts',
-    homevisitor: './src/Page/HomeVisitor/Script.ts',
+    gijilock: './src/Page/GijiLock/Script.ts',
+    gijilockclient: './src/Page/GijiLockClient/Script.ts',
   },
 
   output: {

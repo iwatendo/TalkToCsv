@@ -1,8 +1,6 @@
-import * as Home from "../../../Contents/IndexedDB/Home";
-import * as Personal from "../../../Contents/IndexedDB/Personal";
 import ActorInfo from "../../../Contents/Struct/ActorInfo";
 
-import HomeVisitorController from "../HomeVisitorController";
+import GijiLockClientController from "../GijiLockClientController";
 import GetActorSender from "../../../Contents/Sender/GetActorSender";
 
 import StdUtil from "../../../Base/Util/StdUtil";
@@ -15,7 +13,7 @@ interface ActorFunc { (actor: ActorInfo): void }
 export default class ActorCache {
 
     //
-    private _controller: HomeVisitorController;
+    private _controller: GijiLockClientController;
     //  PeerID / Aid / Actor
     private _actorCache = new Map<string, Map<string, ActorInfo>>();
     //  function queue
@@ -26,7 +24,7 @@ export default class ActorCache {
      * コンストラクタ
      * @param controller 
      */
-    public constructor(controller: HomeVisitorController) {
+    public constructor(controller: GijiLockClientController) {
         this._controller = controller;
     }
 
