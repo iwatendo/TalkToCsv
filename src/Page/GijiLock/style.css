@@ -51,6 +51,10 @@
     padding: 0px 20px 0px 0px;
 }
 
+#sbj-start-linkcopy{
+    margin: 0px 12px 0px 0px;
+}
+
 #sbj-invite-url{
     padding: 0px 0px 0px 0px;
     border-bottom: none;
@@ -64,6 +68,16 @@
     margin: 0px;
 }
 
+#sbj-home-instance-main{
+    height: 100%;
+    width: 100%;
+}
+
+#sbj-gjilock-client{
+    height: 100%;
+    width: 100%;
+}
+            
 .sbj-home-instance-room-panel{
     background-color: var(--sbj-color-default-chatroom);
     height: 280px;

@@ -84,7 +84,7 @@ export default class GijiLockClientView extends AbstractServiceView<GijiLockClie
 
         if (this._isBooting) {
             this._bootElement.hidden = true;
-            this._headElement.hidden = false;
+            //  this._headElement.hidden = false;
             this._mainElement.hidden = false;
             this.InputPane = new InputPaneController(this.Controller);
             this._isBooting = false;

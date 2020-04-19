@@ -20,7 +20,7 @@
         <header id="sbj-home-instance-header" class="mdl-layout__header mdl-color--grey-100 mdl-color-text--grey-600"
             hidden>
             <div class="sbj-home-instance-header-row mdl-layout__header-row">
-                <span id="sbj-home-instance-title" class="mdl-layout-title">チャットサーバーインスタンス&nbsp; </span>
+                <span id="sbj-home-instance-title" class="mdl-layout-title">議事LOCK&nbsp; </span>
                 <div class="mdl-tooltip" data-mdl-for="sbj-home-instance-title">
                     このページが
                     <br />チャットサーバーとして
@@ -31,18 +31,29 @@
                 <div class="mdl-tooltip" data-mdl-for="sbj-home-instance-account-count">接続人数</div>
 
                 <button id='sbj-start-visitor'
-                    class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">
+                    class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" hidden>
                     <i class="material-icons">chat</i>
                     &nbsp; チャットクライアント起動 &nbsp;
                 </button>
-                <button id='sbj-start-linkcopy' class="mdl-button mdl-js-button mdl-button--colored">
-                    &nbsp; 接続URLのコピー &nbsp;
+                <button id='sbj-start-linkcopy' class="mdl-button mdl-button--raised mdl-js-button mdl-button--colored">
+                    &nbsp; 招待URLのコピー &nbsp;
                 </button>
                 <div class="mdl-tooltip" data-mdl-for="sbj-start-linkcopy">
                     招待したいメンバーに
                     <br /> URLを伝えてください
                 </div>
+				<div class="mdl-layout-spacer"></div>
+                <button id='sbj-export-timeline-csv'
+                    class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">
+                    &nbsp; CSV出力 &nbsp;
+                </button>
+                <button id='sbj-clear-timeline'
+                    class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+                    &nbsp; メッセージクリア &nbsp;
+                </button>
             </div>
+
+
         </header>
 
         <main id="sbj-home-instance-boot">
@@ -74,16 +85,7 @@
         </main>
 
         <main id="sbj-home-instance-main" hidden>
-            <div class="sbj-home-instance-actions mdl-card__actions">
-                <button id='sbj-clear-timeline'
-                    class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
-                    &nbsp; タイムラインのクリア &nbsp;
-                </button>
-                <div class="mdl-tooltip" data-mdl-for="sbj-clear-timeline">
-                    全ルームのタイムラインを
-                    <br />クリアします
-                </div>
-            </div>
+            <iframe id="sbj-gjilock-client" src=""></iframe>
         </main>
 
         <main id="sbj-home-instance-mulitboot-error" hidden>

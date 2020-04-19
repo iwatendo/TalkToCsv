@@ -12,9 +12,6 @@ import MdlUtil from "../../Contents/Util/MdlUtil";
 
 export default class GijiLockView extends AbstractServiceView<GijiLockController> {
 
-    private _roomFrame = document.getElementById('sbj-room-frame') as HTMLFrameElement;
-
-
     /**
      * 初期化処理
      * @param callback 
@@ -31,10 +28,17 @@ export default class GijiLockView extends AbstractServiceView<GijiLockController
         let clipcopybtn = document.getElementById('sbj-start-linkcopy') as HTMLButtonElement;
 
         //  「接続URLのコピー」
-        MdlUtil.SetCopyLinkButton(linkurl, "接続URL", clipcopybtn);
+        MdlUtil.SetCopyLinkButton(linkurl, "招待URL", clipcopybtn);
+
+        //
+        (document.getElementById("sbj-gjilock-client") as HTMLFrameElement).src = linkurl;
 
         document.getElementById('sbj-clear-timeline').onclick = (e) => {
             this.ClearTimeline();
+        };
+
+        document.getElementById('sbj-export-timeline-csv').onclick = (e) => {
+            this.ExportTimeline();
         };
 
         this.Controller.Model.GetRooms((rooms) => {
@@ -94,20 +98,10 @@ export default class GijiLockView extends AbstractServiceView<GijiLockController
     }
 
     /**
-     * プロフィール編集ダイアログの表示
-     * @param hid 
+     * タイムラインの出力
      */
-    public DoShowRoomEditDialog(hid: string) {
-
-        let src = LinkUtil.CreateLink("../Room/") + "?hid=" + hid;
-
-        this._roomFrame.src = null;
-        this._roomFrame.onload = () => {
-            this._roomFrame.hidden = false;
-            this._roomFrame.onload = null;
-            this._roomFrame.contentDocument.getElementById('sbj-room-cancel').focus();
-        }
-        this._roomFrame.src = src;
+    public ExportTimeline() {
+        this.Controller.Model.ExportTimeline();
     }
 
 }

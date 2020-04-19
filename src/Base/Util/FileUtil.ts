@@ -20,17 +20,15 @@ export default class FileUtil {
      */
     public static GetDefaultFileName(name: string, ext: string = this.EXPORT_EXT) {
 
-        // let now = new Date();
-        // let year = ("0000" + (now.getFullYear().toString())).slice(-4);
-        // let month = ("0" + (now.getMonth() + 1).toString()).slice(-2);
-        // let day = ("0" + now.getDate().toString()).slice(-2);
-        // let hours = ("0" + now.getHours().toString()).slice(-2);
-        // let min = ("0" + now.getMinutes().toString()).slice(-2);
-        // let sec = ("0" + now.getSeconds().toString()).slice(-2);
-        // let datetime = year + month + day + "-" + hours + min + sec;
-        //  let filename = "SkyBeje_" + datetime + "_" + name + ext;
-
-        let filename = "Skybeje_" + name + ext;
+        let now = new Date();
+        let year = ("0000" + (now.getFullYear().toString())).slice(-4);
+        let month = ("0" + (now.getMonth() + 1).toString()).slice(-2);
+        let day = ("0" + now.getDate().toString()).slice(-2);
+        let hours = ("0" + now.getHours().toString()).slice(-2);
+        let min = ("0" + now.getMinutes().toString()).slice(-2);
+        let sec = ("0" + now.getSeconds().toString()).slice(-2);
+        let datetime = year + month + day + "-" + hours + min + sec;
+        let filename = "gijilock_" + datetime + "_" + name + ext;
 
         return filename;
 

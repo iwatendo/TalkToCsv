@@ -7,6 +7,7 @@ import AbstractServiceModel, { OnModelLoad, OnRead, OnWrite } from "../../Base/A
 
 import GijiLockController from "./GijiLockController";
 import ImageInfo from "../../Base/Container/ImageInfo";
+import FileUtil from "../../Base/Util/FileUtil";
 
 
 export default class GijiLockModel extends AbstractServiceModel<GijiLockController> {
@@ -137,6 +138,51 @@ export default class GijiLockModel extends AbstractServiceModel<GijiLockControll
             this._timelineDB.ClearAll(Timeline.DB.Message, callback);
         }
 
+    }
+
+    public ExportTimeline() {
+        this._timelineDB.ReadAllData((timeline) => {
+            this._homeDB.ReadAllData((home) => {
+                let result = this.ToPlainText(timeline.Messages, home.Rooms);
+                let filename = FileUtil.GetDefaultFileName("gijilock", "txt");
+                FileUtil.Export(filename, result);
+            });
+        });
+    }
+
+
+    /**
+     * 
+     * @param msgs 
+     */
+    private ToPlainText(msgs: Array<Timeline.Message>, rooms: Array<Home.Room>): string {
+
+        let result = new String();
+
+        //  部屋情報をMAPにする
+        let roomMap = new Map<string, Home.Room>();
+        rooms.forEach((room) => { roomMap.set(room.hid, room); });
+
+        //  メッセージを時間順にソート
+        msgs.sort((a, b) => (a.ctime > b.ctime ? 1 : -1));
+
+        //  メッセージループ
+        msgs.forEach((msg) => {
+            if (msg.visible) {
+                let time = StdUtil.ToDispDate(new Date(msg.ctime));
+                let room = (roomMap.has(msg.hid) ? roomMap.get(msg.hid).name : "");
+                let name = msg.name;
+                let text = msg.text;
+                result += time;
+                result += ",";
+                result += name;
+                result += ",";
+                result += text;
+                result += "\r\n";
+            }
+        });
+
+        return result.toString();
     }
 
 }

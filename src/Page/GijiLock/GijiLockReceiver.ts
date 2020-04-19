@@ -45,6 +45,9 @@ export default class GijiLockReceiver extends AbstractServiceReceiver<GijiLockCo
         //  チャットメッセージ通知
         if (sender.type === ChatMessageSender.ID) {
             let chatMessage = sender as ChatMessageSender;
+
+            chatMessage.name = chatMessage.aid + ":" + conn.remoteId;
+
             this.Controller.Manager.Chat.SetMessage(chatMessage);
         }
 

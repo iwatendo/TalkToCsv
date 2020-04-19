@@ -74,12 +74,14 @@ export default class MdlUtil {
                 linkCopyBtn.onclick = (e) => {
                     StdUtil.ClipBoardCopy(link);
                     linkCopyBtn.textContent = " " + label + "をクリップボードにコピーしました ";
+                    linkCopyBtn.classList.remove('mdl-button--raised');
                     linkCopyBtn.classList.remove('mdl-button--colored');
                     linkCopyBtn.classList.add('mdl-button--accent');
                     window.setTimeout(() => {
                         linkCopyBtn.textContent = " " + label + "のコピー ";
                         linkCopyBtn.classList.remove('mdl-button--accent');
                         linkCopyBtn.classList.add('mdl-button--colored');
+                        linkCopyBtn.classList.add('mdl-button--raised');
                     }, 2500);
                 };
             }
