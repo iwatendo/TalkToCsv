@@ -31,7 +31,6 @@ export default class InputPaneController {
 
         //  イベント設定
         this._textareaElement.onkeydown = (e) => { this.OnKeyDown(e); };
-        this._textareaElement.oninput = (e) => { this.OnTextChange(); }
         this._sendMessageButton.onclick = (e) => { this.SendInputMessage(); };
 
         this._voiceRecognition.onclick = (e) => {
@@ -123,7 +122,6 @@ export default class InputPaneController {
      */
     private ClearText() {
         this._textareaElement.value = "";
-        this.OnTextChange();
     }
 
 
@@ -143,7 +141,6 @@ export default class InputPaneController {
                 this._textareaElement.value = this._textareaElement.value + text;
                 this._textareaElement.selectionStart = start;
                 this._textareaElement.selectionEnd = start + end;
-                this.OnTextChange();
                 break;
             case 1:
                 //  直接チャットメッセージとして送信
@@ -179,25 +176,6 @@ export default class InputPaneController {
 
 
     private _intervalSend = new IntervalSend<ChatInfoSender>(200);
-
-    /**
-     * 入力途中有無
-     * @param isInputing 
-     */
-    private OnTextChange() {
-
-        let isInput = this.IsInput();
-        this._sendMessageButton.hidden = !isInput;
-
-        let chm = new ChatInfoSender();
-        let actor = this._controller.CurrentActor;
-        chm.peerid = this._controller.PeerId;
-        chm.aid = actor.aid;
-        chm.name = actor.name;
-        chm.iid = actor.dispIid;
-        chm.isInputing = isInput;
-        this._intervalSend.Send(chm, (s) => { this._controller.SwPeer.SendToOwner(s); });
-    }
 
 
     /**
