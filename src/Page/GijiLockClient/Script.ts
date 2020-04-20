@@ -8,7 +8,7 @@ import GijiLockClientController from "./GijiLockClientController";
 import SWPeer from "../../Base/WebRTC/SWPeer";
 
 
-if (StdUtil.IsSupoortPlatform()) {
+if (StdUtil.IsSupoortPlatform() && !StdUtil.IsMobile()) {
 
     let db = new Home.DB();
 
@@ -18,3 +18,8 @@ if (StdUtil.IsSupoortPlatform()) {
     });
 
 }
+else {
+    document.getElementById("sbj-home-visitor").hidden = true;
+    document.getElementById("sbj-home-browser-error").hidden = false;
+}
+

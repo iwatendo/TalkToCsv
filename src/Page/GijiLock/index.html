@@ -4,13 +4,13 @@
 <head>
     <title>議事LOCK</title>
     <meta charset='utf-8'>
-    <meta name="description" content="音声通話やビデオ通話の音声をテキスト変換し、議事録を取るサービス" />
+    <meta name="description" content="音声通話やビデオ通話と併用して使用し、音声認識で会話のログを残すためのサービス。PC版のGoogle Chrome専用" />
     <meta property="og:title" content="議事LOCK">
-    <meta property="og:description" content="音声通話やビデオ通話の音声をテキスト変換し、議事録を取るサービス">
+    <meta property="og:description" content="音声通話やビデオ通話と併用して使用し、音声認識で会話のログを残すためのサービス。PC版のGoogle Chrome専用">
     <meta property="og:url" content="https://skybeje.net/gijilock/">
     <meta property="og:image" content="https://skybeje.net/image/ogp-image.jpg">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:description" content="音声通話やビデオ通話の音声をテキスト変換し、議事録を取るサービス">
+    <meta name="twitter:description" content="音声通話やビデオ通話と併用して使用し、音声認識で会話のログを残すためのサービス。PC版のGoogle Chrome専用">
     <link rel="icon" type="image/vnd.microsoft.icon" href="/image/favicon_server.ico">
     <script src='/lib/forcedtimer.js'></script>
     <script src='/lib/skyway.min.js'></script>
@@ -48,7 +48,7 @@
                     招待したいメンバーに
                     <br /> URLを伝えてください
                 </div>
-				<div class="mdl-layout-spacer"></div>
+                <div class="mdl-layout-spacer"></div>
                 <button id='sbj-export-timeline-csv'
                     class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">
                     &nbsp; CSV出力 &nbsp;
@@ -64,9 +64,17 @@
 
         <main id="sbj-home-instance-boot">
             <div class="sbj-home-instance-info mdl-card__supporting-text">
-                <h6>
+                <h4>
                     チャットサーバーインスタンスを起動しています。
-                </h6>
+                </h4>
+            </div>
+        </main>
+
+        <main id="sbj-home-browser-error" hidden>
+            <div class="sbj-home-instance-info mdl-card__supporting-text">
+                <h4>
+                    議事LOCKはPC版のGoogle Chromeにのみ対応しています
+                </h4>
             </div>
         </main>
 
@@ -74,18 +82,18 @@
             <div class="sbj-home-instance-info mdl-card__supporting-text">
                 <h6>
                     チャットサーバーインスタンスの起動に失敗しました。
-                    </br>
-                    以下のいずれかの理由により、起動できなかった可能性があります</br>
-                    </br>
-                    ・ネットワークの不調または切断によるタイムアウト</br>
-                    ・ファイヤーウォールによるピア接続のブロック(※)</br>
+                    <br />
+                    以下のいずれかの理由により、起動できなかった可能性があります<br />
+                    <br />
+                    ・ネットワークの不調または切断によるタイムアウト<br />
+                    ・ファイヤーウォールによるピア接続のブロック(※)<br />
                 </h6>
                 <h6>
-                    ※SkyWay(WebRTC)は通信プロトコルとして TCP(WebSocket,HTTPS)及びUDPを使用しています。</br>
-                    ファイヤーウォールにて使用するプロトコルまたはポートがブロックされている場合、当サービスは利用できません。</br>
+                    ※SkyWay(WebRTC)は通信プロトコルとして TCP(WebSocket,HTTPS)及びUDPを使用しています。<br />
+                    ファイヤーウォールにて使用するプロトコルまたはポートがブロックされている場合、当サービスは利用できません。<br />
                     詳細については
                     <a href="https://support.skyway.io/hc/ja/articles/115002273767-SkyWay%E3%81%AE%E9%80%9A%E4%BF%A1%E8%A6%81%E4%BB%B6%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6"
-                        target="_blank">SkyWayの通信要件</a>を確認してください。</br>
+                        target="_blank">SkyWayの通信要件</a>を確認してください。<br />
                 </h6>
             </div>
         </main>

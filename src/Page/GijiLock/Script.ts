@@ -3,7 +3,7 @@ import SWPeer from "../../Base/WebRTC/SWPeer";
 import LocalCache from "../../Contents/Cache/LocalCache";
 import GijiLockController from "./GijiLockController";
 
-if (StdUtil.IsSupoortPlatform()) {
+if (StdUtil.IsSupoortPlatform() && !StdUtil.IsMobile()) {
 
     let bootid = LocalCache.BootGijiLockPeerID;
 
@@ -37,6 +37,17 @@ if (StdUtil.IsSupoortPlatform()) {
             BootSucceed();
         });
     }
+}
+else {
+    BrowerError();
+}
+
+/**
+ * 選択ブラウザのエラー
+ */
+function BrowerError() {
+    document.getElementById('sbj-home-instance-boot').hidden = true;
+    document.getElementById("sbj-home-browser-error").hidden = false;
 }
 
 /**
