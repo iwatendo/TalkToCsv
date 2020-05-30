@@ -4,6 +4,7 @@ import GijiLockClientController from "../GijiLockClientController";
 import ChatMessageSender from '../../../Contents/Sender/ChatMessageSender';
 import ChatInfoSender from '../../../Contents/Sender/ChatInfoSender';
 import IntervalSend from '../../../Base/Util/IntervalSend';
+import RecognitionUtil from "../../../Base/Util/RecognitionUtil";
 
 export default class InputPaneController {
 
@@ -193,7 +194,7 @@ export default class InputPaneController {
         this._voiceRecognitionOn.hidden = !this._isVoiceRecognition;
         this._voiceRecognitionOff.hidden = this._isVoiceRecognition;
         if (this._isVoiceRecognition) {
-            SpeechUtil.InitSpeechRecognition(
+            RecognitionUtil.InitSpeechRecognition(
                 this._controller,
                 (text) => {
                     if (text) this.SendVoiceText(text);
@@ -210,10 +211,10 @@ export default class InputPaneController {
                     this._textareaElement.focus();
                 }
             );
-            SpeechUtil.StartSpeechRecognition();
+            RecognitionUtil.StartSpeechRecognition();
         }
         else {
-            SpeechUtil.StopSpeechRecognition();
+            RecognitionUtil.StopSpeechRecognition();
             this._textareaElement.disabled = false;
         }
     }
