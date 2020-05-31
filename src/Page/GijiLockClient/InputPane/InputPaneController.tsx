@@ -196,8 +196,17 @@ export default class InputPaneController {
         if (this._isVoiceRecognition) {
             RecognitionUtil.InitSpeechRecognition(
                 this._controller,
-                (text) => {
-                    if (text) this.SendVoiceText(text);
+                (text,isFinal) => {
+
+                    if(text){
+                        if(isFinal){
+                            this.SendVoiceText(text);
+                            this._textareaElement.value = "";
+                        }
+                        else{
+                            this._textareaElement.value = text;
+                        }
+                    }
                 }
                 , () => {
                     this._voiceRecognitionOn.classList.remove("mdl-button--colored");
