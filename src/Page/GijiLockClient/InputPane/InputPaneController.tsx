@@ -19,7 +19,6 @@ export default class InputPaneController {
     private _isVoiceSpeech: boolean;
     private _isVoiceRecognition: boolean;
 
-
     /**
      * コンストラクタ
      * @param controller 
@@ -28,7 +27,7 @@ export default class InputPaneController {
 
         this._controller = controller;
 
-        document.onkeyup = this.OnOtherKeyPress;
+        document.onkeydown = this.OnOtherKeyPress;
 
         //  イベント設定
         this._textareaElement.onkeydown = (e) => { this.OnKeyDown(e); };
@@ -50,8 +49,13 @@ export default class InputPaneController {
         if (e.keyCode === 13) {
             document.getElementById('sbj-inputpanel-text').focus();
         }
+        //  エスケープキーは入力中の文字をクリアして終了
+        if (e.keyCode === 27) {
+            e.returnValue = false;
+            RecognitionUtil.Cancel();
+            return;
+        }
     }
-
 
     /**
      * テキストエリアのキーイベント
@@ -196,17 +200,20 @@ export default class InputPaneController {
         if (this._isVoiceRecognition) {
             RecognitionUtil.InitSpeechRecognition(
                 this._controller,
-                (text,isFinal) => {
-
-                    if(text){
-                        if(isFinal){
+                (text, isFinal) => {
+                    if (text) {
+                        if (isFinal) {
                             this.SendVoiceText(text);
                             this._textareaElement.value = "";
                         }
-                        else{
+                        else {
                             this._textareaElement.value = text;
                         }
                     }
+                    else{
+                        this._textareaElement.value = "";
+                    }
+
                 }
                 , () => {
                     this._voiceRecognitionOn.classList.remove("mdl-button--colored");
@@ -220,10 +227,10 @@ export default class InputPaneController {
                     this._textareaElement.focus();
                 }
             );
-            RecognitionUtil.StartSpeechRecognition();
+            RecognitionUtil.Start();
         }
         else {
-            RecognitionUtil.StopSpeechRecognition();
+            RecognitionUtil.Stop();
             this._textareaElement.disabled = false;
         }
     }

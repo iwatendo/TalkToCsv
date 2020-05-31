@@ -13,15 +13,17 @@ export default class RecognitionUtil {
      */
     private static _recognition: SpeechRecognition;
     private static _useRecognition: boolean;
+    private static _isCancel: boolean = false;
 
 
 
     /**
      * 音声認識処理の開始
      */
-    public static StartSpeechRecognition() {
+    public static Start() {
         if (this._recognition) {
             this._useRecognition = true;
+            this._isCancel = false;
             this._recognition.start();
         }
     }
@@ -30,9 +32,20 @@ export default class RecognitionUtil {
     /**
      * 音声認識処理の停止
      */
-    public static StopSpeechRecognition() {
+    public static Stop() {
         if (this._recognition) {
             this._useRecognition = false;
+            this._recognition.stop();
+        }
+    }
+
+
+    /**
+     * 音声認識のキャンセル
+     */
+    public static Cancel() {
+        if (this._recognition) {
+            this._isCancel = true;
             this._recognition.stop();
         }
     }
@@ -75,7 +88,7 @@ export default class RecognitionUtil {
                 }
             }
             //  this._useRecognition = false;
-            this.StopSpeechRecognition();
+            this.Stop();
         };
 
         //
@@ -98,12 +111,18 @@ export default class RecognitionUtil {
 
             var results = event.results;
             for (var i = event.resultIndex; i < results.length; i++) {
+
+                let text = results[i][0].transcript;
+                if (RecognitionUtil._isCancel) {
+                    text = "";
+                }
+
                 if (results[i].isFinal) {
-                    callback(results[i][0].transcript, true);
+                    callback(text, true);
                     this._recognition.stop();
                 }
                 else {
-                    callback(results[i][0].transcript, false);
+                    callback(text, false);
                 }
             }
         }
@@ -116,6 +135,7 @@ export default class RecognitionUtil {
         //
         this._recognition.onend = (e: Event) => {
             if (this._useRecognition) {
+                RecognitionUtil._isCancel = false;
                 this._recognition.start();
             }
         }
