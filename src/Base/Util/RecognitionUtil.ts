@@ -1,4 +1,3 @@
-import LinkUtil from "./LinkUtil";
 import LogUtil from "./LogUtil";
 import IServiceController from "../IServiceController";
 
@@ -110,23 +109,29 @@ export default class RecognitionUtil {
         this._recognition.onresult = (event: SpeechRecognitionEvent) => {
 
             var results = event.results;
-            for (var i = event.resultIndex; i < results.length; i++) {
+            let isFinal = false;
+            let text = "";
 
-                let text = results[i][0].transcript;
-                if (RecognitionUtil._isCancel) {
-                    text = "";
-                }
-
-                if (results[i].isFinal) {
-                    callback(text, true);
-                    this._recognition.stop();
-                }
-                else {
-                    callback(text, false);
+            if (!RecognitionUtil._isCancel) {
+                for (var i = event.resultIndex; i < results.length; i++) {
+                    text += results[i][0].transcript;
+                    if (results[i].isFinal) {
+                        isFinal = true;
+                    }
                 }
             }
+
+            callback(text, false);
+
+            if (isFinal) {
+                RecognitionUtil._isCancel = false;
+                callback(text, true);
+                this._recognition.stop();
+            }
+
         }
 
+        //
         this._recognition.onnomatch = (e: SpeechRecognitionEvent) => {
             this._recognition.stop();
             callback("", true);
