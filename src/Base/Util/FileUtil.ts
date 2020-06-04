@@ -28,10 +28,14 @@ export default class FileUtil {
         let min = ("0" + now.getMinutes().toString()).slice(-2);
         let sec = ("0" + now.getSeconds().toString()).slice(-2);
         let datetime = year + month + day + "-" + hours + min + sec;
-        let filename = "gijilock_" + datetime + "_" + name + ext;
+
+        let filename = "talktocsv_" + datetime;
+        if(name){
+            filename += name;
+        }
+        filename += ext;
 
         return filename;
-
     }
 
 

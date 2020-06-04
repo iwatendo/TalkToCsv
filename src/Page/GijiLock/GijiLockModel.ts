@@ -144,7 +144,7 @@ export default class GijiLockModel extends AbstractServiceModel<GijiLockControll
         this._timelineDB.ReadAllData((timeline) => {
             this._homeDB.ReadAllData((home) => {
                 let result = this.ToPlainText(timeline.Messages, home.Rooms);
-                let filename = FileUtil.GetDefaultFileName("gijilock", "txt");
+                let filename = FileUtil.GetDefaultFileName("", ".csv");
                 FileUtil.Export(filename, result);
             });
         });
