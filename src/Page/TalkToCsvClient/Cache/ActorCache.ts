@@ -1,6 +1,6 @@
 import ActorInfo from "../../../Contents/Struct/ActorInfo";
 
-import GijiLockClientController from "../GijiLockClientController";
+import TalkToCsvClientController from "../TalkToCsvClientController";
 import GetActorSender from "../../../Contents/Sender/GetActorSender";
 
 import StdUtil from "../../../Base/Util/StdUtil";
@@ -13,7 +13,7 @@ interface ActorFunc { (actor: ActorInfo): void }
 export default class ActorCache {
 
     //
-    private _controller: GijiLockClientController;
+    private _controller: TalkToCsvClientController;
     //  PeerID / Aid / Actor
     private _actorCache = new Map<string, Map<string, ActorInfo>>();
     //  function queue
@@ -24,7 +24,7 @@ export default class ActorCache {
      * コンストラクタ
      * @param controller 
      */
-    public constructor(controller: GijiLockClientController) {
+    public constructor(controller: TalkToCsvClientController) {
         this._controller = controller;
     }
 

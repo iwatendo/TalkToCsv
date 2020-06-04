@@ -5,12 +5,12 @@ import * as Timeline from "../../Contents/IndexedDB/Timeline";
 import StdUtil from "../../Base/Util/StdUtil";
 import AbstractServiceModel, { OnModelLoad, OnRead, OnWrite } from "../../Base/AbstractServiceModel";
 
-import GijiLockController from "./GijiLockController";
+import TalkToCsvController from "./TalkToCsvController";
 import ImageInfo from "../../Base/Container/ImageInfo";
 import FileUtil from "../../Base/Util/FileUtil";
 
 
-export default class GijiLockModel extends AbstractServiceModel<GijiLockController> {
+export default class TalkToCsvModel extends AbstractServiceModel<TalkToCsvController> {
 
     private _homeDB: Home.DB;
     private _timelineDB: Timeline.DB;

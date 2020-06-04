@@ -1,4 +1,4 @@
-import GijiLockController from "../GijiLockController";
+import TalkToCsvController from "../TalkToCsvController";
 import RoomManager from "./RoomManager";
 import ChatManager from "./ChatManager";
 
@@ -13,7 +13,7 @@ export default class ManagerController {
      * コンストラクタ
      * @param controller 
      */
-    constructor(controller: GijiLockController, callback) {
+    constructor(controller: TalkToCsvController, callback) {
 
         this.Room = new RoomManager(controller);
         this.Chat = new ChatManager(controller, this.Room, callback);

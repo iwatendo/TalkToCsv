@@ -7,12 +7,12 @@ import * as Timeline from "../../Contents/IndexedDB/Timeline";
 import AbstractServiceView, { OnViewLoad } from "../../Base/AbstractServiceView";
 
 import { TimelineComponent } from "./Timeline/TimelineComponent";
-import GijiLockClientController from "./GijiLockClientController";
+import TalkToCsvClientController from "./TalkToCsvClientController";
 import InputPaneController from "./InputPane/InputPaneController";
 import ChatInfoSender from '../../Contents/Sender/ChatInfoSender';
 
 
-export default class GijiLockClientView extends AbstractServiceView<GijiLockClientController> {
+export default class TalkToCsvClientView extends AbstractServiceView<TalkToCsvClientController> {
 
     private _isBooting: boolean = true;
     private _bootElement = document.getElementById('sbj-home-visitor');

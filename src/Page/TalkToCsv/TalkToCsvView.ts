@@ -4,13 +4,13 @@ import AbstractServiceView, { OnViewLoad } from "../../Base/AbstractServiceView"
 import StdUtil from "../../Base/Util/StdUtil";
 import LinkUtil from "../../Base/Util/LinkUtil";
 
-import GijiLockController from "./GijiLockController";
+import TalkToCsvController from "./TalkToCsvController";
 import LocalCache from "../../Contents/Cache/LocalCache";
 import ClearTimelineSender from "../../Contents/Sender/ClearTimelineSender";
 import MdlUtil from "../../Contents/Util/MdlUtil";
 
 
-export default class GijiLockView extends AbstractServiceView<GijiLockController> {
+export default class TalkToCsvView extends AbstractServiceView<TalkToCsvController> {
 
     /**
      * 初期化処理
@@ -24,7 +24,7 @@ export default class GijiLockView extends AbstractServiceView<GijiLockController
             this.StartVisitor();
         };
 
-        let linkurl = LinkUtil.CreateLink("../GijiLockClient/", LocalCache.BootGijiLockPeerID);
+        let linkurl = LinkUtil.CreateLink("../TalkToCsvClient/", LocalCache.BootTalkToCsvPeerID);
         let clipcopybtn = document.getElementById('sbj-start-linkcopy') as HTMLButtonElement;
 
         //  「接続URLのコピー」
@@ -81,7 +81,7 @@ export default class GijiLockView extends AbstractServiceView<GijiLockController
      * 
      */
     public StartVisitor() {
-        let url = LinkUtil.CreateLink("../GijiLockClient/", LocalCache.BootGijiLockPeerID);
+        let url = LinkUtil.CreateLink("../TalkToCsvClient/", LocalCache.BootTalkToCsvPeerID);
         window.open(url, '_blank');
     }
 

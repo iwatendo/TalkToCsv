@@ -1,6 +1,6 @@
 ﻿import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import GijiLockClientController from "../GijiLockClientController";
+import TalkToCsvClientController from "../TalkToCsvClientController";
 import { Log } from "../../../Base/Util/LogUtil";
 
 
@@ -8,7 +8,7 @@ import { Log } from "../../../Base/Util/LogUtil";
  * プロパティ
  */
 export interface LogProp {
-    controller: GijiLockClientController;
+    controller: TalkToCsvClientController;
     logs: Array<Log>
 }
 

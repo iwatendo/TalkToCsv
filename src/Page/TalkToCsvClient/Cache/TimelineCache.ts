@@ -1,7 +1,7 @@
 
 import * as Timeline from "../../../Contents/IndexedDB/Timeline";
 
-import GijiLockClientController from "../GijiLockClientController";
+import TalkToCsvClientController from "../TalkToCsvClientController";
 
 
 export default class TimelineCache {
@@ -10,7 +10,7 @@ export default class TimelineCache {
     private MAX_DISP_MESSAGE = 512;
 
     //
-    private _controller: GijiLockClientController;
+    private _controller: TalkToCsvClientController;
 
     //  タイムラインメッセージMAP
     private _tlmsgMap = new Map<string, Map<string, Timeline.Message>>();
@@ -20,7 +20,7 @@ export default class TimelineCache {
      * コンストラクタ
      * @param controller 
      */
-    public constructor(controller: GijiLockClientController) {
+    public constructor(controller: TalkToCsvClientController) {
         this._controller = controller;
     }
 

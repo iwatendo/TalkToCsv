@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import GijiLockClientController from "../GijiLockClientController";
+import TalkToCsvClientController from "../TalkToCsvClientController";
 import ChatInfoSender from '../../../Contents/Sender/ChatInfoSender';
 
 
@@ -8,7 +8,7 @@ import ChatInfoSender from '../../../Contents/Sender/ChatInfoSender';
  *  
  */
 interface TimelineInputingItemProp {
-    controller: GijiLockClientController;
+    controller: TalkToCsvClientController;
     chatInputing: ChatInfoSender;
 }
 

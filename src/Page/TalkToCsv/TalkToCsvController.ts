@@ -3,9 +3,9 @@ import { Room } from "../../Contents/IndexedDB/Home";
 
 import AbstractServiceController from "../../Base/AbstractServiceController";
 
-import GijiLockReceiver from "./GijiLockReceiver";
-import GijiLockView from "./GijiLockView";
-import GijiLockModel from "./GijiLockModel";
+import TalkToCsvReceiver from "./TalkToCsvReceiver";
+import TalkToCsvView from "./TalkToCsvView";
+import TalkToCsvModel from "./TalkToCsvModel";
 
 import ManagerController from "./Manager/ManagerController";
 import LocalCache from "../../Contents/Cache/LocalCache";
@@ -15,9 +15,9 @@ import RoomSender from "../../Contents/Sender/RoomSender";
 /**
  * 
  */
-export default class GijiLockController extends AbstractServiceController<GijiLockView, GijiLockModel> {
+export default class TalkToCsvController extends AbstractServiceController<TalkToCsvView, TalkToCsvModel> {
 
-    public ControllerName(): string { return "GijiLock"; }
+    public ControllerName(): string { return "TalkToCsv"; }
 
     public PeerID: string;
     public Manager: ManagerController;
@@ -28,7 +28,7 @@ export default class GijiLockController extends AbstractServiceController<GijiLo
      */
     constructor() {
         super();
-        this.Receiver = new GijiLockReceiver(this);
+        this.Receiver = new TalkToCsvReceiver(this);
     };
 
 
@@ -37,8 +37,8 @@ export default class GijiLockController extends AbstractServiceController<GijiLo
      */
     public ClearBootInfo() {
         //  インスタンスが正常終了した場合、接続情報はクリアする
-        if (this.PeerID === LocalCache.BootGijiLockPeerID) {
-            LocalCache.BootGijiLockPeerID = "";
+        if (this.PeerID === LocalCache.BootTalkToCsvPeerID) {
+            LocalCache.BootTalkToCsvPeerID = "";
         }
     }
 
@@ -51,18 +51,18 @@ export default class GijiLockController extends AbstractServiceController<GijiLo
      */
     public OnPeerOpen(peer: PeerJs.Peer) {
 
-        //  GijiLockIDをLocalCacheに保持
-        LocalCache.BootGijiLockPeerID = peer.id;
+        //  TalkToCsvIDをLocalCacheに保持
+        LocalCache.BootTalkToCsvPeerID = peer.id;
         this.PeerID = peer.id;
 
         //  DB接続
-        this.Model = new GijiLockModel(this, () => {
+        this.Model = new TalkToCsvModel(this, () => {
 
             //  タイムラインメッセージの読込
             this.Manager = new ManagerController(this, () => {
 
                 //  UI初期化
-                this.View = new GijiLockView(this, () => {
+                this.View = new TalkToCsvView(this, () => {
 
                 });
 

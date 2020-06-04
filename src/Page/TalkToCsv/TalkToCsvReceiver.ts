@@ -1,7 +1,7 @@
 ﻿import AbstractServiceReceiver from "../../Base/AbstractServiceReceiver";
 import Sender from "../../Base/Container/Sender";
 
-import GijiLockController from "./GijiLockController";
+import TalkToCsvController from "./TalkToCsvController";
 
 import ClientBootSender from "../../Contents/Sender/ClientBootSender";
 import GetRoomSender from "../../Contents/Sender/GetRoomSender";
@@ -14,7 +14,7 @@ import UpdateTimelineSender from "../../Contents/Sender/UpdateTimelineSender";
 import ChatInfoSender from "../../Contents/Sender/ChatInfoSender";
 
 
-export default class GijiLockReceiver extends AbstractServiceReceiver<GijiLockController> {
+export default class TalkToCsvReceiver extends AbstractServiceReceiver<TalkToCsvController> {
 
 
     /**

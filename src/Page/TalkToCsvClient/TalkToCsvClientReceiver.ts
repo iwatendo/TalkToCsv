@@ -6,7 +6,7 @@ import StdUtil from "../../Base/Util/StdUtil";
 import Sender from "../../Base/Container/Sender";
 import ActorInfo from "../../Contents/Struct/ActorInfo";
 
-import GijiLockClientController from "./GijiLockClientController";
+import TalkToCsvClientController from "./TalkToCsvClientController";
 
 import ConnInfoSender from "../../Contents/Sender/ConnInfoSender";
 import RoomSender from "../../Contents/Sender/RoomSender";
@@ -19,7 +19,7 @@ import ActorInfoSender from "../../Contents/Sender/ActorInfoSender";
 import ProfileSender from "../../Contents/Sender/ProfileSender";
 
 
-export default class GijiLockClientReceiver extends AbstractServiceReceiver<GijiLockClientController> {
+export default class TalkToCsvClientReceiver extends AbstractServiceReceiver<TalkToCsvClientController> {
 
     /**
      * 

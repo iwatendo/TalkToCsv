@@ -1,6 +1,6 @@
 import * as Home from "../../../Contents/IndexedDB/Home";
 
-import GijiLockClientController from "../GijiLockClientController";
+import TalkToCsvClientController from "../TalkToCsvClientController";
 import RoomActorMemberSender from "../../../Contents/Sender/RoomActorMemberSender";
 import GetRoomSender from "../../../Contents/Sender/GetRoomSender";
 
@@ -12,7 +12,7 @@ interface RoomActorMemberFunc { (ram: RoomActorMemberSender): void }
 export default class RoomCache {
 
     //
-    private _controller: GijiLockClientController;
+    private _controller: TalkToCsvClientController;
     //  hid / Room
     private _roomCache = new Map<string, Home.Room>();
     //  hid / RoomActorMember
@@ -27,7 +27,7 @@ export default class RoomCache {
      * コンストラクタ
      * @param controller 
      */
-    public constructor(controller: GijiLockClientController) {
+    public constructor(controller: TalkToCsvClientController) {
         this._controller = controller;
     }
 

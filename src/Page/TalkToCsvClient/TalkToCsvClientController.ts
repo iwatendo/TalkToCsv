@@ -10,9 +10,9 @@ import { Order } from "../../Base/Container/Order";
 import TimelineCache from "./Cache/TimelineCache";
 import ActorCache from "./Cache/ActorCache";
 import RoomCache from "./Cache/RoomCache";
-import GijiLockClientReceiver from "./GijiLockClientReceiver";
-import GijiLockClientView from "./GijiLockClientView";
-import GijiLockClientModel from "./GijiLockClientModel";
+import TalkToCsvClientReceiver from "./TalkToCsvClientReceiver";
+import TalkToCsvClientView from "./TalkToCsvClientView";
+import TalkToCsvClientModel from "./TalkToCsvClientModel";
 import LogController from "./Log/LogController";
 
 import ActorInfo from "../../Contents/Struct/ActorInfo";
@@ -26,9 +26,9 @@ import ServentCloseSender from "../../Contents/Sender/ServentCloseSender";
 /**
  * 
  */
-export default class GijiLockClientController extends AbstractServiceController<GijiLockClientView, GijiLockClientModel> {
+export default class TalkToCsvClientController extends AbstractServiceController<TalkToCsvClientView, TalkToCsvClientModel> {
 
-    public ControllerName(): string { return "GijiLockClient"; }
+    public ControllerName(): string { return "TalkToCsvClient"; }
 
     public PeerId: string;
     public ConnStartTime: number;
@@ -58,7 +58,7 @@ export default class GijiLockClientController extends AbstractServiceController<
         super();
         this.HasError = false;
         this.Log = new LogController(this);
-        this.Receiver = new GijiLockClientReceiver(this);
+        this.Receiver = new TalkToCsvClientReceiver(this);
         this.ActorCache = new ActorCache(this);
         this.RoomCache = new RoomCache(this);
         this.TimelineCache = new TimelineCache(this);
@@ -77,9 +77,9 @@ export default class GijiLockClientController extends AbstractServiceController<
         this.UseActors = new Array<Personal.Actor>();
 
         //  DB接続
-        this.Model = new GijiLockClientModel(this, () => {
+        this.Model = new TalkToCsvClientModel(this, () => {
             //  UI初期化
-            this.View = new GijiLockClientView(this, () => {
+            this.View = new TalkToCsvClientView(this, () => {
 
             });
         });

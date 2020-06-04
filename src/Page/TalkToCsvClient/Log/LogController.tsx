@@ -2,14 +2,14 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
 
-import GijiLockClientController from "../GijiLockClientController";
+import TalkToCsvClientController from "../TalkToCsvClientController";
 import LogUtil, { ILogListener, Log } from "../../../Base/Util/LogUtil";
 import LogComponent from "./LogComponent";
 
 
 export default class LogController implements ILogListener {
 
-    private _controller: GijiLockClientController;
+    private _controller: TalkToCsvClientController;
     private _logElement = document.getElementById('sbj-home-visitor-console-log');
     private _logs = new Array<Log>();
 
@@ -17,7 +17,7 @@ export default class LogController implements ILogListener {
      * コンストラクタ
      * @param controller 
      */
-    constructor(controller: GijiLockClientController) {
+    constructor(controller: TalkToCsvClientController) {
         this._controller = controller;
         LogUtil.AddListener(this);
     }

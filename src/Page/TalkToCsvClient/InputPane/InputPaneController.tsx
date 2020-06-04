@@ -1,6 +1,6 @@
 import SpeechUtil from "../../../Base/Util/SpeechUtil";
 import LocalCache from '../../../Contents/Cache/LocalCache';
-import GijiLockClientController from "../GijiLockClientController";
+import TalkToCsvClientController from "../TalkToCsvClientController";
 import ChatMessageSender from '../../../Contents/Sender/ChatMessageSender';
 import ChatInfoSender from '../../../Contents/Sender/ChatInfoSender';
 import IntervalSend from '../../../Base/Util/IntervalSend';
@@ -14,7 +14,7 @@ export default class InputPaneController {
     private _voiceRecognition = document.getElementById('sbj-inputpanel-send-message-recognition');
     private _voiceRecognitionOn = document.getElementById('sbj-inputpanel-send-message-recognition-on');
     private _voiceRecognitionOff = document.getElementById('sbj-inputpanel-send-message-recognition-off');
-    private _controller: GijiLockClientController;
+    private _controller: TalkToCsvClientController;
 
     private _isVoiceSpeech: boolean;
     private _isVoiceRecognition: boolean;
@@ -23,7 +23,7 @@ export default class InputPaneController {
      * コンストラクタ
      * @param controller 
      */
-    constructor(controller: GijiLockClientController) {
+    constructor(controller: TalkToCsvClientController) {
 
         this._controller = controller;
 

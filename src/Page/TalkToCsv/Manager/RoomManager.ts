@@ -1,7 +1,7 @@
 import LogUtil from "../../../Base/Util/LogUtil";
 import { OnRead } from "../../../Base/AbstractServiceModel";
 
-import HomeInstanceController from "../GijiLockController";
+import HomeInstanceController from "../TalkToCsvController";
 import ActorInfo from "../../../Contents/Struct/ActorInfo";
 import UseActorSender from "../../../Contents/Sender/UseActorSender";
 import RoomActorMemberSender from "../../../Contents/Sender/RoomActorMemberSender";

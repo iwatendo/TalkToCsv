@@ -1,11 +1,11 @@
 import StdUtil from "../../Base/Util/StdUtil";
 import SWPeer from "../../Base/WebRTC/SWPeer";
 import LocalCache from "../../Contents/Cache/LocalCache";
-import GijiLockController from "./GijiLockController";
+import TalkToCsvController from "./TalkToCsvController";
 
 if (StdUtil.IsSupoortPlatform() && !StdUtil.IsMobile()) {
 
-    let bootid = LocalCache.BootGijiLockPeerID;
+    let bootid = LocalCache.BootTalkToCsvPeerID;
 
     if (bootid && bootid.length > 0) {
 
@@ -14,7 +14,7 @@ if (StdUtil.IsSupoortPlatform() && !StdUtil.IsMobile()) {
 
         //  強制起動
         document.getElementById('sbj-home-instance-force-boot').onclick = () => {
-            LocalCache.BootGijiLockPeerID = "";
+            LocalCache.BootTalkToCsvPeerID = "";
             location.reload();
         }
     }
@@ -31,7 +31,7 @@ if (StdUtil.IsSupoortPlatform() && !StdUtil.IsMobile()) {
         }, 5000);
 
         //  通常起動
-        let server = new GijiLockController();
+        let server = new TalkToCsvController();
         server.SwPeer = new SWPeer(server, null, () => {
             isBoot = true;
             BootSucceed();

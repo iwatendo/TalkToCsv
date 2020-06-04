@@ -6,7 +6,7 @@ import * as Timeline from "../../../Contents/IndexedDB/Timeline";
 import StdUtil from "../../../Base/Util/StdUtil";
 import MessageUtil from '../../../Base/Util/MessageUtil';
 
-import GijiLockClientController from "../GijiLockClientController";
+import TalkToCsvClientController from "../TalkToCsvClientController";
 import { TimelineMsgGroup } from "./TimelineComponent";
 import SpeechUtil from '../../../Base/Util/SpeechUtil';
 import ImageInfo from '../../../Base/Container/ImageInfo';
@@ -17,7 +17,7 @@ import StyleCache from '../../../Contents/Cache/StyleCache';
  *  
  */
 interface TimelineMsgItemProp {
-    controller: GijiLockClientController;
+    controller: TalkToCsvClientController;
     MsgGroup: TimelineMsgGroup;
 }
 

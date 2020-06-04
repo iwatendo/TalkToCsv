@@ -1,12 +1,12 @@
-import GijiLockController from "../GijiLockController";
+import TalkToCsvController from "../TalkToCsvController";
 import RoomManager from "./RoomManager";
 
 export default class ServentManager {
 
-    private _controller: GijiLockController;
+    private _controller: TalkToCsvController;
 
 
-    public get Controller(): GijiLockController {
+    public get Controller(): TalkToCsvController {
         return this._controller;
     }
 
@@ -16,7 +16,7 @@ export default class ServentManager {
      * @param controller 
      * @param roomManager 
      */
-    constructor(controller: GijiLockController, roomManager: RoomManager) {
+    constructor(controller: TalkToCsvController, roomManager: RoomManager) {
         this._controller = controller;
     }
 

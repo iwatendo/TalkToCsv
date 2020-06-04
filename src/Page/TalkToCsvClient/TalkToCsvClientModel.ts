@@ -3,13 +3,13 @@ import * as Personal from "../../Contents/IndexedDB/Personal";
 
 import AbstractServiceModel, { OnModelLoad, OnRead, OnWrite } from "../../Base/AbstractServiceModel";
 
-import GijiLockClientController from "./GijiLockClientController";
+import TalkToCsvClientController from "./TalkToCsvClientController";
 import StdUtil from "../../Base/Util/StdUtil";
 import ImageInfo from "../../Base/Container/ImageInfo";
 import LocalCache from "../../Contents/Cache/LocalCache";
 
 
-export default class GijiLockClientModel extends AbstractServiceModel<GijiLockClientController> {
+export default class TalkToCsvClientModel extends AbstractServiceModel<TalkToCsvClientController> {
 
     private _personalDB: Personal.DB;
 

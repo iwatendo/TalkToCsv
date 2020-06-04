@@ -3,8 +3,8 @@ module.exports = {
   mode: 'development',
 
   entry: {
-    gijilock: './src/Page/GijiLock/Script.ts',
-    gijilockclient: './src/Page/GijiLockClient/Script.ts',
+    talktocsv: './src/Page/TalkToCsv/Script.ts',
+    talktocsvclient: './src/Page/TalkToCsvClient/Script.ts',
   },
   output: {
     path: __dirname + '/dist',
