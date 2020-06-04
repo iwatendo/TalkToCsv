@@ -27,8 +27,9 @@ export default class FileUtil {
         let hours = ("0" + now.getHours().toString()).slice(-2);
         let min = ("0" + now.getMinutes().toString()).slice(-2);
         let sec = ("0" + now.getSeconds().toString()).slice(-2);
-        let datetime = year + month + day + "-" + hours + min + sec;
 
+        let datetime = year + month + day + "_" + hours + min + sec;
+        
         let filename = "talktocsv_" + datetime;
         if(name){
             filename += name;
