@@ -145,7 +145,7 @@ export default class TalkToCsvModel extends AbstractServiceModel<TalkToCsvContro
             this._homeDB.ReadAllData((home) => {
                 let result = this.ToPlainText(timeline.Messages, home.Rooms);
                 let filename = FileUtil.GetDefaultFileName("", ".csv");
-                FileUtil.Export(filename, result);
+                FileUtil.ExportCsv(filename, result);
             });
         });
     }

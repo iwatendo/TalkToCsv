@@ -163,6 +163,32 @@ export default class FileUtil {
 
 
     /**
+     * 
+     * @param value 
+     */
+    public static ExportCsv(filename: string, value: string) {
+
+        //  出力テキストのフォーマット編集
+        let strValue = this.JsonFormatter(value);
+
+        //ファイル作成
+        let bom  = new Uint8Array([0xEF, 0xBB, 0xBF]);
+        var blob = new Blob([bom, value] , { type: "text/csv;" });        
+
+        if (window.navigator.msSaveBlob) {
+            window.navigator.msSaveBlob(blob, filename);
+        } else {
+            let a: any = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = filename;
+            document.body.appendChild(a) //  FireFox specification
+            a.click();
+            document.body.removeChild(a) //  FireFox specification
+        }
+    }
+
+
+    /**
      * Json文字列の加工
      * 改行コードを入れテキストエディタで加工しやすい形にする
      */
@@ -178,16 +204,29 @@ export default class FileUtil {
         return str;
     }
 
+    /**
+     * 文字列をUTF16に変換
+     * @param value 
+     */
+    private static str2utf16(value:string) : Uint16Array
+    {
+        var array = [];
+        for (var i=0; i<value.length; i++){
+        array.push(value.charCodeAt(i));
+        }
+        return new Uint16Array(array);
+    }
+
 
     /**
      * 文字列をバイナリに変換
      */
-    private static str2bytes(str, callback) {
+    private static str2bytes(str : string, callback) {
         let fr = new FileReader();
         fr.onloadend = function () {
             callback(fr.result);
         };
-        fr.readAsArrayBuffer(new Blob([str]));
+        fr.readAsArrayBuffer(new Blob([str],{ type: "text/csv;charset=utf-16;" }));
     }
 
 }
