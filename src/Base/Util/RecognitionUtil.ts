@@ -60,8 +60,8 @@ export default class RecognitionUtil {
     ) {
 
         let win = window as any;
-
         win.SpeechRecognition = win.SpeechRecognition || webkitSpeechRecognition;
+
         this._recognition = new webkitSpeechRecognition();
         this._recognition.lang = 'ja';
         this._recognition.interimResults = true;
@@ -86,7 +86,6 @@ export default class RecognitionUtil {
                     LogUtil.Error(service, sre.message);
                 }
             }
-            //  this._useRecognition = false;
             this.Stop();
         };
 
@@ -121,14 +120,14 @@ export default class RecognitionUtil {
                 }
             }
 
-            callback(text, false);
-
             if (isFinal) {
                 RecognitionUtil._isCancel = false;
+                //  this._recognition.stop();
                 callback(text, true);
-                this._recognition.stop();
             }
-
+            else {
+                callback(text, false);
+            }
         }
 
         //
