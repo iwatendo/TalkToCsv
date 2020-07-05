@@ -122,7 +122,7 @@ export default class RecognitionUtil {
 
             if (isFinal) {
                 RecognitionUtil._isCancel = false;
-                //  this._recognition.stop();
+                this._recognition.stop();
                 callback(text, true);
             }
             else {
