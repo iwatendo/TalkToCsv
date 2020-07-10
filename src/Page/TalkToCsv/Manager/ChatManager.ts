@@ -137,7 +137,7 @@ export default class ChatManager {
     private ToTimelineMessage(chm: ChatMessageSender): Timeline.Message {
         let tlmsg = new Timeline.Message();
         let ctime = Date.now();
-        tlmsg.mid = ctime.toString() + "-" + StdUtil.CreateUuid();
+        tlmsg.mid = chm.mid;
         tlmsg.hid = this._roomManager.GetRoomId(chm.peerid, chm.aid);
         tlmsg.peerid = chm.peerid;
         tlmsg.aid = chm.aid;
