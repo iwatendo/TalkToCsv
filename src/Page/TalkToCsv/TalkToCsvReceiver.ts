@@ -12,6 +12,7 @@ import GetTimelineSender from "../../Contents/Sender/GetTimelineSender";
 import TimelineSender from "../../Contents/Sender/TimelineSender";
 import UpdateTimelineSender from "../../Contents/Sender/UpdateTimelineSender";
 import ChatInfoSender from "../../Contents/Sender/ChatInfoSender";
+import AudioBlobSender from "../../Contents/Sender/AudioBlobSender";
 
 
 export default class TalkToCsvReceiver extends AbstractServiceReceiver<TalkToCsvController> {
@@ -92,6 +93,14 @@ export default class TalkToCsvReceiver extends AbstractServiceReceiver<TalkToCsv
         if (sender.type === UpdateTimelineSender.ID) {
             let utl = sender as UpdateTimelineSender;
             this.Controller.Manager.Chat.UpdateTimeline(utl.message);
+        }
+
+
+        if(sender.type === AudioBlobSender.ID){
+            let abs = sender as AudioBlobSender;
+            console.info(abs.mid);
+            console.info(abs.blob.size);
+            //  RecordingUtil.download(abs.blob);
         }
     }
 

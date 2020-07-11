@@ -1,4 +1,6 @@
-﻿import Sender from "./Container/Sender";
+﻿import { deepStrictEqual } from "assert";
+import { encode, decode } from "@msgpack/msgpack";
+import Sender from "./Container/Sender";
 import LogUtil, { LogLevel } from "./Util/LogUtil";
 import LinkUtil from "./Util/LinkUtil";
 import ISWRoom from "./WebRTC/ISWRoom";
@@ -10,6 +12,7 @@ import IServiceView from "./IServiceView";
 import IServiceModel from "./IServiceModel";
 import LocalCache from "../Contents/Cache/LocalCache";
 import CloseRequestSender from "./Container/CloseRequestSender";
+import SWMsgPack from "./WebRTC/SWMsgPack";
 
 /**
  * Peerサービスコントローラーの抽象化クラス
@@ -176,14 +179,16 @@ export default abstract class AbstractServiceController<V extends IServiceView, 
      */
     public Recv(conn: PeerJs.DataConnection, recv: any) {
 
-        if (recv === null)
+        if (recv === null){
             return;
+        }
 
-        let json = decodeURIComponent(recv);
-        let sender: Sender = JSON.parse(json) as Sender;
+        let sender = SWMsgPack.Decode(recv);
 
-        if (LogUtil.IsOutputSender(sender))
+        if (LogUtil.IsOutputSender(sender)){
+            let json = JSON.stringify(sender);
             LogUtil.Info(this, "recv : " + json);
+        }
 
         if (sender === null)
             return;

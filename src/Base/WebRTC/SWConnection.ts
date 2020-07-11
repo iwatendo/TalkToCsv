@@ -1,6 +1,8 @@
 import IServiceController from "../IServiceController";
 import LogUtil from "../Util/LogUtil";
 import SWPeer from "./SWPeer";
+import Sender from "../Container/Sender";
+import SWMsgPack from "./SWMsgPack";
 
 
 export default class SWConnection {
@@ -10,7 +12,7 @@ export default class SWConnection {
     private _swpeer: SWPeer
     private _service: IServiceController;
     private _conn: PeerJs.DataConnection;
-    private _sendQueue = new Array<any>();
+    private _sendQueue = new Array<Uint8Array>();
     private _isOpen = false;
     private _isCreate = false;
     private _isClose = false;
@@ -48,17 +50,18 @@ export default class SWConnection {
         });
     }
 
-
     /**
      * データ送信
-     * @param data 
+     * @param sender 
      */
-    public Send(data: any) {
+    public Send(dataType: string, sender: Sender) {
+
+        let data = SWMsgPack.Encode(sender);
 
         //  接続済みの場合は即送信
         if (this._isOpen) {
             if (this._conn.open) {
-                this._conn.send(encodeURIComponent(data));
+                this._conn.send(data);
             }
         }
         else {
@@ -68,6 +71,11 @@ export default class SWConnection {
             }
 
             this._sendQueue.push(data);
+        }
+
+        if (LogUtil.IsOutputSender(sender)) {
+            let msg = `send(${dataType}) : ${JSON.stringify(sender)}`;
+            LogUtil.Info(this._service, msg);
         }
     }
 
@@ -79,7 +87,7 @@ export default class SWConnection {
     private OnConnectionOpen(conn: PeerJs.DataConnection) {
         this._isOpen = true;
         LogUtil.Info(this._service, "data connection [" + this._swpeer.PeerId + "] <-> [" + conn.remoteId + "]");
-        this._sendQueue.forEach((data) => { conn.send(encodeURIComponent(data)); });
+        this._sendQueue.forEach((data) => { conn.send(data); });
         this._sendQueue = new Array<any>();
         this._service.OnDataConnectionOpen(conn);
     }

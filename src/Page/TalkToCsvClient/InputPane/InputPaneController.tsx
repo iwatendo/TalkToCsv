@@ -1,10 +1,12 @@
-import SpeechUtil from "../../../Base/Util/SpeechUtil";
 import LocalCache from '../../../Contents/Cache/LocalCache';
 import TalkToCsvClientController from "../TalkToCsvClientController";
 import ChatMessageSender from '../../../Contents/Sender/ChatMessageSender';
 import ChatInfoSender from '../../../Contents/Sender/ChatInfoSender';
 import IntervalSend from '../../../Base/Util/IntervalSend';
 import RecognitionUtil from "../../../Base/Util/RecognitionUtil";
+import RecordingUtil from "../../../Base/Util/RecordingUtil";
+import StdUtil from "../../../Base/Util/StdUtil";
+import AudioBlobSender from '../../../Contents/Sender/AudioBlobSender';
 
 export default class InputPaneController {
 
@@ -134,7 +136,7 @@ export default class InputPaneController {
      * 音声認識のテキスト処理
      * @param text 
      */
-    private SendVoiceText(text) {
+    private SendVoiceText(text): ChatMessageSender | undefined {
 
         let sendVoiceType = 1;
 
@@ -149,8 +151,7 @@ export default class InputPaneController {
                 break;
             case 1:
                 //  直接チャットメッセージとして送信
-                this.SendChatMessage(text, true);
-                break;
+                return this.SendChatMessage(text, true);
         }
     }
 
@@ -158,6 +159,7 @@ export default class InputPaneController {
     private CreateChatMessage(text: string, isVoiceRecognition: boolean): ChatMessageSender {
         let chm = new ChatMessageSender();
         let actor = this._controller.CurrentActor;
+        chm.mid = StdUtil.CreateUuid();
         chm.peerid = this._controller.PeerId;
         chm.aid = actor.aid;
         chm.name = actor.name;
@@ -173,10 +175,11 @@ export default class InputPaneController {
      * メッセージ送信
      * @param text 
      */
-    private SendChatMessage(text: string, isVoiceRecognition: boolean) {
+    private SendChatMessage(text: string, isVoiceRecognition: boolean): ChatMessageSender {
 
         let chm = this.CreateChatMessage(text, isVoiceRecognition);
         this._controller.SendChatMessage(chm);
+        return chm;
     }
 
 
@@ -195,32 +198,45 @@ export default class InputPaneController {
         else {
             this._voiceRecognition.classList.remove("mdl-button--colored");
         }
+
         this._voiceRecognitionOn.hidden = !this._isVoiceRecognition;
         this._voiceRecognitionOff.hidden = this._isVoiceRecognition;
+
+        RecordingUtil.initilize((audioBlob) => {
+            let sender = new AudioBlobSender();
+            sender.mid = RecordingUtil.Mid;
+            sender.blob = audioBlob;
+            this._controller.SwPeer.SendToOwner(sender);
+        });
+
+
         if (this._isVoiceRecognition) {
             RecognitionUtil.InitSpeechRecognition(
                 this._controller,
                 (text, isFinal) => {
                     if (text) {
                         if (isFinal) {
-                            this.SendVoiceText(text);
+                            let chm = this.SendVoiceText(text);
+                            RecordingUtil.Mid = chm.mid;
                             this._textareaElement.value = "";
                         }
                         else {
                             this._textareaElement.value = text;
                         }
                     }
-                    else{
+                    else {
                         this._textareaElement.value = "";
                     }
 
                 }
                 , () => {
+                    RecordingUtil.start();
                     this._voiceRecognitionOn.classList.remove("mdl-button--colored");
                     this._voiceRecognitionOn.classList.add("mdl-button--accent");
                     this._textareaElement.disabled = true;
                 }
                 , () => {
+                    RecordingUtil.stop();
                     this._voiceRecognitionOn.classList.remove("mdl-button--accent");
                     this._voiceRecognitionOn.classList.add("mdl-button--colored");
                     this._textareaElement.disabled = false;
