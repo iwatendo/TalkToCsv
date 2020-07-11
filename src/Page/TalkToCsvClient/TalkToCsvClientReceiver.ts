@@ -17,6 +17,7 @@ import GetProfileSender from "../../Contents/Sender/GetProfileSender";
 import GetActorSender from "../../Contents/Sender/GetActorSender";
 import ActorInfoSender from "../../Contents/Sender/ActorInfoSender";
 import ProfileSender from "../../Contents/Sender/ProfileSender";
+import AudioBlobSender from "../../Contents/Sender/AudioBlobSender";
 
 
 export default class TalkToCsvClientReceiver extends AbstractServiceReceiver<TalkToCsvClientController> {
@@ -98,6 +99,13 @@ export default class TalkToCsvClientReceiver extends AbstractServiceReceiver<Tal
         if (sender.type === ActorInfoSender.ID) {
             this.Controller.ActorCache.SetActor(conn.remoteId, (sender as ActorInfoSender).actorInfo);
         }
+
+        //  音声再生
+        if (sender.type === AudioBlobSender.ID) {
+            let abs = sender as AudioBlobSender;
+            console.info(abs.binary);
+        }
+
     }
 
     /**

@@ -43,21 +43,16 @@ export class DB extends AbstractIndexedDB<Data> {
 
 
     public IsImportMatch(preData: any): boolean {
-
         let data: Data = preData;
         if (data.Voices && data.Voices.length > 0) return true;
-
         return false;
-
     }
 
 
     public Import(data: Data, callback: DBI.OnWriteComplete) {
-
         this.ClearAll(DB.Voice, () => {
             this.WriteAllData(data, callback);
         });
-
     }
 
 }

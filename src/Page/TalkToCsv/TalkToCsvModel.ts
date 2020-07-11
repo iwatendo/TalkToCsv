@@ -10,6 +10,7 @@ import TalkToCsvController from "./TalkToCsvController";
 import ImageInfo from "../../Base/Container/ImageInfo";
 import FileUtil from "../../Base/Util/FileUtil";
 import AudioBlobSender from "../../Contents/Sender/AudioBlobSender";
+import GetAudioBlobSender from "../../Contents/Sender/GetAudioBlobSender";
 
 
 export default class TalkToCsvModel extends AbstractServiceModel<TalkToCsvController> {
@@ -198,6 +199,20 @@ export default class TalkToCsvModel extends AbstractServiceModel<TalkToCsvContro
      */
     public SaveVoice(abs: AudioBlobSender, callback: OnWrite) {
         this._voiceDB.Write<ArrayBuffer>(Voice.DB.Voice, abs.mid, abs.binary, callback);
+    }
+
+
+    /**
+     * 音声をIndexedDBから取得
+     * @param key 
+     */
+    public LoadVoice(key: GetAudioBlobSender, callback: OnRead<AudioBlobSender>) {
+        this._voiceDB.Read<ArrayBuffer,string>(Voice.DB.Voice, key.mid, (result)=>{
+            let abs = new AudioBlobSender();
+            abs.mid = key.mid;
+            abs.binary = result;
+            callback(abs);
+        });
     }
 
 }

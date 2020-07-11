@@ -14,6 +14,7 @@ import UpdateTimelineSender from "../../Contents/Sender/UpdateTimelineSender";
 import ChatInfoSender from "../../Contents/Sender/ChatInfoSender";
 import AudioBlobSender from "../../Contents/Sender/AudioBlobSender";
 import RecordingUtil from "../../Base/Util/RecordingUtil";
+import GetAudioBlobSender from "../../Contents/Sender/GetAudioBlobSender";
 
 
 export default class TalkToCsvReceiver extends AbstractServiceReceiver<TalkToCsvController> {
@@ -29,10 +30,10 @@ export default class TalkToCsvReceiver extends AbstractServiceReceiver<TalkToCsv
         let reuslt = "";
 
         //  Aidそのままだと長すぎるのでピックアップして表示
-        for( let col of aid.split("-")){
-            if(col){
+        for (let col of aid.split("-")) {
+            if (col) {
                 reuslt += col[0];
-                reuslt += col[col.length-1];
+                reuslt += col[col.length - 1];
             }
         }
 
@@ -97,11 +98,18 @@ export default class TalkToCsvReceiver extends AbstractServiceReceiver<TalkToCsv
         }
 
 
-        if(sender.type === AudioBlobSender.ID){
+        //  音声の登録
+        if (sender.type === AudioBlobSender.ID) {
             let abs = sender as AudioBlobSender;
+            this.Controller.Model.SaveVoice(abs, () => { });
+        }
 
-            this.Controller.Model.SaveVoice(abs,()=>{
-
+        //  音声の要求
+        if (sender.type === GetAudioBlobSender.ID) {
+            let key = sender as GetAudioBlobSender;
+            this.Controller.Model.LoadVoice(key, (resultAbs) => {
+                //  要求があったクライアントに音声情報を返す
+                this.Controller.SwPeer.SendTo(conn, resultAbs);
             });
         }
     }
