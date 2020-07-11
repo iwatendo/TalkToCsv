@@ -99,11 +99,10 @@ export default class TalkToCsvReceiver extends AbstractServiceReceiver<TalkToCsv
 
         if(sender.type === AudioBlobSender.ID){
             let abs = sender as AudioBlobSender;
-            console.info(abs.mid);
-            console.info(abs.binary.byteLength);
-            var blob = new Blob([abs.binary]);
 
-            //  RecordingUtil.download(blob);
+            this.Controller.Model.SaveVoice(abs,()=>{
+
+            });
         }
     }
 
