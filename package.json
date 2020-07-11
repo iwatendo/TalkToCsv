@@ -19,6 +19,7 @@
     "copy:src": "cpx \"./src/Page/**/{*.html,*.css,*.map,*.json}\" ./dist"
   },
   "dependencies": {
+    "@msgpack/msgpack": "^1.12.2",
     "co": "^4.6.0",
     "cpx": "^1.5.0",
     "http-server": "^0.12.1",
