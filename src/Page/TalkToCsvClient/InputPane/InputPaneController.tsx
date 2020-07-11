@@ -7,6 +7,7 @@ import RecognitionUtil from "../../../Base/Util/RecognitionUtil";
 import RecordingUtil from "../../../Base/Util/RecordingUtil";
 import StdUtil from "../../../Base/Util/StdUtil";
 import AudioBlobSender from '../../../Contents/Sender/AudioBlobSender';
+import SWMsgPack from '../../../Base/WebRTC/SWMsgPack';
 
 export default class InputPaneController {
 
@@ -203,10 +204,14 @@ export default class InputPaneController {
         this._voiceRecognitionOff.hidden = this._isVoiceRecognition;
 
         RecordingUtil.initilize((audioBlob) => {
-            let sender = new AudioBlobSender();
-            sender.mid = RecordingUtil.Mid;
-            sender.blob = audioBlob;
-            this._controller.SwPeer.SendToOwner(sender);
+
+            SWMsgPack.BlobToArray(audioBlob).then((value)=>{
+                let sender = new AudioBlobSender();
+                sender.mid = RecordingUtil.Mid;
+                sender.binary = value as ArrayBuffer;
+                this._controller.SwPeer.SendToOwner(sender);
+            });
+
         });
 
 

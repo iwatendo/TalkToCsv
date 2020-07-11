@@ -1,11 +1,10 @@
-import * as Personal from "../IndexedDB/Personal";
-import Sender from "../../Base/Container/Sender";
+import BinarySender from "../../Base/Container/BinarySender";
 
 
 /**
  * 
  */
-export default class AudioBlobSender extends Sender {
+export default class AudioBlobSender extends BinarySender {
 
     public static ID = "AudioBlob";
 
@@ -14,6 +13,4 @@ export default class AudioBlobSender extends Sender {
     }
 
     public mid: string;
-
-    public blob: Blob;
 }

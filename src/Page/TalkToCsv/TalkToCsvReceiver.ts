@@ -13,6 +13,7 @@ import TimelineSender from "../../Contents/Sender/TimelineSender";
 import UpdateTimelineSender from "../../Contents/Sender/UpdateTimelineSender";
 import ChatInfoSender from "../../Contents/Sender/ChatInfoSender";
 import AudioBlobSender from "../../Contents/Sender/AudioBlobSender";
+import RecordingUtil from "../../Base/Util/RecordingUtil";
 
 
 export default class TalkToCsvReceiver extends AbstractServiceReceiver<TalkToCsvController> {
@@ -99,8 +100,10 @@ export default class TalkToCsvReceiver extends AbstractServiceReceiver<TalkToCsv
         if(sender.type === AudioBlobSender.ID){
             let abs = sender as AudioBlobSender;
             console.info(abs.mid);
-            console.info(abs.blob.size);
-            //  RecordingUtil.download(abs.blob);
+            console.info(abs.binary.byteLength);
+            var blob = new Blob([abs.binary]);
+
+            //  RecordingUtil.download(blob);
         }
     }
 
