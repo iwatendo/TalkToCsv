@@ -45,15 +45,23 @@ export class TimelineMsgItemComponent extends React.Component<TimelineMsgItemPro
             let tmclass = "sbj-timeline-message" + (tlmsg.visible ? "" : " sbj-timeline-message-ignore");
             let icon = (tlmsg.visible ? "clear" : "undo");
 
+
+            let button = (<span></span>);
+
+            //  音声再生ボタン
+            if(tlmsg.voiceRecog){
+                button = (
+                    <span>
+                        <button className='mdl-button mdl-js-button mdl-button--icon mdl-button--colored sbj-timeline-ignore'
+                            onClick={(e) => { this.OnVoiceClick(tlmsg); }}>
+                            <i className='material-icons' id={mid}>volume_up</i>
+                        </button>
+                    </span>
+                );
+            }
+
             //  自分のメッセージの場合は削除ボタンを表示
-            let button = (
-                <span>
-                    <button className='mdl-button mdl-js-button mdl-button--icon mdl-button--colored sbj-timeline-ignore'
-                        onClick={(e) => { this.OnVoiceClick(tlmsg); }}>
-                        <i className='sbj-timeline-message-icon material-icons' id={mid}>volume_up</i>
-                    </button>
-                </span>
-            );
+            //  ※削除ボタンは廃止
             /*
             if (this.IsMyChatMessage()) {
                 button = (

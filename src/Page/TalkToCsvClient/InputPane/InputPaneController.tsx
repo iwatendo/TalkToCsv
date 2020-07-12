@@ -206,10 +206,13 @@ export default class InputPaneController {
         RecordingUtil.initilize((audioBlob) => {
 
             SWMsgPack.BlobToArray(audioBlob).then((value)=>{
-                let sender = new AudioBlobSender();
-                sender.mid = RecordingUtil.Mid;
-                sender.binary = value as ArrayBuffer;
-                this._controller.SwPeer.SendToOwner(sender);
+                if(RecordingUtil.Mid){
+                    let sender = new AudioBlobSender();
+                    sender.mid = RecordingUtil.Mid;
+                    sender.binary = value as ArrayBuffer;
+                    this._controller.SwPeer.SendToOwner(sender);
+                    RecordingUtil.Mid = "";
+                }
             });
 
         });

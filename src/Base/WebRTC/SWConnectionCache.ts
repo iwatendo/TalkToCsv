@@ -1,9 +1,6 @@
-import { deepStrictEqual } from "assert";
-import { encode, decode } from "@msgpack/msgpack";
 import SWConnection from "./SWConnection";
 import IServiceController from "../IServiceController";
 import Sender from "../Container/Sender";
-import LogUtil from "../Util/LogUtil";
 import SWPeer from "./SWPeer";
 
 

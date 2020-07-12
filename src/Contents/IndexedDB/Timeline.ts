@@ -15,6 +15,7 @@ export class Message {
     utime: number;
     visible: boolean;
     speech: boolean;
+    voiceRecog: boolean;    
 }
 
 export class Data {

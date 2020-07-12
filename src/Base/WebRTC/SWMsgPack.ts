@@ -1,6 +1,6 @@
 import Sender from "../Container/Sender";
-import { encode, decode } from "@msgpack/msgpack";
 import BinarySender from "../Container/BinarySender";
+import { encode, decode } from "@msgpack/msgpack";
 
 
 export default class SWMsgPack {
@@ -49,10 +49,10 @@ export default class SWMsgPack {
             let binarySize = (wd[4] << 24) + (wd[5] << 16) + (wd[6] << 8) + wd[7];
             let md = wd.slice(8, dataSize + 8);
 
-            if(binarySize === 0){
+            if (binarySize === 0) {
                 return decode(md) as Sender;
             }
-            else{
+            else {
                 let result = decode(md) as BinarySender;
                 result.binary = wd.slice(dataSize + 8, dataSize + binarySize + 8);
                 return result;
@@ -84,7 +84,7 @@ export default class SWMsgPack {
      * 
      * @param ab 
      */
-    public static ArrayToBlob(ab : ArrayBuffer): Blob{
+    public static ArrayToBlob(ab: ArrayBuffer): Blob {
         return new Blob([ab]);
     }
 
