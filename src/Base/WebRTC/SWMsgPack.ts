@@ -80,4 +80,12 @@ export default class SWMsgPack {
         });
     }
 
+    /**
+     * 
+     * @param ab 
+     */
+    public static ArrayToBlob(ab : ArrayBuffer): Blob{
+        return new Blob([ab]);
+    }
+
 }

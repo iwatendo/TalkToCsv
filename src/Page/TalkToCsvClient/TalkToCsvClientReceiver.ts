@@ -18,6 +18,8 @@ import GetActorSender from "../../Contents/Sender/GetActorSender";
 import ActorInfoSender from "../../Contents/Sender/ActorInfoSender";
 import ProfileSender from "../../Contents/Sender/ProfileSender";
 import AudioBlobSender from "../../Contents/Sender/AudioBlobSender";
+import SWMsgPack from "../../Base/WebRTC/SWMsgPack";
+import RecordingUtil from "../../Base/Util/RecordingUtil";
 
 
 export default class TalkToCsvClientReceiver extends AbstractServiceReceiver<TalkToCsvClientController> {
@@ -103,7 +105,12 @@ export default class TalkToCsvClientReceiver extends AbstractServiceReceiver<Tal
         //  音声再生
         if (sender.type === AudioBlobSender.ID) {
             let abs = sender as AudioBlobSender;
-            console.info(abs.binary);
+            let blob = SWMsgPack.ArrayToBlob(abs.binary);
+
+            //  再生処理
+            let url =URL.createObjectURL(blob);
+            var music = new Audio(url);
+            music.play();
         }
 
     }
