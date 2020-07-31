@@ -5,8 +5,8 @@ module.exports = {
   mode: 'production',
 
   entry: {
-    talktocsv: './src/Page/TalkToCsv/Script.ts',
-    talktocsvclient: './src/Page/TalkToCsvClient/Script.ts',
+    chatowner: './src/Page/ChatOwner/Script.ts',
+    chatclient: './src/Page/ChatClient/Script.ts',
   },
 
   output: {

@@ -1,10 +1,10 @@
 {
-  "name": "talktocsv",
+  "name": "gijilockon",
   "version": "1.0.0",
   "license": "AGPL-3.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/iwatendo/talktocsv"
+    "url": "https://github.com/iwatendo/gijilockon"
   },
   "scripts": {
     "start": "http-server ./dist/ -p 8080 -c-1",

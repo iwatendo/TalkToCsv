@@ -22,8 +22,8 @@ export default class LocalCache {
     /**
      *  起動しているインスタンスのPeerID
      */
-    public static set BootTalkToCsvPeerID(val: string) { localStorage.setItem('home-instance-id', val); }
-    public static get BootTalkToCsvPeerID(): string { return localStorage.getItem('home-instance-id'); }
+    public static set BootChatOwnerPeerID(val: string) { localStorage.setItem('home-instance-id', val); }
+    public static get BootChatOwnerPeerID(): string { return localStorage.getItem('home-instance-id'); }
 
 
     /**
