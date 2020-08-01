@@ -1,7 +1,5 @@
 import * as Timeline from "../../../Contents/IndexedDB/Timeline";
 
-import StdUtil from "../../../Base/Util/StdUtil";
-
 import ChatOwnerController from "../ChatOwnerController";
 import RoomManager from "./RoomManager";
 import ChatMessageSender from "../../../Contents/Sender/ChatMessageSender";
@@ -144,6 +142,7 @@ export default class ChatManager {
         tlmsg.iid = chm.iid;
         tlmsg.gid = chm.gid;
         tlmsg.name = chm.name;
+        tlmsg.chatBgColor = chm.chatBgColor;
         tlmsg.text = chm.text;
         tlmsg.ctime = ctime;
         tlmsg.utime = ctime;

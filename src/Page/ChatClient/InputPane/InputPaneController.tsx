@@ -8,6 +8,9 @@ import RecordingUtil from "../../../Base/Util/RecordingUtil";
 import StdUtil from "../../../Base/Util/StdUtil";
 import AudioBlobSender from '../../../Contents/Sender/AudioBlobSender';
 import SWMsgPack from '../../../Base/WebRTC/SWMsgPack';
+import ReactDOM = require('react-dom');
+import React = require('react');
+import { ColorComponent } from './ColorComponent';
 
 export default class InputPaneController {
 
@@ -39,6 +42,11 @@ export default class InputPaneController {
         this._voiceRecognition.onclick = (e) => {
             this.ChangeVoiceRecognition();
         }
+
+        let element: HTMLElement = document.getElementById('sbj-chatmessage-color');
+
+        let actor = controller.CurrentActor;
+        ReactDOM.render(<ColorComponent controller={controller} actor={actor} />, element, () => { });
 
         this.ClearText();
     }
@@ -163,6 +171,7 @@ export default class InputPaneController {
         chm.peerid = this._controller.PeerId;
         chm.aid = actor.aid;
         chm.name = actor.name;
+        chm.chatBgColor = actor.chatBgColor;
         chm.iid = actor.dispIid;
         chm.text = text;
         chm.isVoiceRecog = isVoiceRecognition;

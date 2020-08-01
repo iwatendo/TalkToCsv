@@ -15,6 +15,7 @@ export default class ChatMessageSender extends Sender {
         this.iid = "";
         this.gid = "";
         this.name = "";
+        this.chatBgColor = "";
         this.text = "";
         this.isSpeech = false;
         this.isVoiceRecog = false;
@@ -34,6 +35,8 @@ export default class ChatMessageSender extends Sender {
     public gid: string;
 
     public name: string;
+
+    public chatBgColor: string;
 
     public text: string;
 

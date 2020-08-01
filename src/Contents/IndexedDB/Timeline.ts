@@ -10,6 +10,7 @@ export class Message {
     iid: string;
     gid: string;
     name: string;
+    chatBgColor: string;
     text: string;
     ctime: number;
     utime: number;

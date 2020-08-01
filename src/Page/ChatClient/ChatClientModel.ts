@@ -94,6 +94,15 @@ export default class ChatClientModel extends AbstractServiceModel<ChatClientCont
     }
 
     /**
+     * アイコン情報の取得
+     * @param iid 
+     * @param callback 
+     */
+    public GetIcon(iid: string, callback: OnRead<Personal.Icon>) {
+        this._personalDB.Read(Personal.DB.ICON, iid, callback);
+    }
+
+    /**
      * アイコンの更新
      * @param icon 
      * @param callback 

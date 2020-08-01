@@ -49,7 +49,7 @@ export class TimelineMsgItemComponent extends React.Component<TimelineMsgItemPro
             let button = (<span></span>);
 
             //  音声再生ボタン
-            if(tlmsg.voiceRecog){
+            if (tlmsg.voiceRecog) {
                 button = (
                     <span>
                         <button className='mdl-button mdl-js-button mdl-button--icon mdl-button--colored sbj-timeline-ignore'
@@ -93,7 +93,15 @@ export class TimelineMsgItemComponent extends React.Component<TimelineMsgItemPro
         });
 
         let iconstyle = StyleCache.GetIconStyle(iid);
-        let msgstyle = StyleCache.GetTimelineMsgStyle(iid);
+        //  let msgstyle = StyleCache.GetTimelineMsgStyle(iid);
+
+        let bgColor = this.props.MsgGroup[0].chatBgColor;
+        var fgColor = this.blackOrWhite(bgColor);
+
+        let msgstyle = {
+            color: fgColor,
+            backgroundColor: bgColor,
+        };
 
         //
         let image_div = (iid ? (<div className='sbj-timeline-img-box'><div className='sbj-timeline-img' style={iconstyle}></div></div>) : (<div></div>));
@@ -117,6 +125,18 @@ export class TimelineMsgItemComponent extends React.Component<TimelineMsgItemPro
             return (<div key="right" className='sbj-timeline-flex-right'>{spc_div}{msg_div}{image_div}</div>);
         }
 
+    }
+
+    /**
+     * 背景色に応じて文字色を黒か白か判定する
+     * @param hexcolor 
+     */
+    public blackOrWhite(hexcolor: string) {
+        var r = parseInt(hexcolor.substr(1, 2), 16);
+        var g = parseInt(hexcolor.substr(3, 2), 16);
+        var b = parseInt(hexcolor.substr(5, 2), 16);
+
+        return ((((r * 299) + (g * 587) + (b * 114)) / 1000) < 128) ? "white" : "black";
     }
 
     /**

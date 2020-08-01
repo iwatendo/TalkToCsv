@@ -101,6 +101,8 @@ export class TimelineComponent extends React.Component<TimelineProp, any>{
 
             //  名前が変更されていない事
             if (pre.name !== cur.name) return false;
+            //  色が変更されてない事
+            if (pre.chatBgColor !== cur.chatBgColor) return false;
 
             //  前回の発言から５分経過していない事
             //  5 * 60 * 1000 = 300000
