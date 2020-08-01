@@ -60,7 +60,7 @@ export default class ChatClientModel extends AbstractServiceModel<ChatClientCont
      * プロフィール情報取得
      * @param callback 
      */
-    public GetUserProfile(callback: OnRead<Personal.Actor>) {
+    public GetFirstActor(callback: OnRead<Personal.Actor>) {
 
         this._personalDB.ReadAll(Personal.DB.ACTOR, (actors: Array<Personal.Actor>) => {
 
@@ -94,15 +94,6 @@ export default class ChatClientModel extends AbstractServiceModel<ChatClientCont
     }
 
     /**
-     * アクター情報を全て取得
-     * @param callback 
-     */
-    public GetActors(callback: OnRead<Array<Personal.Actor>>) {
-        this._personalDB.ReadAll(Personal.DB.ACTOR, callback);
-    }
-
-
-    /**
      * アイコンの更新
      * @param icon 
      * @param callback 
@@ -115,70 +106,12 @@ export default class ChatClientModel extends AbstractServiceModel<ChatClientCont
         });
     }
 
-
     /**
-     * アイコン情報を全て取得
+     * アクター情報を全て取得
      * @param callback 
      */
-    public GetIcons(callback: OnRead<Array<Personal.Icon>>) {
-        this._personalDB.ReadAll(Personal.DB.ICON, callback);
+    public GetActors(callback: OnRead<Array<Personal.Actor>>) {
+        this._personalDB.ReadAll(Personal.DB.ACTOR, callback);
     }
-
-
-    /**
-     * アイコン情報の取得
-     * @param iid 
-     * @param callback 
-     */
-    public GetIcon(iid: string, callback: OnRead<Personal.Icon>) {
-        this._personalDB.Read(Personal.DB.ICON, iid, callback);
-    }
-
-
-    /**
-     * 指定されたAIDのアイコンリストを取得します
-     * @param pid 
-     * @param OnRead 
-     */
-    public GetIconList(actor: Personal.Actor, callback: OnRead<Array<Personal.Icon>>) {
-
-        if (actor === null) {
-            return;
-        }
-        let result = new Array<Personal.Icon>();
-
-        let icons = actor.iconIds;
-        let loop: number = 0;
-        let max: number = icons.length;
-
-        let loopCall = (icon) => {
-            result.push(icon);
-            loop += 1;
-            if (loop < max) {
-                this.GetIcon(icons[loop], loopCall);
-            }
-            else {
-                callback(result);
-            }
-        };
-
-        if (max === 0) {
-            callback(result);
-        }
-        else {
-            this.GetIcon(icons[0], loopCall)
-        }
-    }
-
-
-    /**
-     * ガイド情報の取得
-     * @param gid 
-     * @param callback 
-     */
-    public GetGuide(gid: string, callback: OnRead<Personal.Guide>) {
-        this._personalDB.Read(Personal.DB.GUIDE, gid, callback);
-    }
-
 
 }

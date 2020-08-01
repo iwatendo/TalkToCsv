@@ -19,27 +19,6 @@ import GetAudioBlobSender from "../../Contents/Sender/GetAudioBlobSender";
 
 export default class ChatOwnerReceiver extends AbstractServiceReceiver<ChatOwnerController> {
 
-
-    /**
-     * 表示用ID
-     * @param aid 
-     * @param remoteId 
-     */
-    private ToDispID(aid: string, remoteId: string): string {
-
-        let reuslt = "";
-
-        //  Aidそのままだと長すぎるのでピックアップして表示
-        for (let col of aid.split("-")) {
-            if (col) {
-                reuslt += col[0];
-                reuslt += col[col.length - 1];
-            }
-        }
-
-        return `UserID:${reuslt}`;
-    }
-
     /**
      * 
      */
@@ -70,7 +49,7 @@ export default class ChatOwnerReceiver extends AbstractServiceReceiver<ChatOwner
         if (sender.type === ChatMessageSender.ID) {
             let chatMessage = sender as ChatMessageSender;
 
-            chatMessage.name = this.ToDispID(chatMessage.aid, conn.remoteId);
+            //  chatMessage.name = this.ToDispID(chatMessage.aid, conn.remoteId);
 
             this.Controller.Manager.Chat.SetMessage(chatMessage);
         }

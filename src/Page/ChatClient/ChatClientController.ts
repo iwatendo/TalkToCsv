@@ -187,6 +187,7 @@ export default class ChatClientController extends AbstractServiceController<Chat
         this.Model.GetActor(aid, (actor) => {
             this._currentActor = actor;
             this.SetUseActors(ua);
+            this.View.InitializeActorEvent(actor);
         });
     }
 

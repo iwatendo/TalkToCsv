@@ -19,7 +19,6 @@ import ActorInfoSender from "../../Contents/Sender/ActorInfoSender";
 import ProfileSender from "../../Contents/Sender/ProfileSender";
 import AudioBlobSender from "../../Contents/Sender/AudioBlobSender";
 import SWMsgPack from "../../Base/WebRTC/SWMsgPack";
-import RecordingUtil from "../../Base/Util/RecordingUtil";
 
 
 export default class ChatClientReceiver extends AbstractServiceReceiver<ChatClientController> {
@@ -108,7 +107,7 @@ export default class ChatClientReceiver extends AbstractServiceReceiver<ChatClie
             let blob = SWMsgPack.ArrayToBlob(abs.binary);
 
             //  再生処理
-            let url =URL.createObjectURL(blob);
+            let url = URL.createObjectURL(blob);
             var music = new Audio(url);
             music.play();
         }
@@ -120,7 +119,7 @@ export default class ChatClientReceiver extends AbstractServiceReceiver<ChatClie
      * @param conn 
      */
     public GetProfile(conn: PeerJs.DataConnection) {
-        this.Controller.Model.GetUserProfile((profile) => {
+        this.Controller.Model.GetFirstActor((profile) => {
             let result = new ProfileSender();
             result.profile = profile;
             this.Controller.SwPeer.SendTo(conn, result);

@@ -10,6 +10,8 @@ import { TimelineComponent } from "./Timeline/TimelineComponent";
 import CatClientController from "./ChatClientController";
 import InputPaneController from "./InputPane/InputPaneController";
 import ChatInfoSender from '../../Contents/Sender/ChatInfoSender';
+import { Actor } from '../../Contents/IndexedDB/Personal';
+import MdlUtil from '../../Contents/Util/MdlUtil';
 
 
 export default class CatClientView extends AbstractServiceView<CatClientController> {
@@ -52,6 +54,19 @@ export default class CatClientView extends AbstractServiceView<CatClientControll
         callback();
     }
 
+    /**
+     * プロフィールの初期表示と変更時イベント設定
+     */
+    public InitializeActorEvent(actor: Actor) {
+
+        MdlUtil.SetTextField('sbj-profile-name', 'sbj-profile-name-field', actor.name, true);
+
+        let element = document.getElementById('sbj-profile-name') as HTMLInputElement;
+        element.onchange = (ev) => {
+            actor.name = element.value;
+            this.Controller.Model.UpdateActor(actor, () => { });
+        };
+    }
 
     /**
      * 多重起動エラー

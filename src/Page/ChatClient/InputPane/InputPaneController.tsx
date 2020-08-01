@@ -43,7 +43,6 @@ export default class InputPaneController {
         this.ClearText();
     }
 
-
     /**
      * テキストエリア以外でエンターキーが押された場合に、テキストエリアにフォーカスを設定を移す
      * @param e 
@@ -205,8 +204,8 @@ export default class InputPaneController {
 
         RecordingUtil.initilize((audioBlob) => {
 
-            SWMsgPack.BlobToArray(audioBlob).then((value)=>{
-                if(RecordingUtil.Mid){
+            SWMsgPack.BlobToArray(audioBlob).then((value) => {
+                if (RecordingUtil.Mid) {
                     let sender = new AudioBlobSender();
                     sender.mid = RecordingUtil.Mid;
                     sender.binary = value as ArrayBuffer;
