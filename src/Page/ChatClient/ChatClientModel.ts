@@ -43,6 +43,7 @@ export default class ChatClientModel extends AbstractServiceModel<ChatClientCont
         let user = new Personal.Actor();
         user.aid = LocalCache.UserID;
         user.name = "名前未設定";
+        user.chatBgColor = "#3F51B5";
         user.tag = "";
         user.isUserProfile = true;
         user.profile = "";

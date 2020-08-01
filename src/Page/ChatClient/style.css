@@ -265,6 +265,13 @@
     color: var(--sbj-color-default-text);
 }
 
+#sbj-inputpanel-header{
+    display: flex;
+}
+#sbj-chatmessage-color{
+    margin:24px 0px 0px 8px;
+}
+
 .sbj-inputpanel-noread-icon{
     margin: 4px;
 }

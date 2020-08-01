@@ -2,7 +2,7 @@
 import reactCSS from 'reactcss'
 
 import ChatClientController from "../ChatClientController";
-import { TwitterPicker } from 'react-color';
+import { CompactPicker } from 'react-color';
 import { Actor } from '../../../Contents/IndexedDB/Personal';
 
 /**
@@ -18,12 +18,27 @@ export class ColorComponent extends React.Component<ColorProp, any>{
     state = {
         displayColorPicker: false,
         color: {
-            r: '241',
-            g: '112',
-            b: '19',
+            r: this.getRGB("r"),
+            g: this.getRGB("g"),
+            b: this.getRGB("b"),
             a: '1',
         },
     };
+
+
+    /**
+     * 
+     * @param rgb 
+     */
+    private getRGB(rgb: string) {
+        let color = this.props.actor.chatBgColor;
+        switch (rgb) {
+            case "r": return parseInt(color.substr(1, 2), 16).toString();
+            case "g": return parseInt(color.substr(3, 2), 16).toString();
+            case "b": return parseInt(color.substr(5, 2), 16).toString();
+        }
+        return "0";
+    }
 
     handleClick = () => {
         this.setState({ displayColorPicker: !this.state.displayColorPicker })
@@ -79,7 +94,7 @@ export class ColorComponent extends React.Component<ColorProp, any>{
                 </div>
                 {this.state.displayColorPicker ? <div style={styles.popover}>
                     <div style={styles.cover} onClick={this.handleClose} />
-                    <TwitterPicker color={this.state.color} onChange={this.handleChange} />
+                    <CompactPicker color={this.state.color} onChange={this.handleChange} />
                 </div> : null}
 
             </div>
