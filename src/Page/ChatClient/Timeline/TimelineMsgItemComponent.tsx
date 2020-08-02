@@ -132,6 +132,10 @@ export class TimelineMsgItemComponent extends React.Component<TimelineMsgItemPro
      * @param hexcolor 
      */
     public blackOrWhite(hexcolor: string) {
+
+        if (!hexcolor || hexcolor.length < 7) {
+            hexcolor = this.props.controller.DEFULT_BG_COLOR;
+        }
         var r = parseInt(hexcolor.substr(1, 2), 16);
         var g = parseInt(hexcolor.substr(3, 2), 16);
         var b = parseInt(hexcolor.substr(5, 2), 16);

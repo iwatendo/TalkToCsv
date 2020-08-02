@@ -32,6 +32,11 @@ export class ColorComponent extends React.Component<ColorProp, any>{
      */
     private getRGB(rgb: string) {
         let color = this.props.actor.chatBgColor;
+
+        if(!color || color.length < 7){
+            color = this.props.controller.DEFULT_BG_COLOR;
+        }
+
         switch (rgb) {
             case "r": return parseInt(color.substr(1, 2), 16).toString();
             case "g": return parseInt(color.substr(3, 2), 16).toString();

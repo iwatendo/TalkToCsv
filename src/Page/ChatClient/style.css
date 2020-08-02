@@ -438,9 +438,10 @@ p.sbj-timeline-message-ignore {
 }
 
 .sbj-timeline-ignore{
-    height: 24px;
+    height: 28px;
     margin: 0px 8px 4px;
     border: 0px;
+    background: rgba(255,255,255,0.2);
 }
 
 /*-----------------------------
