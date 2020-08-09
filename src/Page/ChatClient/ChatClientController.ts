@@ -266,7 +266,7 @@ export default class ChatClientController extends AbstractServiceController<Chat
     public GetTimeline(hid: string) {
         let sender = new GetTimelineSender();
         sender.hid = hid;
-        sender.count = 256;
+        sender.count = 2000;
         this.SwPeer.SendToOwner(sender);
     }
 

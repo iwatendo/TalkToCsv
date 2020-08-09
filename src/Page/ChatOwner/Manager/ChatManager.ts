@@ -24,6 +24,8 @@ export default class ChatManager {
         this._roomManager = roomManager;
 
         controller.Model.GetTimelineAll((tlmsgs) => {
+            //  時間順でソート
+            tlmsgs.sort((a, b) => (a.ctime - b.ctime));
             this._tlmsgs = tlmsgs;
             this._inputMap = new Map<string, ChatInfoSender>();
             callback();
