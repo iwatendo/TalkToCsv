@@ -432,6 +432,11 @@ i.sbj-timeline-message-icon{
     color: var(--sbj-color-link-text);
 }
 
+.sbj-timeline-icon-image{
+    height: 64px;
+    margin: 4px;
+}
+
 p.sbj-timeline-message-ignore {
     text-decoration: line-through;
     color: var(--sbj-color-timeline-message-ignore);

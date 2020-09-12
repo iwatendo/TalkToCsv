@@ -152,7 +152,15 @@ export class TimelineMsgItemComponent extends React.Component<TimelineMsgItemPro
         let linkArray = MessageUtil.AutoLinkAnaylze(baseText);
 
         let result = linkArray.map((al) => {
-            if (al.isLink) {
+
+            if( al.isImage){
+                return (
+                    <span>
+                        <img className="sbj-timeline-icon-image" src={al.msg}></img>
+                    </span>
+                );
+            }
+            else if (al.isLink) {
 
                 let dispurl = decodeURI(al.msg);
 
