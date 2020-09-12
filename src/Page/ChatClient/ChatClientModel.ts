@@ -1,5 +1,6 @@
 
 import * as Personal from "../../Contents/IndexedDB/Personal";
+import * as SpeechRtm from "../../Contents/IndexedDB/SpeechRtm";
 
 import AbstractServiceModel, { OnModelLoad, OnRead, OnWrite } from "../../Base/AbstractServiceModel";
 
@@ -12,6 +13,7 @@ import LocalCache from "../../Contents/Cache/LocalCache";
 export default class ChatClientModel extends AbstractServiceModel<ChatClientController> {
 
     private _personalDB: Personal.DB;
+    private _speechRtmDB: SpeechRtm.DB;
 
     /**
      * 初期化処理
@@ -20,9 +22,12 @@ export default class ChatClientModel extends AbstractServiceModel<ChatClientCont
     protected Initialize(callback: OnModelLoad) {
 
         this._personalDB = new Personal.DB();
+        this._speechRtmDB = new SpeechRtm.DB();
 
         this._personalDB.Connect(() => {
-            callback();
+            this._speechRtmDB.Connect(() => {
+                callback();
+            });
         });
     }
 
@@ -122,6 +127,14 @@ export default class ChatClientModel extends AbstractServiceModel<ChatClientCont
      */
     public GetActors(callback: OnRead<Array<Personal.Actor>>) {
         this._personalDB.ReadAll(Personal.DB.ACTOR, callback);
+    }
+
+    /**
+     * 音声認識変換結果の文字列変換テーブル
+     * @param callback 
+     */
+    public GetSpeechRtms(callback: OnRead<Array<SpeechRtm.SpeechRtm>>) {
+        this._speechRtmDB.ReadAll(SpeechRtm.DB.SpeechRtm, callback);
     }
 
 }

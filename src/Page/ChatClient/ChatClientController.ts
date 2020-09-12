@@ -22,6 +22,7 @@ import ChatMessageSender from "../../Contents/Sender/ChatMessageSender";
 import GetTimelineSender from "../../Contents/Sender/GetTimelineSender";
 import UpdateTimelineSender from "../../Contents/Sender/UpdateTimelineSender";
 import ServentCloseSender from "../../Contents/Sender/ServentCloseSender";
+import SpeechRecongnitionTextModify from "../../Contents/Util/SpeechRecongnitionTextModify";
 
 /**
  * 
@@ -30,7 +31,7 @@ export default class ChatClientController extends AbstractServiceController<Chat
 
     public ControllerName(): string { return "ChatClient"; }
 
-    public DEFULT_BG_COLOR ="#3F51B5";
+    public DEFULT_BG_COLOR = "#3F51B5";
 
     public PeerId: string;
     public ConnStartTime: number;
@@ -40,6 +41,7 @@ export default class ChatClientController extends AbstractServiceController<Chat
     public Log: LogController;
 
     public UseActors: Array<Personal.Actor>;
+    public SpeechRTM: SpeechRecongnitionTextModify;
 
     private _currentActor: Personal.Actor;
 
@@ -80,9 +82,14 @@ export default class ChatClientController extends AbstractServiceController<Chat
 
         //  DB接続
         this.Model = new ChatClientModel(this, () => {
+
+            //  音声認識用の文字変換テーブル取得
+            this.Model.GetSpeechRtms((list) => {
+                this.SpeechRTM = new SpeechRecongnitionTextModify(list);
+            });
+
             //  UI初期化
             this.View = new ChatClientView(this, () => {
-
             });
         });
 
@@ -255,6 +262,7 @@ export default class ChatClientController extends AbstractServiceController<Chat
      * @param chatMessage 
      */
     public SendChatMessage(chatMessage: ChatMessageSender) {
+        chatMessage.text = this.SpeechRTM.Modify(chatMessage.text);
         this.SwPeer.SendToOwner(chatMessage);
     }
 
