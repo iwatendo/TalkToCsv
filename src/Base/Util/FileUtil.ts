@@ -30,7 +30,7 @@ export default class FileUtil {
 
         let datetime = year + month + day + "_" + hours + min + sec;
         
-        let filename = "gijilockon_" + datetime;
+        let filename = "talktocsv_" + datetime;
         if(name){
             filename += name;
         }
