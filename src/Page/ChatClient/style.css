@@ -226,14 +226,8 @@
     clear:both;
 }
 
-.sbj-inputpanel-action{
-    padding: 4px;
-    clear:both;
-}
-
-.sbj-inputpanel-button{
-    padding: 0px 4px;
-    color: #757575;    
+.sbj-inputpanel-button-left{
+    float: left;
 }
 
 .sbj-inputpanel-button-right{
@@ -241,6 +235,27 @@
     float: right;
 }
 
+.sbj-inputpanel-action{
+    padding: 4px;
+    clear:both;
+}
+
+#sbj-inputpanel-send-message-recognition{
+    width: 120px;
+    text-align: left;
+}
+
+#sbj-check-recording-label{
+    margin: 6px;
+    width: 72px;
+    padding-left: 20px;
+    color: var(--sbj-color-icon-selection);
+}
+
+.sbj-inputpanel-button{
+    padding: 0px 4px;
+    color: #757575;    
+}
 
 .sbj-inputpanel-actor-name{
     padding: 6px 8px 2px 12px;

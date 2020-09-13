@@ -20,7 +20,10 @@ export default class InputPaneController {
     private _voiceRecognition = document.getElementById('sbj-inputpanel-send-message-recognition');
     private _voiceRecognitionOn = document.getElementById('sbj-inputpanel-send-message-recognition-on');
     private _voiceRecognitionOff = document.getElementById('sbj-inputpanel-send-message-recognition-off');
+    private _voiceRecordingSwitch = document.getElementById('sbj-check-recording-label');
+
     private _controller: ChatClientController;
+
 
     private _isVoiceSpeech: boolean;
     private _isVoiceRecognition: boolean;
@@ -32,13 +35,14 @@ export default class InputPaneController {
     constructor(controller: ChatClientController) {
 
         this._controller = controller;
+        this._voiceRecordingSwitch.hidden = true;
 
         document.onkeydown = this.OnOtherKeyPress;
 
         //  イベント設定
         this._textareaElement.onkeydown = (e) => { this.OnKeyDown(e); };
         this._sendMessageButton.onclick = (e) => { this.SendInputMessage(); };
-
+       
         this._voiceRecognition.onclick = (e) => {
             this.ChangeVoiceRecognition();
         }
@@ -50,6 +54,15 @@ export default class InputPaneController {
 
         this.ClearText();
     }
+
+
+    /**
+     * 録音機能を有効にするか？
+     */
+    private get IsRecording() : boolean{
+        return (document.getElementById('sbj-check-recording') as HTMLInputElement).checked;
+    }
+
 
     /**
      * テキストエリア以外でエンターキーが押された場合に、テキストエリアにフォーカスを設定を移す
@@ -159,7 +172,7 @@ export default class InputPaneController {
                 break;
             case 1:
                 //  直接チャットメッセージとして送信
-                return this.SendChatMessage(text, true);
+                return this.SendChatMessage(text, this.IsRecording);
         }
     }
 
@@ -194,7 +207,6 @@ export default class InputPaneController {
 
     private _intervalSend = new IntervalSend<ChatInfoSender>(200);
 
-
     /**
      * 音声認識によるチャットメッセージ入力
      */
@@ -203,9 +215,11 @@ export default class InputPaneController {
 
         if (this._isVoiceRecognition) {
             this._voiceRecognition.classList.add("mdl-button--colored");
+            this._voiceRecordingSwitch.hidden = false;
         }
         else {
             this._voiceRecognition.classList.remove("mdl-button--colored");
+            this._voiceRecordingSwitch.hidden = true;
         }
 
         this._voiceRecognitionOn.hidden = !this._isVoiceRecognition;
@@ -246,7 +260,9 @@ export default class InputPaneController {
 
                 }
                 , () => {
-                    RecordingUtil.start();
+                    if(this.IsRecording){
+                        RecordingUtil.start();
+                    }
                     this._voiceRecognitionOn.classList.remove("mdl-button--colored");
                     this._voiceRecognitionOn.classList.add("mdl-button--accent");
                     this._textareaElement.disabled = true;

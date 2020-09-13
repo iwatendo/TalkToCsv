@@ -99,13 +99,19 @@
 							</textarea>
 						</div>
 						<div class="mdl-card__actions sbj-inputpanel-action">
-							<button class="sbj-inputpanel-button mdl-button"
-								id="sbj-inputpanel-send-message-recognition">
-								<span id="sbj-inputpanel-send-message-recognition-on" hidden>
-									<i class="material-icons">speaker_notes</i>音声認識ON</span>
-								<span id="sbj-inputpanel-send-message-recognition-off">
-									<i class="material-icons">speaker_notes_off</i>音声認識OFF</span>
-							</button>
+							<div class="sbj-inputpanel-button-left">
+								<button class="sbj-inputpanel-button mdl-button"
+									id="sbj-inputpanel-send-message-recognition">
+									<span id="sbj-inputpanel-send-message-recognition-on" hidden>
+										<i class="material-icons">speaker_notes</i>音声認識ON</span>
+									<span id="sbj-inputpanel-send-message-recognition-off">
+										<i class="material-icons">speaker_notes_off</i>音声認識OFF</span>
+								</button>
+								<label id="sbj-check-recording-label" class="sbj-cast-instance-option mdl-switch mdl-js-switch mdl-js-ripple-effect" for="sbj-check-recording">
+									<input type="checkbox" id="sbj-check-recording" class="mdl-switch__input">
+									<span class="mdl-switch__label">録音</span>
+								</label>
+							</div>
 							<button class="sbj-inputpanel-button-right mdl-button mdl-button--colored"
 								id="sbj-inputpanel-send-message-button">
 								<i class="material-icons">send</i>送信
