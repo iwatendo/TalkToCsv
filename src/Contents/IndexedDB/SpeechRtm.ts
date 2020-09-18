@@ -2,36 +2,27 @@
 import * as DBI from "../../Base/AbstractIndexedDB";
 
 
-export class Message {
-    mid: string;
-    hid: string;
-    aid: string;
-    peerid: string;
-    iid: string;
-    gid: string;
-    name: string;
-    chatBgColor: string;
-    text: string;
-    ctime: number;
-    utime: number;
-    visible: boolean;
-    speech: boolean;
-    voiceRecog: boolean;    
+//  Speech Recongnition Text Modify
+export class SpeechRtm {
+    order: string;
+    targetText: string;
+    modifyText: string;
+    iconUrl: string;
 }
 
 export class Data {
-    Messages: Array<Message>;
+    SpeechRtms: Array<SpeechRtm>;
 }
 
 export class DB extends AbstractIndexedDB<Data> {
 
-    public static NAME = "Timeline";
-    public static NOTE = "タイムライン";
-    public static Message: string = 'message';
+    public static NAME = "SpeechRtm";
+    public static NOTE = "Speech recognition text modify";
+    public static SpeechRtm: string = 'SpeechRtm';
 
     constructor() {
         super(DB.NAME);
-        this.SetStoreList(DB.Message);
+        this.SetStoreList(DB.SpeechRtm);
     }
 
     public GetName(): string { return DB.NAME; }
@@ -41,15 +32,15 @@ export class DB extends AbstractIndexedDB<Data> {
 
         let data = new Data();
 
-        this.ReadAll<Message>(DB.Message, (result: Array<Message>) => {
-            data.Messages = result;
+        this.ReadAll<SpeechRtm>(DB.SpeechRtm, (result: Array<SpeechRtm>) => {
+            data.SpeechRtms = result;
             onload(data);
         });
     }
 
     public WriteAllData(data: Data, callback: DBI.OnWriteComplete) {
 
-        this.WriteAll<Message>(DB.Message, (n) => n.mid, data.Messages, () => {
+        this.WriteAll<SpeechRtm>(DB.SpeechRtm, (n) => n.order, data.SpeechRtms, () => {
             callback();
         });
     }
@@ -58,7 +49,7 @@ export class DB extends AbstractIndexedDB<Data> {
     public IsImportMatch(preData: any): boolean {
 
         let data: Data = preData;
-        if (data.Messages && data.Messages.length > 0) return true;
+        if (data.SpeechRtms && data.SpeechRtms.length > 0) return true;
 
         return false;
 
@@ -67,7 +58,7 @@ export class DB extends AbstractIndexedDB<Data> {
 
     public Import(data: Data, callback: DBI.OnWriteComplete) {
 
-        this.ClearAll(DB.Message, () => {
+        this.ClearAll(DB.SpeechRtm, () => {
             this.WriteAllData(data, callback);
         });
 

@@ -27,13 +27,23 @@ export default class StdUtil {
      * サポートブラウザか？
      * @param isGeneral 
      */
-    public static IsSupoortPlatform(isGeneral: boolean = false): boolean {
+    public static IsSupoortPlatform(isGeneral: boolean = false, useSpeechRecognition: boolean = true): boolean {
 
         //  対応ブラウザかチェック
         let name = platform.name.toLocaleLowerCase();
 
         if (name === 'chrome' || name === 'chrome mobile') {
-            return true;
+
+            if (useSpeechRecognition) {
+                //  Chromium版のEdgeの場合、SpeechRecognitionが利用できない
+                let ua = navigator.userAgent;
+                if (ua.indexOf('Edg') < 0) {
+                    return true;
+                }
+            }
+            else {
+                return true;
+            }
         }
 
         let errmsg = "";

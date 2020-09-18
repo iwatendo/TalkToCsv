@@ -1,10 +1,7 @@
 import LogUtil from "../Util/LogUtil";
 import IServiceController from "../IServiceController";
-import SWPeer from "./SWPeer";
 import Sender from "../Container/Sender";
 import ISWRoom from "./ISWRoom";
-import StreamUtil from "../Util/StreamUtil";
-import StdUtil from "../Util/StdUtil";
 import LinkUtil from "../Util/LinkUtil";
 
 

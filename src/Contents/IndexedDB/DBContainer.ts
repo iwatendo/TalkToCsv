@@ -2,6 +2,9 @@
 import * as Personal from "./Personal";
 import * as Home from "./Home";
 import * as Timeline from "./Timeline";
+import * as Voice from "./Voice";
+import * as SpeechRtm from "./SpeechRtm";
+
 import { OnModelLoad } from "../../Base/AbstractServiceModel";
 
 export default class DBContainer {
@@ -9,7 +12,8 @@ export default class DBContainer {
     public PersonalDB: Personal.DB;
     public HomeDB: Home.DB;
     public TimelineDB: Timeline.DB;
-
+    public VoiceDB: Voice.DB;
+    public SpeechRtmDB: SpeechRtm.DB;
     /**
      * 
      */
@@ -17,6 +21,8 @@ export default class DBContainer {
         this.PersonalDB = new Personal.DB();
         this.HomeDB = new Home.DB();
         this.TimelineDB = new Timeline.DB();
+        this.VoiceDB = new Voice.DB();
+        this.SpeechRtmDB = new SpeechRtm.DB();
     }
 
 
@@ -29,6 +35,8 @@ export default class DBContainer {
         this.PersonalDB.Remove(() => {
             this.HomeDB.Remove(() => {
                 this.TimelineDB.Remove(() => {
+                    this.VoiceDB.Remove(() => {
+                    });
                 });
             });
         });
@@ -45,7 +53,11 @@ export default class DBContainer {
         this.PersonalDB.Connect(() => {
             this.HomeDB.Connect(() => {
                 this.TimelineDB.Connect(() => {
-                    callback();
+                    this.VoiceDB.Connect(() => {
+                        this.SpeechRtmDB.Connect(() => {
+                            callback();
+                        });
+                    });
                 });
             });
         });

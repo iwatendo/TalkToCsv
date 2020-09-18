@@ -30,6 +30,7 @@ export class Actor implements IOrder {
         this.dispIid = "";
         this.iconIds = new Array<string>();
         this.guideIds = new Array<string>();
+        this.chatBgColor = "";
         this.order = 0;
     }
 
@@ -43,6 +44,7 @@ export class Actor implements IOrder {
     dispIid: string;
     iconIds: Array<string>;
     guideIds: Array<string>;
+    chatBgColor: string;
     order: number;
 
     /**

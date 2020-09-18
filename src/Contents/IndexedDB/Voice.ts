@@ -2,36 +2,23 @@
 import * as DBI from "../../Base/AbstractIndexedDB";
 
 
-export class Message {
+export class VoiceData {
     mid: string;
-    hid: string;
-    aid: string;
-    peerid: string;
-    iid: string;
-    gid: string;
-    name: string;
-    chatBgColor: string;
-    text: string;
-    ctime: number;
-    utime: number;
-    visible: boolean;
-    speech: boolean;
-    voiceRecog: boolean;    
 }
 
 export class Data {
-    Messages: Array<Message>;
+    Voices: Array<VoiceData>;
 }
 
 export class DB extends AbstractIndexedDB<Data> {
 
-    public static NAME = "Timeline";
-    public static NOTE = "タイムライン";
-    public static Message: string = 'message';
+    public static NAME = "Voice";
+    public static NOTE = "音声";
+    public static Voice: string = 'voice';
 
     constructor() {
         super(DB.NAME);
-        this.SetStoreList(DB.Message);
+        this.SetStoreList(DB.Voice);
     }
 
     public GetName(): string { return DB.NAME; }
@@ -41,36 +28,31 @@ export class DB extends AbstractIndexedDB<Data> {
 
         let data = new Data();
 
-        this.ReadAll<Message>(DB.Message, (result: Array<Message>) => {
-            data.Messages = result;
+        this.ReadAll<VoiceData>(DB.Voice, (result: Array<VoiceData>) => {
+            data.Voices = result;
             onload(data);
         });
     }
 
     public WriteAllData(data: Data, callback: DBI.OnWriteComplete) {
 
-        this.WriteAll<Message>(DB.Message, (n) => n.mid, data.Messages, () => {
+        this.WriteAll<VoiceData>(DB.Voice, (n) => n.mid, data.Voices, () => {
             callback();
         });
     }
 
 
     public IsImportMatch(preData: any): boolean {
-
         let data: Data = preData;
-        if (data.Messages && data.Messages.length > 0) return true;
-
+        if (data.Voices && data.Voices.length > 0) return true;
         return false;
-
     }
 
 
     public Import(data: Data, callback: DBI.OnWriteComplete) {
-
-        this.ClearAll(DB.Message, () => {
+        this.ClearAll(DB.Voice, () => {
             this.WriteAllData(data, callback);
         });
-
     }
 
 }

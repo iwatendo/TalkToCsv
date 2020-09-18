@@ -1,8 +1,6 @@
-
 import SWConnection from "./SWConnection";
 import IServiceController from "../IServiceController";
 import Sender from "../Container/Sender";
-import LogUtil from "../Util/LogUtil";
 import SWPeer from "./SWPeer";
 
 
@@ -35,7 +33,7 @@ export default class SWConnectionCache {
         pp.Set(conn);
     }
 
-    
+
     /**
      * 
      * @param conn 
@@ -44,18 +42,13 @@ export default class SWConnectionCache {
         this._owner = new SWConnection(this._swpeer, conn.remoteId);
     }
 
-
     /**
      * 
      * @param data 
      */
-    public SendToOwner(sender: Sender) {
+    public async SendToOwner(sender: Sender) {
         if (this._owner) {
-            let data = JSON.stringify(sender);
-            this._owner.Send(data);
-            if (LogUtil.IsOutputSender(sender)) {
-                LogUtil.Info(this._service, "send(owner) : " + data.toString());
-            }
+            this._owner.Send("owner", sender);
         }
     }
 
@@ -64,13 +57,8 @@ export default class SWConnectionCache {
      * 子の接続先にデータ送信
      */
     public Send(peerid: string, sender: Sender) {
-        let data = JSON.stringify(sender);
         let pp = this.GetConnection(peerid);
-        pp.Send(data);
-
-        if (LogUtil.IsOutputSender(sender)) {
-            LogUtil.Info(this._service, "send : " + data.toString());
-        }
+        pp.Send("", sender);
     }
 
 
@@ -78,14 +66,9 @@ export default class SWConnectionCache {
      * 全ての接続クライアントへ通知
      */
     public SendAll(sender: Sender) {
-        let data = JSON.stringify(sender);
         this._map.forEach((peerPair, key) => {
-            peerPair.Send(data);
+            peerPair.Send("all", sender);
         });
-
-        if (LogUtil.IsOutputSender(sender)) {
-            LogUtil.Info(this._service, "send(all) : " + data.toString());
-        }
     }
 
 

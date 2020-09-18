@@ -1,0 +1,67 @@
+body{
+    background-color: rgba(0,0,0,0);
+    line-height: 40px;
+    overflow: hidden;
+}
+
+.timeline-pane{
+    background-color: rgba(0,0,0,0);
+}
+
+#sbj-home-visitor-main{
+    background-color: rgba(0,0,0,0);
+}
+
+.sbj-inputpanel{
+    display: none;
+}
+
+#sbj-inputpanel{
+    height: 100%;
+}
+
+#sbj-home-visitor-timeline-component{
+    height: 100%;
+}
+
+#sbj-home-visitor-timeline-component::-webkit-scrollbar {
+    display: none;
+}
+
+.sbj-timeline-flex-right{
+    float: none;
+}
+
+.sbj-timeline-adjust {
+    min-width: 0px;
+    min-height: 0px;
+}
+
+.sbj-timeline-time{
+    display: none;
+}
+
+.sbj-timeline-info{
+    float: none !important;
+}
+
+.sbj-timeline-balloon{
+    background-color: rgba(0,0,0,0) !important;
+}
+
+label.sbj-timeline-name{
+    font-size: 24px;
+    line-height: 28px;
+    padding: 0px 16px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.6);
+    color: rgba(0,0,0,1);
+}
+
+.sbj-timeline-message,h4,h5{
+    font-size: 36px !important;
+    line-height: 40px;
+    text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
+    color: whitesmoke;
+}
+

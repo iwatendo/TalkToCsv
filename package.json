@@ -1,10 +1,10 @@
 {
   "name": "talktocsv",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "license": "AGPL-3.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/iwatendo/talktocsv"
+    "url": "https://github.com/iwatendo/talktocsv2"
   },
   "scripts": {
     "start": "http-server ./dist/ -p 8080 -c-1",
@@ -19,6 +19,7 @@
     "copy:src": "cpx \"./src/Page/**/{*.html,*.css,*.map,*.json}\" ./dist"
   },
   "dependencies": {
+    "@msgpack/msgpack": "^1.12.2",
     "co": "^4.6.0",
     "cpx": "^1.5.0",
     "http-server": "^0.12.1",
@@ -26,6 +27,7 @@
     "peerjs": "^1.2.0",
     "platform": "^1.3.5",
     "react": "^16.12.0",
+    "react-color": "^2.18.1",
     "react-dom": "^16.12.0",
     "rimraf": "^3.0.2",
     "ts-loader": "^6.2.1",

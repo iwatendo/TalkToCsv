@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="ja-jp">
+
+<head>
+    <title>Talk To CSV</title>
+    <meta charset='utf-8'>
+    <meta name="description" content="音声通話やビデオ通話と併用して使用し、音声認識で会話のログを残すためのサービス。PC版のGoogle Chrome専用" />
+    <meta property="og:title" content="Talk To CSV">
+    <meta property="og:description" content="音声通話やビデオ通話と併用して使用し、音声認識で会話のログを残すためのサービス。PC版のGoogle Chrome専用">
+    <meta property="og:url" content="https://skybeje.net/ChatOwner/">
+    <meta property="og:image" content="https://skybeje.net/image/ogp-image.jpg">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:description" content="音声通話やビデオ通話と併用して使用し、音声認識で会話のログを残すためのサービス。PC版のGoogle Chrome専用">
+    <link rel="icon" type="image/vnd.microsoft.icon" href="/image/favicon_server.ico">
+    <script src='../lib/forcedtimer.js'></script>
+    <script src='../lib/skyway.min.js'></script>
+    <link rel='stylesheet' type='text/css' href='../lib/material.min.css' />
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Noto+Sans+JP:400,700" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel='stylesheet' type='text/css' href='../common.css?v={version}' />
+    <link rel='stylesheet' type='text/css' href='style.css?v={version}' />
+    <script src="../lib/material.min.js"></script>
+</head>
+
+<body>
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header" id="sbj-home-instance">
+        <header id="sbj-home-instance-header" class="mdl-layout__header mdl-color--grey-100 mdl-color-text--grey-600"
+            hidden>
+            <div class="sbj-home-instance-header-row mdl-layout__header-row">
+                <span id="sbj-home-instance-title" class="mdl-layout-title">Talk To CSV (Ver2)&nbsp; </span>
+                <div id="sbj-home-instance-account-count" class="material-icons mdl-badge mdl-badge--overlap"
+                    data-badge="0">person</div>
+                <div class="mdl-tooltip" data-mdl-for="sbj-home-instance-account-count">接続人数</div>
+
+                <button id='sbj-start-visitor'
+                    class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" hidden>
+                    <i class="material-icons">chat</i>
+                    &nbsp; チャットクライアント起動 &nbsp;
+                </button>
+                <button id='sbj-start-linkcopy' class="mdl-button mdl-button--raised mdl-js-button mdl-button--colored">
+                    &nbsp; 招待URLのコピー &nbsp;
+                </button>
+                <div class="mdl-tooltip" data-mdl-for="sbj-start-linkcopy">
+                    招待したいメンバーに
+                    <br /> URLを伝えてください
+                </div>
+                <button id='sbj-start-linkcopy-obs' class="mdl-button mdl-button--raised mdl-js-button mdl-button--colored">
+                    &nbsp; OBS用URL &nbsp;
+                </button>
+                <div class="mdl-layout-spacer"></div>
+                <button id='sbj-export-timeline-csv'
+                    class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">
+                    &nbsp; CSV出力 &nbsp;
+                </button>
+                <button id='sbj-clear-timeline'
+                    class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+                    &nbsp; メッセージクリア &nbsp;
+                </button>
+            </div>
+
+
+        </header>
+
+        <main id="sbj-home-instance-boot">
+            <div class="sbj-home-instance-info mdl-card__supporting-text">
+                <h4>
+                    チャットサーバーインスタンスを起動しています。
+                </h4>
+            </div>
+        </main>
+
+        <main id="sbj-home-browser-error" hidden>
+            <div class="sbj-home-instance-info mdl-card__supporting-text">
+                <h4>
+                    Talk To CSVはPC版のGoogle Chromeにのみ対応しています
+                </h4>
+            </div>
+        </main>
+
+        <main id="sbj-home-instance-timeout" hidden>
+            <div class="sbj-home-instance-info mdl-card__supporting-text">
+                <h6>
+                    チャットサーバーインスタンスの起動に失敗しました。
+                    <br />
+                    以下のいずれかの理由により、起動できなかった可能性があります<br />
+                    <br />
+                    ・ネットワークの不調または切断によるタイムアウト<br />
+                    ・ファイヤーウォールによるピア接続のブロック(※)<br />
+                </h6>
+                <h6>
+                    ※SkyWay(WebRTC)は通信プロトコルとして TCP(WebSocket,HTTPS)及びUDPを使用しています。<br />
+                    ファイヤーウォールにて使用するプロトコルまたはポートがブロックされている場合、当サービスは利用できません。<br />
+                    詳細については
+                    <a href="https://support.skyway.io/hc/ja/articles/115002273767-SkyWay%E3%81%AE%E9%80%9A%E4%BF%A1%E8%A6%81%E4%BB%B6%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6"
+                        target="_blank">SkyWayの通信要件</a>を確認してください。<br />
+                </h6>
+            </div>
+        </main>
+
+        <main id="sbj-home-instance-main" hidden>
+            <iframe id="sbj-gjilock-client" src=""></iframe>
+        </main>
+
+        <main id="sbj-home-instance-mulitboot-error" hidden>
+            <div class="sbj-home-instance-info mdl-card__supporting-text">
+                <h6>
+                    起動済みのチャットサーバーインスタンスが検出されました。
+                    <br /> チャットサーバーインスタンスは同時に複数起動することはできません。
+                    <br /> 前回の起動時に、正常終了しなかった場合にも検出される事があります。
+                </h6>
+                <button id="sbj-home-instance-force-boot"
+                    class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent sbj-start-instance">
+                    <i class='material-icons'>cast</i>
+                    &nbsp;チャットサーバーインスタンスの強制起動&nbsp;
+                </button>
+                <h6>
+                    チャットサーバーインスタンスを複数起動した場合
+                    <br /> どちらのチャットサーバーインスタンスも正常に動作しなくなるので注意してください。
+                </h6>
+            </div>
+        </main>
+
+    </div>
+
+    <script src="../lib/react.min.js"></script>
+    <script src="../lib/react-dom.min.js"></script>
+    <script src="bundle.js?v={version}"></script>
+
+</body>
+
+</html>
