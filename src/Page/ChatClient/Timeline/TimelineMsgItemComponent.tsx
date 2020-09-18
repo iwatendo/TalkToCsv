@@ -194,11 +194,11 @@ export class TimelineMsgItemComponent extends React.Component<TimelineMsgItemPro
 
         if (isMine) {
             return (
-                <div style={namestyle}>
+                <div className="sbj-timeline-info" style={namestyle}>
                     <label className='sbj-timeline-name'>
                         {name}
                     </label>
-                    <label>
+                    <label className='sbj-timeline-time'>
                         {datetime}
                     </label>
                 </div>
@@ -206,8 +206,8 @@ export class TimelineMsgItemComponent extends React.Component<TimelineMsgItemPro
         }
         else {
             return (
-                <div style={namestyle}>
-                    <label>
+                <div className="sbj-timeline-info" style={namestyle}>
+                    <label className='sbj-timeline-time'>
                         {datetime}
                     </label>
                     <label className='sbj-timeline-name'>

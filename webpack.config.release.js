@@ -7,6 +7,7 @@ module.exports = {
   entry: {
     chatowner: './src/Page/ChatOwner/Script.ts',
     chatclient: './src/Page/ChatClient/Script.ts',
+    chatclientobs: './src/Page/ChatClientObs/Script.ts',
   },
 
   output: {
