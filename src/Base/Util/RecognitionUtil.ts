@@ -20,10 +20,11 @@ export default class RecognitionUtil {
     /**
      * 音声認識処理の開始
      */
-    public static Start() {
+    public static Start(lang:string) {
         if (this._recognition) {
             this._useRecognition = true;
             this._isCancel = false;
+            this._recognition.lang = lang;
             this._recognition.start();
         }
     }
@@ -51,6 +52,15 @@ export default class RecognitionUtil {
     }
 
     /**
+     * 言語設定
+     */
+    public static set Lang(value: string) {
+        if (this._recognition) {
+            this._recognition.lang = value;
+        }
+    }
+
+    /**
      * 音声認識処理
      */
     public static InitSpeechRecognition(
@@ -64,7 +74,7 @@ export default class RecognitionUtil {
         win.SpeechRecognition = win.SpeechRecognition || webkitSpeechRecognition;
 
         this._recognition = new webkitSpeechRecognition();
-        this._recognition.lang = 'ja';
+        this._recognition.lang = "ja";
         this._recognition.interimResults = true;
         this._recognition.continuous = true;
 
@@ -161,7 +171,7 @@ export default class RecognitionUtil {
         }
     }
 
-
+    
 }
 
 

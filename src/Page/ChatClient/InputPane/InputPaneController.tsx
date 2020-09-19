@@ -22,6 +22,9 @@ export default class InputPaneController {
     private _voiceRecognitionOff = document.getElementById('sbj-inputpanel-send-message-recognition-off');
     private _voiceRecordingSwitch = document.getElementById('sbj-check-recording-label');
 
+    private _selectLang = document.getElementById('select-lang') as HTMLInputElement;;
+
+
     private _controller: ChatClientController;
 
 
@@ -42,7 +45,7 @@ export default class InputPaneController {
         //  イベント設定
         this._textareaElement.onkeydown = (e) => { this.OnKeyDown(e); };
         this._sendMessageButton.onclick = (e) => { this.SendInputMessage(); };
-       
+
         this._voiceRecognition.onclick = (e) => {
             this.ChangeVoiceRecognition();
         }
@@ -59,7 +62,7 @@ export default class InputPaneController {
     /**
      * 録音機能を有効にするか？
      */
-    private get IsRecording() : boolean{
+    private get IsRecording(): boolean {
         return (document.getElementById('sbj-check-recording') as HTMLInputElement).checked;
     }
 
@@ -207,6 +210,15 @@ export default class InputPaneController {
 
     private _intervalSend = new IntervalSend<ChatInfoSender>(200);
 
+
+    /**
+     * 選択されている言語を取得
+     */
+    private GetLang(): string {
+        return (document as any).form.lang.value;
+    }
+
+
     /**
      * 音声認識によるチャットメッセージ入力
      */
@@ -260,7 +272,7 @@ export default class InputPaneController {
 
                 }
                 , () => {
-                    if(this.IsRecording){
+                    if (this.IsRecording) {
                         RecordingUtil.start();
                     }
                     this._voiceRecognitionOn.classList.remove("mdl-button--colored");
@@ -275,11 +287,13 @@ export default class InputPaneController {
                     this._textareaElement.focus();
                 }
             );
-            RecognitionUtil.Start();
+            this._selectLang.disabled = true;
+            RecognitionUtil.Start(this.GetLang());
         }
         else {
             RecognitionUtil.Stop();
             this._textareaElement.disabled = false;
+            this._selectLang.disabled = false;
         }
     }
 
