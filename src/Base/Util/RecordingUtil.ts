@@ -55,7 +55,9 @@ export default class RecordingUtil {
      * 録音停止
      */
     public static stop() {
-        this.recorder.stop();
+        if(this.recorder){
+            this.recorder.stop();
+        }
     }
 
 
