@@ -192,27 +192,22 @@ export class TimelineMsgItemComponent extends React.Component<TimelineMsgItemPro
 
         let namestyle: React.CSSProperties = { float: (isMine ? "left" : "right") };
 
+        let nameLabel = (name ? <label className='sbj-timeline-name'>{name}</label> : <span></span>);
+        let dateLabel = (datetime ? <label className='sbj-timeline-time'>{datetime}</label> : <span></span>);
+
         if (isMine) {
             return (
                 <div className="sbj-timeline-info" style={namestyle}>
-                    <label className='sbj-timeline-name'>
-                        {name}
-                    </label>
-                    <label className='sbj-timeline-time'>
-                        {datetime}
-                    </label>
+                    {nameLabel}
+                    {dateLabel}
                 </div>
             );
         }
         else {
             return (
                 <div className="sbj-timeline-info" style={namestyle}>
-                    <label className='sbj-timeline-time'>
-                        {datetime}
-                    </label>
-                    <label className='sbj-timeline-name'>
-                        {name}
-                    </label>
+                    {dateLabel}
+                    {nameLabel}
                 </div>
             );
         }
