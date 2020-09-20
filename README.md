@@ -6,7 +6,7 @@
 
 以下の公開サーバーからすぐに試せます。
 
-https://skybeje.net/talktocsv2/chatowner/
+https://skybeje.net/talktocsv/chatowner/
 
 - ※デスクトップ版のGoogle Chrome専用のサービスです。
 - 音声入力を開始するには「音声認識OFF」の部分をクリックします
