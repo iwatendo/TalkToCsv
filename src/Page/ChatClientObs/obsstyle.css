@@ -65,3 +65,8 @@ label.sbj-timeline-name{
     color: whitesmoke;
 }
 
+.sbj-timeline-ignore{
+    display: none;
+}
+
+

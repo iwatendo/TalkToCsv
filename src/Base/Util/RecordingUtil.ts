@@ -9,6 +9,8 @@ export default class RecordingUtil {
     private static audioData: any;
     private static audioExtension: any;
 
+    private static _isRec: boolean;
+
     private static _mid: string;
 
     public static set Mid(mid: string) {
@@ -48,6 +50,7 @@ export default class RecordingUtil {
     public static start() {
         this.audioData = [];
         this.recorder.start();
+        this._isRec = true;
     }
 
 
@@ -55,8 +58,9 @@ export default class RecordingUtil {
      * 録音停止
      */
     public static stop() {
-        if(this.recorder){
+        if (this._isRec && this.recorder) {
             this.recorder.stop();
+            this._isRec = false;
         }
     }
 

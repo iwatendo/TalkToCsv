@@ -17,19 +17,12 @@ export default class InputPaneController {
     private _textareaElement = document.getElementById('sbj-inputpanel-text') as HTMLInputElement;
     private _sendMessageButton = document.getElementById('sbj-inputpanel-send-message-button') as HTMLInputElement;
 
-    private _voiceRecognition = document.getElementById('sbj-inputpanel-send-message-recognition');
-    private _voiceRecognitionOn = document.getElementById('sbj-inputpanel-send-message-recognition-on');
-    private _voiceRecognitionOff = document.getElementById('sbj-inputpanel-send-message-recognition-off');
     private _voiceRecordingSwitch = document.getElementById('sbj-check-recording-label');
-
-    private _selectLang = document.getElementById('select-lang') as HTMLInputElement;;
-
-
     private _controller: ChatClientController;
 
 
     private _isVoiceSpeech: boolean;
-    private _isVoiceRecognition: boolean;
+    private _selectLang: string;
 
     /**
      * コンストラクタ
@@ -46,8 +39,13 @@ export default class InputPaneController {
         this._textareaElement.onkeydown = (e) => { this.OnKeyDown(e); };
         this._sendMessageButton.onclick = (e) => { this.SendInputMessage(); };
 
-        this._voiceRecognition.onclick = (e) => {
-            this.ChangeVoiceRecognition();
+        const selectElement = document.querySelector('#select-lang');
+
+        if(selectElement){
+            selectElement.addEventListener('change', (event) => {
+                let lang = this.GetLang();
+                this.ChangeVoiceRecognition(lang);
+            });
         }
 
         let element: HTMLElement = document.getElementById('sbj-chatmessage-color');
@@ -222,23 +220,9 @@ export default class InputPaneController {
     /**
      * 音声認識によるチャットメッセージ入力
      */
-    private ChangeVoiceRecognition() {
-        this._isVoiceRecognition = !this._isVoiceRecognition;
-
-        if (this._isVoiceRecognition) {
-            this._voiceRecognition.classList.add("mdl-button--colored");
-            this._voiceRecordingSwitch.hidden = false;
-        }
-        else {
-            this._voiceRecognition.classList.remove("mdl-button--colored");
-            this._voiceRecordingSwitch.hidden = true;
-        }
-
-        this._voiceRecognitionOn.hidden = !this._isVoiceRecognition;
-        this._voiceRecognitionOff.hidden = this._isVoiceRecognition;
+    private async ChangeVoiceRecognition(lang: string) {
 
         RecordingUtil.initilize((audioBlob) => {
-
             SWMsgPack.BlobToArray(audioBlob).then((value) => {
                 if (RecordingUtil.Mid) {
                     let sender = new AudioBlobSender();
@@ -248,11 +232,19 @@ export default class InputPaneController {
                     RecordingUtil.Mid = "";
                 }
             });
-
         });
 
+        //  音声入力がOFFまたは選択されている言語が変更された場合、音声入力を止める
+        if (lang.length === 0 || lang !== this._selectLang) {
+            RecognitionUtil.Stop();
+            this._textareaElement.disabled = false;
+            this._voiceRecordingSwitch.hidden = true;
+            await StdUtil.Sleep(200);
+        }
+        this._selectLang = lang;
 
-        if (this._isVoiceRecognition) {
+        if (this._selectLang.length > 0) {
+            this._voiceRecordingSwitch.hidden = false;
             RecognitionUtil.InitSpeechRecognition(
                 this._controller,
                 (text, isFinal) => {
@@ -275,26 +267,19 @@ export default class InputPaneController {
                     if (this.IsRecording) {
                         RecordingUtil.start();
                     }
-                    this._voiceRecognitionOn.classList.remove("mdl-button--colored");
-                    this._voiceRecognitionOn.classList.add("mdl-button--accent");
                     this._textareaElement.disabled = true;
                 }
                 , () => {
                     RecordingUtil.stop();
-                    this._voiceRecognitionOn.classList.remove("mdl-button--accent");
-                    this._voiceRecognitionOn.classList.add("mdl-button--colored");
                     this._textareaElement.disabled = false;
                     this._textareaElement.focus();
                 }
             );
-            this._selectLang.disabled = true;
-            RecognitionUtil.Start(this.GetLang());
+
+            RecognitionUtil.Start(lang);
+
         }
-        else {
-            RecognitionUtil.Stop();
-            this._textareaElement.disabled = false;
-            this._selectLang.disabled = false;
-        }
+
     }
 
 }

@@ -549,8 +549,14 @@ p.sbj-timeline-message-ignore {
 }
 
 /*-----------------------------
- *  qrcode
+ *  
  *---------------------------*/
+
+ .sbj-inptpanel-recognition-label{
+    margin: 5px 8px 5px 0px;
+    font-size: 14px;
+    color: #191970;
+ }
 
  .cp_ipselect {
     overflow: hidden;
@@ -577,7 +583,7 @@ p.sbj-timeline-message-ignore {
     position: relative;
     border-radius: 2px;
     border: 1px solid #191970;
-    border-radius: 50px;
+    border-radius: 8px;
     margin: 0 16px 4px 0px;    
     background: #ffffff;
 }
