@@ -25,9 +25,20 @@ export default class LocalCache {
     public static set BootChatOwnerPeerID(val: string) { localStorage.setItem('home-instance-id', val); }
     public static get BootChatOwnerPeerID(): string { return localStorage.getItem('home-instance-id'); }
 
+    /**
+     * 起動しているインスタンスのKeyID
+     */
+    public static set FixedConnectionPeerID(val: string) { localStorage.setItem('fixed-connection-id', val); }
+    public static get FixedConnectionPeerID(): string { return localStorage.getItem('fixed-connection-id'); }
 
     /**
-     *  起動しているインスタンスのPeerID
+     * 起動しているインスタンスのKeyID
+     */
+    public static set FixedConnectionKey(val: string) { localStorage.setItem('fixed-connection-key', val); }
+    public static get FixedConnectionKey(): string { return localStorage.getItem('fixed-connection-key'); }
+
+    /**
+     *  パーミッションの確認有無
      */
     public static set IsCheckDevicePermision(val: boolean) { localStorage.setItem('checked-device-permision', (val ? "True" : "")); }
     public static get IsCheckDevicePermision(): boolean { return localStorage.getItem('checked-device-permision') === "True" }

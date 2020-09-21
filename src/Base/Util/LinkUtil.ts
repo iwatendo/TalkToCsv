@@ -1,4 +1,5 @@
-﻿
+﻿import LocalCache from "../../Contents/Cache/LocalCache";
+
 export default class LinkUtil {
 
     public static OneTimeKey: string = LinkUtil.CreateOneTimeKey();
@@ -117,11 +118,17 @@ export default class LinkUtil {
      * ワンタイムパスワードを生成します
      */
     public static CreateOneTimeKey(): string {
-        let key: string;
-        key = LinkUtil.GetOneTimeKey();
+
+        let key: string = LinkUtil.GetOneTimeKey();
         if (!key) {
+            //  Keyが固定されている場合、固定Keyを使用
+            key = LocalCache.FixedConnectionKey;
+        }
+        if (!key) {
+            //  それ以外の場合はKeyを生成
             key = this.createRandKey(8, "");
         }
+
         return key;
     }
 

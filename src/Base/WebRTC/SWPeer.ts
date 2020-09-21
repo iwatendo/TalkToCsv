@@ -68,7 +68,17 @@ export default class SWPeer {
         SWPeer.GetApiKey((apikey) => {
 
             let debugMode = (LocalCache.DebugMode > 1 ? 3 : 1);
-            let peer = new Peer({ key: apikey, debug: debugMode });
+
+            let fixedPeerID = "fixid";
+            let peer: PeerJs.Peer;
+
+            if(fixedPeerID){
+                alert(fixedPeerID);
+                peer = new Peer({ key: apikey, debug: debugMode });
+            }
+            else{
+                peer = new Peer({ key: apikey, debug: debugMode });
+            }
 
             //  
             this.PeerSetting(service, peer, ownerId);

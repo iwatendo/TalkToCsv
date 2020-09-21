@@ -34,6 +34,25 @@ export default class ChatOwnerView extends AbstractServiceView<ChatOwnerControll
         let clipcopybtnobs = document.getElementById('sbj-start-linkcopy-obs') as HTMLButtonElement;
         MdlUtil.SetCopyLinkButton(linkurlobs, "OBS用URL", clipcopybtnobs);
 
+        //  「ID固定有無」のチェック変更
+        let voiceRecordingSwitch = document.getElementById('sbj-check-id-fixed') as HTMLInputElement;
+
+        if(LocalCache.FixedConnectionPeerID && LocalCache.FixedConnectionKey){
+            MdlUtil.SetChecked("sbj-check-id-fixed","sbj-check-id-fixed-label",true);
+        }
+
+        voiceRecordingSwitch.onchange = (e)=>{
+
+            if(voiceRecordingSwitch.checked){
+                LocalCache.FixedConnectionPeerID = LocalCache.BootChatOwnerPeerID;
+                LocalCache.FixedConnectionKey = LinkUtil.OneTimeKey;
+            }
+            else{
+                LocalCache.FixedConnectionPeerID = "";
+                LocalCache.FixedConnectionKey = "";
+            }
+        };
+
         //
         (document.getElementById("sbj-gjilock-client") as HTMLFrameElement).src = linkurl;
 

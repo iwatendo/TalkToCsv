@@ -53,8 +53,12 @@
     font-family: Arial, Helvetica, sans-serif;
 }
 
-#sbj-start-linkcopy{
+#sbj-start-linkcopy,#sbj-start-linkcopy-obs{
     margin: 0px 12px 0px 0px;
+}
+
+#sbj-check-id-fixed-label{
+    width: 150px;
 }
 
 #sbj-invite-url{
