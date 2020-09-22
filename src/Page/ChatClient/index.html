@@ -83,7 +83,7 @@
 			<div id="sbj-home-visitor-inputpane">
 				<div class="sbj-inputpanel" id="sbj-inputpanel">
 					<div class="mdl-card__actions sbj-inputpanel-action">
-						<div class="sbj-profile-text-left" id="sbj-inputpanel-header">
+						<div class="sbj-inputpanel-button-left" id="sbj-inputpanel-header">
 							<div id="sbj-profile-name-field"
 								class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
 								<input class="mdl-textfield__input" type="text" id="sbj-profile-name" spellcheck=false
@@ -92,36 +92,34 @@
 							</div>
 							<div id="sbj-chatmessage-color">
 							</div>
-						</div>
-					</div>
-					<div class="sbj-inputpanel-icontext">
-						<textarea class='sbj-inputpanel-text' id='sbj-inputpanel-text' maxLength=1024 rows=3
-							spellCheck='false'>
-							</textarea>
-					</div>
-					<div class="mdl-card__actions sbj-inputpanel-action">
-						<div class="sbj-inputpanel-button-left">
-							<label class="sbj-inptpanel-recognition-label">音声入力</label>
-							<form name="form">
-								<div class="cp_ipselect cp_sl04">
-									<select id="select-lang" name="lang">
-										<option value="">OFF</option>
-										<option value="ja">日本語</option>
-										<option value="en">English</option>
-									</select>
-								</div>
-							</form>
-							<label id="sbj-check-recording-label"
-								class="sbj-cast-instance-option mdl-switch mdl-js-switch mdl-js-ripple-effect"
-								for="sbj-check-recording">
-								<input type="checkbox" id="sbj-check-recording" class="mdl-switch__input">
-								<span class="mdl-switch__label">録音</span>
-							</label>
+							<span id="sbj-recording-settings">
+								<label class="sbj-inptpanel-recognition-label">音声入力</label>
+								<form name="form">
+									<div class="cp_ipselect cp_sl04">
+										<select id="select-lang" name="lang">
+											<option value="">OFF</option>
+											<option value="ja">日本語</option>
+											<option value="en">English</option>
+										</select>
+									</div>
+								</form>
+								<label id="sbj-check-recording-label"
+									class="sbj-cast-instance-option mdl-switch mdl-js-switch mdl-js-ripple-effect"
+									for="sbj-check-recording">
+									<input type="checkbox" id="sbj-check-recording" class="mdl-switch__input">
+									<span class="mdl-switch__label">録音</span>
+								</label>
+							</span>
 						</div>
 						<button class="sbj-inputpanel-button-right mdl-button mdl-button--colored"
 							id="sbj-inputpanel-send-message-button">
 							<i class="material-icons">send</i>送信
 						</button>
+					</div>
+					<div class="sbj-inputpanel-icontext">
+						<textarea class='sbj-inputpanel-text' id='sbj-inputpanel-text' maxLength=1024 rows=3
+							spellCheck='false'>
+							</textarea>
 					</div>
 				</div>
 			</div>

@@ -1,4 +1,12 @@
 
+.mdl-layout-spacer{
+    margin: 16px;
+}
+
+.mdl-tooltip.is-active{
+    text-align: left;
+}
+
 .sbj-content {
 	height: 100%;
     color: var(--sbj-color-default-text);

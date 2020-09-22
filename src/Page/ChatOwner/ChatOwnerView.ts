@@ -24,12 +24,12 @@ export default class ChatOwnerView extends AbstractServiceView<ChatOwnerControll
             this.StartVisitor();
         };
 
-        //  「接続URLのコピー」
+        //  「接続URL」
         let linkurl = LinkUtil.CreateLink("../ChatClient/", LocalCache.BootChatOwnerPeerID);
         let clipcopybtn = document.getElementById('sbj-start-linkcopy') as HTMLButtonElement;
-        MdlUtil.SetCopyLinkButton(linkurl, "招待URL", clipcopybtn);
+        MdlUtil.SetCopyLinkButton(linkurl, "招待用URL", clipcopybtn);
 
-        //  「OBS用URLのコピー」
+        //  「OBS用URL」
         let linkurlobs = LinkUtil.CreateLink("../ChatClientObs/", LocalCache.BootChatOwnerPeerID);
         let clipcopybtnobs = document.getElementById('sbj-start-linkcopy-obs') as HTMLButtonElement;
         MdlUtil.SetCopyLinkButton(linkurlobs, "OBS用URL", clipcopybtnobs);

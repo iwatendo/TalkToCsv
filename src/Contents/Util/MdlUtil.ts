@@ -78,7 +78,7 @@ export default class MdlUtil {
                     linkCopyBtn.classList.remove('mdl-button--colored');
                     linkCopyBtn.classList.add('mdl-button--accent');
                     window.setTimeout(() => {
-                        linkCopyBtn.textContent = " " + label + "のコピー ";
+                        linkCopyBtn.textContent = " " + label + " ";
                         linkCopyBtn.classList.remove('mdl-button--accent');
                         linkCopyBtn.classList.add('mdl-button--colored');
                         linkCopyBtn.classList.add('mdl-button--raised');

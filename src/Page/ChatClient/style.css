@@ -147,7 +147,7 @@
     width: 100%;
     overflow-y: scroll;
     overflow-x: hidden;
-    height: calc(100% - 215px);
+    height: calc(100% - 166px);
 }
 
 .sbj-home-visitor-disconnect-action{
@@ -202,6 +202,7 @@
 
 .sbj-inputpanel{
     position: absolute;
+    min-width: 800px;
     bottom: 8px;
     left: 8px;
     right: 8px;
@@ -231,8 +232,13 @@
     display: inline-flex;
 }
 
+#sbj-recording-settings {
+   display: inline-flex;
+   margin: 20px 0px 0px 40px;
+}
+
 .sbj-inputpanel-button-right{
-    padding: 0px 20px;    
+    margin: 20px 0px;
     float: right;
 }
 
@@ -307,8 +313,8 @@
 
 textarea.sbj-inputpanel-text {
     width: calc(100% - 40px);
-    height: 62px;
-    margin: 4px;
+    height: 48px;
+    margin: 0px 4px 12px 4px;
     border-radius: 8px;
     outline: none;
     padding: 4px 8px;
