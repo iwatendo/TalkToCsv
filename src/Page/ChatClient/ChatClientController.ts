@@ -33,6 +33,7 @@ export default class ChatClientController extends AbstractServiceController<Chat
 
     public DEFULT_BG_COLOR = "#3F51B5";
 
+    public UseTwemoji: boolean = false;
     public PeerId: string;
     public ConnStartTime: number;
     public ActorCache: ActorCache;

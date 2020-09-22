@@ -50,8 +50,8 @@ body{
 }
 
 label.sbj-timeline-name{
-    font-size: 24px;
-    line-height: 28px;
+    font-size: 36px;
+    line-height: 40px;
     padding: 0px 16px;
     border-radius: 16px;
     background: rgba(255,255,255,0.6);
@@ -59,10 +59,17 @@ label.sbj-timeline-name{
 }
 
 .sbj-timeline-message,h4,h5{
-    font-size: 36px !important;
-    line-height: 40px;
+    font-size: 72px !important;
+    line-height: 80px;
     text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
     color: whitesmoke;
+}
+
+img.emoji {
+  height: 72px;
+  width: 72px;
+  margin: 0 .05em 0 .1em;
+  vertical-align: -0.1em;
 }
 
 .sbj-timeline-ignore{

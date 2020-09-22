@@ -13,6 +13,7 @@ import ChatInfoSender from '../../Contents/Sender/ChatInfoSender';
 import { Actor } from '../../Contents/IndexedDB/Personal';
 import MdlUtil from '../../Contents/Util/MdlUtil';
 
+declare var twemoji;
 
 export default class CatClientView extends AbstractServiceView<CatClientController> {
 
@@ -148,6 +149,12 @@ export default class CatClientView extends AbstractServiceView<CatClientControll
                 if (isScrollMax) {
                     this.MoveLastTimeline();
                 }
+
+                //  Twemojiが読み込まれている場合は絵文字変換する
+                if(this.Controller.UseTwemoji){
+                    twemoji.parse(document.body);
+                }
+
             });
         });
     }
