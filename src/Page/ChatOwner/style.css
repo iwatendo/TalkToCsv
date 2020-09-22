@@ -17,6 +17,11 @@
     padding: 0px 40px;
 }
 
+.sbj-timeline-icon-image{
+    height: 72px;
+    margin: 0px 4px 16px 4px;
+}
+
 #sbj-home-instance-account-count{
     margin-right: 40px;
 }
