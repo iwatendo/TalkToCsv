@@ -1,42 +1,4 @@
 /*-----------------------------
- *  ActorSelectorDialog
- *---------------------------*/
-
-.sbj-dialog-actor-selector-list-title{
-    margin: 10px;
-    text-decoration: underline;
-}
-
-.sbj-dialog-actor-selecter-right{
-    float: right;
-    width: 50%;
-    height:350px;
-}
-
-.sbj-dialog-actor-selecter-left{
-    float: left;
-    width: 50%;
-    height:350px;
-}
-
-.sbj-dialog-actor-selecter-list{
-    overflow-y: scroll;
-    height:340px;
-}
-
-/*-----------------------------
- *  
- *---------------------------*/
-
- .sbj-profile-frame{
-     position: absolute;
-     top: 57px;
-     right: 0;
-     width: 100%;
-     height: calc(100% - 57px);
- }
-
-/*-----------------------------
  *  
  *---------------------------*/
 .sbj-home-visitor{
@@ -57,52 +19,9 @@
     margin-right: 16px;
 }
 
-#sbj-home-visitor-room-member{
-    width: 260px;
-}
-
-.sbj-home-visitor-room-member-item{
-    padding: 8px 16px;
-}
-
-.sbj-home-visitor-room-member-item:hover{
-    cursor: pointer;
-}
-
-.sbj-home-visitor-room-member-icon{
-    margin-right: 8px !important;
-}
-
-.sbj-home-visitor-room-actor-icon{
-    margin-right: 8px !important;
-    margin-left: 32px !important;
-}
-
 /*-----------------------------
  *  
  *---------------------------*/
-
-#sbj-service-list{
-    width: 320px;
-}
-
-.sbj-service-list-item{
-    color: var(--sbj-color-default-text);
-}
-
-.sbj-service-list-item{
-    color: var(--sbj-color-default-text);
-}
-
-.sbj-service-list-item:hover{
-    cursor: pointer;
-}
-
-
-/*-----------------------------
- *  
- *---------------------------*/
-
 
 .timeline-pane{
     background-color: var(--sbj-color-room-default-background);
@@ -114,33 +33,8 @@
     margin: auto;
 }
 
-.sbj-split-pane-component-left{
-    background-color: var(--sbj-color-timeline-panel);
-    width: 600px;
-    min-width: 520px;
-}
-
-#sbj-home-visitor-divider {
-    left: 600px;
-    width: 5px;
-    background-color: var(--sbj-color-edge-background);
-}
-
-#sbj-home-visitor-gadget-component{
-    left: 600px;
-}
-
-.sbj-split-pane-component-right{
-    margin-left: 5px;
-    overflow: hidden !important;    
-}
-
 .sbj-home-visitor-connecting{
     margin: 20px;
-}
-
-#sbj-home-visitor-title{
-    margin: 0px 24px 0px 0px;
 }
 
 #sbj-home-visitor-timeline-component {
@@ -158,14 +52,6 @@
  * 
  *---------------------------*/
 
-.sbj-invitation-box{
-    padding: 24px;
-}
-
-.sbj-invitation-text{
-    color: var(--sbj-color-highlight-text);
-}
-
 #sbj-start-visitor 
 {
     margin: 0px 0px 0px 16px;
@@ -173,27 +59,6 @@
 
 #sbj-stop-visitor{
     margin: 0px 0px 0px 16px;
-}
-
-.sbj-room{
-    width: 100%;
-    height: 100%;
-}
-
-.sbj-room-info-icon{
-    color: var(--sbj-color-default-text);
-    font-size: 32px;
-    margin: 0px 4px 0px 16px;
-}
-
-.sbj-room-info-text{
-    color: var(--sbj-color-default-text);
-    font-size: 22px;
-    margin-top:4px;
-}
-
-#sbj-actor-profile-name{
-    font-weight: 600;
 }
 
 /*-----------------------------
@@ -264,29 +129,6 @@
     color: #757575;    
 }
 
-.sbj-inputpanel-actor-name{
-    padding: 6px 8px 2px 12px;
-    float: left;
-}
-
-.sbj-inputpanel-ather-room{
-    bottom: 172px;
-}
-
-
-.sbj-unread-count{
-    color: var(--sbj-color-default-text);
-    float: right;
-    position: relative;
-    display: flex;
-    margin: 0px 20px 0px 0px;
-    height: 32px;
-}
-
-#sbj-inputpanel-other-room-button{
-    color: var(--sbj-color-default-text);
-}
-
 #sbj-inputpanel-header{
     display: flex;
 }
@@ -296,19 +138,6 @@
 
 .sbj-inputpanel-noread-icon{
     margin: 4px;
-}
-
-.sbj-inputpanel-actor-icon{
-    width: 72px;
-    height: 72px;
-    margin: 4px;
-    border-radius: 8px;
-    background-color: var(--sbj-color-default-background);
-    float: left;
-}
-
-.sbj-inputpanel-actor-icon:hover{
-    cursor: pointer;
 }
 
 textarea.sbj-inputpanel-text {
@@ -334,15 +163,6 @@ textarea.sbj-inputpanel-text {
 	width: 96px;
 	height:96px;
     min-height: 96px;
-}
-
-.sbj-actor{
-    width: 100%;
-}
-
-.sbj-select-actor{
-    background-color: var(--sbj-color-actor-selection);
-    font-weight: 600;
 }
 
 .sbj-home-visitor-profile-editer{
@@ -469,89 +289,6 @@ p.sbj-timeline-message-ignore {
     margin: 0px 8px 4px;
     border: 0px;
     background: rgba(255,255,255,0.2);
-}
-
-/*-----------------------------
- *  livecast layout
- *---------------------------*/
-
-.sbj-home-visitor-livecast-layout-pane{
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    width: 100%;
-    height: 100%;
-}
-
-.sbj-home-visitor-livecast-status{
-    background-color: var(--sbj-color-default-background);
-    padding: 4px 10px;
-    border-radius: 6px;
-    overflow: hidden;
-    margin: 12px;
-    min-height: 24px;
-}
-
-#sbj-home-visitor-livecast-layout{
-    position: absolute;
-    top: 8px;
-    left: 12px;
-}
-
-#sbj-home-visitor-livecast-layout-1{
-    position: absolute;
-    top: 100px;
-    left: 12px;
-}
-
-#sbj-home-visitor-livecast-layout-2{
-    position: absolute;
-    top: 150px;
-    left: 12px;
-}
-
-#sbj-home-visitor-livecast-layout-4{
-    position: absolute;
-    top: 200px;
-    left: 12px;
-}
-
-#sbj-home-visitor-castselect-pane{
-    position: absolute;
-    top:0px;
-    left:64px;
-    width: calc(100% - 48px);
-    height: 48px;
-}
-
-.sbj-home-visitor-livecast-select-button{
-    margin: 8px 4px;
-}
-
-.sbj-home-visitor-livecast-select-status{
-    width: 100px;
-}
-
-#sbj-home-visitor-castfrmae-pane{
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    height: 100%;
-    width: 100%;
-}
-
-/*-----------------------------
- *  livecast
- *---------------------------*/
-.sbj-home-visitor-livecast{
-    position: absolute;
-    margin: 4px;
-    width: calc(100% - 8px);
-    height: calc(100% - 8px);
-}
-
-.sbj-home-visitor-mobile-label{
-    margin: 0px;
 }
 
 /*-----------------------------

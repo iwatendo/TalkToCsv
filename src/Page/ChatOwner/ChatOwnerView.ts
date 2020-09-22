@@ -35,7 +35,7 @@ export default class ChatOwnerView extends AbstractServiceView<ChatOwnerControll
         MdlUtil.SetCopyLinkButton(linkurlobs, "OBS用URL", clipcopybtnobs);
 
         //
-        (document.getElementById("sbj-gjilock-client") as HTMLFrameElement).src = linkurl;
+        (document.getElementById("sbj-chat-client") as HTMLFrameElement).src = linkurl;
 
         document.getElementById('sbj-clear-timeline').onclick = (e) => {
             this.ClearTimeline();

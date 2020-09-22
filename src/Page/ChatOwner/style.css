@@ -13,26 +13,12 @@
 
 }
 
- .sbj-room-frame{
-     position: absolute;
-     top: 64px;
-     right: 0;
-     width: 100%;
-     height: calc(100% - 64px);
-	 z-index: 2;
- }
-
-
 .sbj-home-instance-header-row{
     padding: 0px 40px;
 }
 
 #sbj-home-instance-account-count{
     margin-right: 40px;
-}
-
-#sbj-home-instance-rooms{
-    padding: 16px 0px 0px 0px;
 }
 
 .sbj-home-instance-actions{
@@ -53,7 +39,6 @@
     margin: 0px;
     padding: 0px 0px;
 }
-
 
 #sbj-home-instance-title{
     padding: 0px 20px 0px 0px;
@@ -83,55 +68,11 @@
     width: 100%;
 }
 
-#sbj-gjilock-client{
+#sbj-chat-client{
     height: 100%;
     width: 100%;
-}
-            
-.sbj-home-instance-room-panel{
-    background-color: var(--sbj-color-default-chatroom);
-    height: 280px;
-    cursor: grab;
-}
-
-.sbj-home-instance-room-header{
-    padding: 8px;
-    color: var(--sbj-color-highlight-text);
-    background-color: var(--sbj-color-edge-background);
-}
-
-.sbj-home-instance-room-title{
-    position: absolute;
-    top: 15px;
-    left: 20px;
 }
 
 #sbj-clear-timeline{
     margin: 0px 12px;
-}
-
-.sbj-home-instance-room-grid{
-    margin: 0px 16px;
-}
-
-.sbj-home-instance-room-member{
-    margin: 4px;
-    padding: 8px;
-    border-radius: 4px;
-    background-color: var(--sbj-color-default-background);
-    border-style: solid;
-    display: inline-flex;
-    border-color: var(--sbj-color-edge-background);
-    color: var(--sbj-color-icon-selection);
-    border-width: 1px;
-}
-
-.sbj-home-instance-room-member:hover{
-    cursor: -moz-grab;
-    cursor: -webkit-grab;
-    cursor: grab;
-}
-
-.sbj-home-instance-room-edit-button{
-    float: right;
 }
