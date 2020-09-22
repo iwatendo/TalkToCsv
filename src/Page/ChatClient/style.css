@@ -67,7 +67,7 @@
 
 .sbj-inputpanel{
     position: absolute;
-    min-width: 800px;
+    min-width: 640px;
     bottom: 8px;
     left: 8px;
     right: 8px;
@@ -85,6 +85,10 @@
     background-color: var(--sbj-color-default-background);
     padding-left: 12px;
     border-radius: 6px;    
+ }
+
+ #sbj-profile-name-field{
+     width: 180px;
  }
 
 .sbj-inputpanel-icontext{
@@ -141,9 +145,9 @@
 }
 
 textarea.sbj-inputpanel-text {
-    width: calc(100% - 40px);
+    width: calc(100% - 30px);
     height: 48px;
-    margin: 0px 4px 12px 4px;
+    margin: 0px 0px 12px 0px;
     border-radius: 8px;
     outline: none;
     padding: 4px 8px;
