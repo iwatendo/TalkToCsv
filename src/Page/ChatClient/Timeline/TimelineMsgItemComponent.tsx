@@ -9,7 +9,6 @@ import MessageUtil from '../../../Base/Util/MessageUtil';
 import ChatClientController from "../ChatClientController";
 import { TimelineMsgGroup } from "./TimelineComponent";
 import SpeechUtil from '../../../Base/Util/SpeechUtil';
-import ImageInfo from '../../../Base/Container/ImageInfo';
 import StyleCache from '../../../Contents/Cache/StyleCache';
 import GetAudioBlobSender from '../../../Contents/Sender/GetAudioBlobSender';
 
@@ -22,13 +21,20 @@ interface TimelineMsgItemProp {
     MsgGroup: TimelineMsgGroup;
 }
 
+/**
+ *  
+ */
+interface TimelineMsgItemStat {
+    EditMid: string;
+}
 
-export class TimelineMsgItemComponent extends React.Component<TimelineMsgItemProp, any> {
+
+export class TimelineMsgItemComponent extends React.Component<TimelineMsgItemProp, TimelineMsgItemStat> {
 
 
     /**
      *  描画処理
-   　*/
+    */
     public render() {
 
         let aid = this.props.MsgGroup.aid;
@@ -60,19 +66,6 @@ export class TimelineMsgItemComponent extends React.Component<TimelineMsgItemPro
                 );
             }
 
-            //  自分のメッセージの場合は削除ボタンを表示
-            //  ※削除ボタンは廃止
-            /*
-            if (this.IsMyChatMessage()) {
-                button = (
-                    <button className='mdl-button mdl-js-button mdl-button--icon mdl-button--colored sbj-timeline-ignore'
-                        onClick={(e) => { this.OnIgnoreClick(tlmsg); }}>
-                        <i className='sbj-timeline-message-icon material-icons' id={mid}>{icon}</i>
-                    </button>
-                );
-            }
-            */
-
             let msgs = StdUtil.TextLineSplit(tlmsg.text);
             let ln = 0;
             let dispText = msgs.map(n => {
@@ -87,9 +80,16 @@ export class TimelineMsgItemComponent extends React.Component<TimelineMsgItemPro
                 }
             });
 
-            return (
-                <p key={tlmsg.mid} className={tmclass}>{dispText}</p>
-            );
+            if (this.state && this.state.EditMid === tlmsg.mid) {
+                return (
+                    <textarea key={tlmsg.mid} id='sbj-timeline-edit-textarea' className='sbj-timeline-edit-textarea' onBlur={(e) => { this.OnEditEnd(e, tlmsg) }} onKeyPress={(e)=> {this.OnKeyPress(e,tlmsg);}}>{tlmsg.text}</textarea>
+                );
+            }
+            else {
+                return (
+                    <p key={tlmsg.mid} className={tmclass} onDoubleClick={(e) => { this.OnEditClick(tlmsg); }}>{dispText}</p>
+                );
+            }
         });
 
         let iconstyle = StyleCache.GetIconStyle(iid);
@@ -128,6 +128,18 @@ export class TimelineMsgItemComponent extends React.Component<TimelineMsgItemPro
     }
 
     /**
+     * 
+     */
+    public componentDidUpdate(){
+        //  編集モードになった場合、テキストエリアにフォーカスを当てる
+        let editTextArea = document.getElementById('sbj-timeline-edit-textarea') as HTMLInputElement;
+        if (editTextArea) {
+            editTextArea.selectionStart = editTextArea.value.length;
+            editTextArea.focus();
+        }
+    }
+
+    /**
      * 背景色に応じて文字色を黒か白か判定する
      * @param hexcolor 
      */
@@ -153,7 +165,7 @@ export class TimelineMsgItemComponent extends React.Component<TimelineMsgItemPro
 
         let result = linkArray.map((al) => {
 
-            if( al.isImage){
+            if (al.isImage) {
                 return (
                     <span>
                         <img className="sbj-timeline-icon-image" src={al.msg}></img>
@@ -234,14 +246,67 @@ export class TimelineMsgItemComponent extends React.Component<TimelineMsgItemPro
         return (this.props.MsgGroup.aid === this.props.controller.CurrentAid);
     }
 
+    /**
+     * 
+     * @param e 
+     */
+    private OnEditClick(tml: Timeline.Message) {
+        this.setState((state) => {
+            return { EditMid: tml.mid };
+        });
+    }
 
     /**
-     * メッセージの「✕」ボタン押下時イベント
-     * @param event
+     * 編集完了
+     * @param tml 
      */
-    public OnIgnoreClick(tml: Timeline.Message) {
-        tml.visible = !tml.visible;
-        this.props.controller.UpdateTimeline(tml);
+    private OnEditEnd(e: React.FocusEvent, tml: Timeline.Message) {
+        this.UpdateMessage(e.target,tml);
+    }
+
+
+    /**
+     * 
+     * @param e 
+     * @param tml 
+     */
+    public OnKeyPress(e: React.KeyboardEvent,tml: Timeline.Message) {
+        if (e.key === 'Enter'){
+            this.UpdateMessage(e.target,tml);
+        }
+    }
+
+
+    /**
+     * 表示済みのメッセージを更新
+     * @param target 
+     * @param tml 
+     */
+    private UpdateMessage(target : any, tml: Timeline.Message){
+
+        if(!this.state || !this.state.EditMid ){
+            return;
+        }
+
+        let text = (target as HTMLInputElement).value;
+
+        if (text && text.length) {
+            //  テキストが変更された場合、更新
+            if (tml.text !== text) {
+                tml.text = text;
+                this.props.controller.UpdateTimeline(tml);
+            }
+        }
+        else {
+            //  テキストが全部削除された場合、非表示状態とする
+            tml.text = "";
+            tml.visible = false;
+            this.props.controller.UpdateTimeline(tml);
+        }
+
+        this.setState((state) => {
+            return { EditMid: "" };
+        });
     }
 
 

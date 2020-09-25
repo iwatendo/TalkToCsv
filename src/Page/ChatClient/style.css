@@ -295,6 +295,21 @@ p.sbj-timeline-message-ignore {
     background: rgba(255,255,255,0.2);
 }
 
+:focus {
+    outline: none;
+}
+
+.sbj-timeline-edit-textarea{
+    width: calc(100% - 12px);
+    border: 0px;
+    margin: 4px;
+    padding: 3px;
+    overflow: hidden;
+    border-radius: 6px;
+    min-width: 600px;
+    height: 32px;
+}
+
 /*-----------------------------
  *  
  *---------------------------*/

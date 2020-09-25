@@ -70,11 +70,12 @@ export default class InputPaneController {
      * @param e 
      */
     public OnOtherKeyPress(e: KeyboardEvent) {
-        if (e.keyCode === 13) {
-            document.getElementById('sbj-inputpanel-text').focus();
+        if (e.key === 'Enter') {
+            //  廃止
+            //  document.getElementById('sbj-inputpanel-text').focus();
         }
         //  エスケープキーは入力中の文字をクリアして終了
-        if (e.keyCode === 27) {
+        if (e.key === 'Escape') {
             e.returnValue = false;
             RecognitionUtil.Cancel();
             return;
@@ -88,14 +89,14 @@ export default class InputPaneController {
     private OnKeyDown(e: KeyboardEvent) {
 
         //  エスケープキーは入力中の文字をクリアして終了
-        if (e.keyCode === 27) {
+        if (e.key === 'Escape') {
             e.returnValue = false;
             this.ClearText();
             return;
         }
 
         //  エンターキーは設定によって動作を変える
-        if (e.keyCode === 13) {
+        if (e.key === 'Enter') {
 
             let isSend = false;
 
