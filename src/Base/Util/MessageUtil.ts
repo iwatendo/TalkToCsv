@@ -27,7 +27,7 @@ export default class MessageUtil {
         while (workText.length > 0) {
 
             //  画像データ有無
-            let imageRe = /\[\[.*\]\]/ig;
+            let imageRe = /\[\[.*?\]\]/;
             let imageRega = imageRe.exec(workText);
 
             if (imageRega) {
