@@ -82,7 +82,7 @@ export class TimelineMsgItemComponent extends React.Component<TimelineMsgItemPro
 
             if (this.state && this.state.EditMid === tlmsg.mid) {
                 return (
-                    <textarea key={tlmsg.mid} id='sbj-timeline-edit-textarea' className='sbj-timeline-edit-textarea' onBlur={(e) => { this.OnEditEnd(e, tlmsg) }} onKeyPress={(e)=> {this.OnKeyPress(e,tlmsg);}}>{tlmsg.text}</textarea>
+                    <textarea key={tlmsg.mid} id='sbj-timeline-edit-textarea' className='sbj-timeline-edit-textarea' onBlur={(e) => { this.OnEditEnd(e, tlmsg) }} onKeyDown={(e)=> {this.onKeyDown(e,tlmsg);}}>{tlmsg.text}</textarea>
                 );
             }
             else {
@@ -270,8 +270,14 @@ export class TimelineMsgItemComponent extends React.Component<TimelineMsgItemPro
      * @param e 
      * @param tml 
      */
-    public OnKeyPress(e: React.KeyboardEvent,tml: Timeline.Message) {
-        if (e.key === 'Enter'){
+    public onKeyDown(e: React.KeyboardEvent,tml: Timeline.Message) {
+
+        if (e.key === 'Escape'){
+            this.setState((state) => {
+                return { EditMid: "" };
+            });
+        }
+        else if (e.key === 'Enter'){
             this.UpdateMessage(e.target,tml);
         }
     }

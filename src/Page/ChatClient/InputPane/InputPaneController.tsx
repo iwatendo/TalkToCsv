@@ -273,7 +273,7 @@ export default class InputPaneController {
                 , () => {
                     RecordingUtil.stop();
                     this._textareaElement.disabled = false;
-                    this._textareaElement.focus();
+                    //  this._textareaElement.focus();
                 }
             );
 
