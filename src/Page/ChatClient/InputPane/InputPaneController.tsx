@@ -53,6 +53,16 @@ export default class InputPaneController {
         let actor = controller.CurrentActor;
         ReactDOM.render(<ColorComponent controller={controller} actor={actor} />, element, () => { });
 
+
+        //  録音機能をON時、録音処理の初期化処理を実行
+        let isRecordingInit = true;
+        (document.getElementById('sbj-check-recording') as HTMLInputElement).onchange = (e)=>{
+            if( isRecordingInit && this.IsRecording){
+                this.RecordingInitilize();
+                isRecordingInit = false;
+            }
+        };
+
         this.ClearText();
     }
 
@@ -219,10 +229,9 @@ export default class InputPaneController {
 
 
     /**
-     * 音声認識によるチャットメッセージ入力
+     * 録音機能の初期化
      */
-    private async ChangeVoiceRecognition(lang: string) {
-
+    private RecordingInitilize(){
         RecordingUtil.initilize((audioBlob) => {
             SWMsgPack.BlobToArray(audioBlob).then((value) => {
                 if (RecordingUtil.Mid) {
@@ -234,6 +243,13 @@ export default class InputPaneController {
                 }
             });
         });
+    }
+
+
+    /**
+     * 音声認識によるチャットメッセージ入力
+     */
+    private async ChangeVoiceRecognition(lang: string) {
 
         //  音声入力がOFFまたは選択されている言語が変更された場合、音声入力を止める
         if (lang.length === 0 || lang !== this._selectLang) {
