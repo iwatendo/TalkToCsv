@@ -1,3 +1,4 @@
+import { textChangeRangeIsUnchanged } from "typescript";
 
 declare var MediaRecorder: any;
 
@@ -9,22 +10,50 @@ export default class RecordingUtil {
     private static audioData: any;
     private static audioExtension: any;
 
-    private static _isRec: boolean;
+    /**
+     * 初期化有無
+     */
+    private static _isInit: boolean = false;
 
-    private static _mid: string;
+    /**
+     * 録音している最中か？
+     */
+    private static _isRecording: boolean;
 
-    public static set Mid(mid: string) {
-        this._mid = mid;
+    /**
+     * 録音されたか？
+     */
+    private static _isRecorded: boolean;
+
+    /**
+     * 初期化有無
+     */
+    public static get IsInit(): boolean {
+        return this._isInit;
     }
 
-    public static get Mid(): string {
-        return this._mid;
+    /**
+     * 
+     */
+    public static get IsRecorded(): boolean {
+        return this._isRecorded;
+    }
+
+    /**
+     * 
+     */
+    public static set IsRecorded(value: boolean) {
+        this._isRecorded = value;
     }
 
     /**
      * 録音処理の初期化
      */
     public static initilize(callback: OnRecorded) {
+
+        if (this._isInit) {
+            return;
+        }
 
         navigator.mediaDevices.getUserMedia({ audio: true })
             .then(stream => {
@@ -40,6 +69,8 @@ export default class RecordingUtil {
                     const audioBlob = new Blob(this.audioData);
                     callback(audioBlob);
                 });
+
+                this._isInit = true;
             });
     }
 
@@ -50,7 +81,8 @@ export default class RecordingUtil {
     public static start() {
         this.audioData = [];
         this.recorder.start();
-        this._isRec = true;
+        this._isRecording = true;
+        this._isRecorded = true;
     }
 
 
@@ -58,9 +90,9 @@ export default class RecordingUtil {
      * 録音停止
      */
     public static stop() {
-        if (this._isRec && this.recorder) {
+        if (this._isRecording && this.recorder) {
             this.recorder.stop();
-            this._isRec = false;
+            this._isRecording = false;
         }
     }
 

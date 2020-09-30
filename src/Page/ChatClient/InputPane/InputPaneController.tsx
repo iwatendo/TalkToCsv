@@ -23,6 +23,7 @@ export default class InputPaneController {
 
     private _isVoiceSpeech: boolean;
     private _selectLang: string;
+    private _latestSppechMid: string;
 
     /**
      * コンストラクタ
@@ -41,7 +42,7 @@ export default class InputPaneController {
 
         const selectElement = document.querySelector('#select-lang');
 
-        if(selectElement){
+        if (selectElement) {
             selectElement.addEventListener('change', (event) => {
                 let lang = this.GetLang();
                 this.ChangeVoiceRecognition(lang);
@@ -55,11 +56,10 @@ export default class InputPaneController {
 
 
         //  録音機能をON時、録音処理の初期化処理を実行
-        let isRecordingInit = true;
-        (document.getElementById('sbj-check-recording') as HTMLInputElement).onchange = (e)=>{
-            if( isRecordingInit && this.IsRecording){
+        (document.getElementById('sbj-check-recording') as HTMLInputElement).onchange = (e) => {
+
+            if (this.IsRecording) {
                 this.RecordingInitilize();
-                isRecordingInit = false;
             }
         };
 
@@ -169,7 +169,7 @@ export default class InputPaneController {
      * 音声認識のテキスト処理
      * @param text 
      */
-    private SendVoiceText(text): ChatMessageSender | undefined {
+    private SendVoiceText(text, isRec: boolean): ChatMessageSender | undefined {
 
         let sendVoiceType = 1;
 
@@ -184,12 +184,17 @@ export default class InputPaneController {
                 break;
             case 1:
                 //  直接チャットメッセージとして送信
-                return this.SendChatMessage(text, this.IsRecording);
+                return this.SendChatMessage(text, isRec);
         }
     }
 
 
-    private CreateChatMessage(text: string, isVoiceRecognition: boolean): ChatMessageSender {
+    /**
+     * 
+     * @param text 
+     * @param isRec 
+     */
+    private CreateChatMessage(text: string, isRec: boolean): ChatMessageSender {
         let chm = new ChatMessageSender();
         let actor = this._controller.CurrentActor;
         chm.mid = StdUtil.CreateUuid();
@@ -199,7 +204,7 @@ export default class InputPaneController {
         chm.chatBgColor = actor.chatBgColor;
         chm.iid = actor.dispIid;
         chm.text = text;
-        chm.isVoiceRecog = isVoiceRecognition;
+        chm.isVoiceRecog = isRec;
         chm.isSpeech = this._isVoiceSpeech;
         return chm;
     }
@@ -209,9 +214,9 @@ export default class InputPaneController {
      * メッセージ送信
      * @param text 
      */
-    private SendChatMessage(text: string, isVoiceRecognition: boolean): ChatMessageSender {
+    private SendChatMessage(text: string, isRec: boolean): ChatMessageSender {
 
-        let chm = this.CreateChatMessage(text, isVoiceRecognition);
+        let chm = this.CreateChatMessage(text, isRec);
         this._controller.SendChatMessage(chm);
         return chm;
     }
@@ -231,15 +236,16 @@ export default class InputPaneController {
     /**
      * 録音機能の初期化
      */
-    private RecordingInitilize(){
+    private RecordingInitilize() {
         RecordingUtil.initilize((audioBlob) => {
             SWMsgPack.BlobToArray(audioBlob).then((value) => {
-                if (RecordingUtil.Mid) {
+                if (this._latestSppechMid && RecordingUtil.IsRecorded) {
                     let sender = new AudioBlobSender();
-                    sender.mid = RecordingUtil.Mid;
+                    sender.mid = this._latestSppechMid;
                     sender.binary = value as ArrayBuffer;
                     this._controller.SwPeer.SendToOwner(sender);
-                    RecordingUtil.Mid = "";
+                    this._latestSppechMid = "";
+                    RecordingUtil.IsRecorded = false;
                 }
             });
         });
@@ -267,9 +273,9 @@ export default class InputPaneController {
                 (text, isFinal) => {
                     if (text) {
                         if (isFinal) {
-                            let chm = this.SendVoiceText(text);
-                            RecordingUtil.Mid = chm.mid;
+                            let chm = this.SendVoiceText(text, RecordingUtil.IsRecorded);
                             this._textareaElement.value = "";
+                            this._latestSppechMid = chm.mid;
                         }
                         else {
                             this._textareaElement.value = text;
@@ -281,7 +287,7 @@ export default class InputPaneController {
 
                 }
                 , () => {
-                    if (this.IsRecording) {
+                    if (this.IsRecording && RecordingUtil.IsInit) {
                         RecordingUtil.start();
                     }
                     this._textareaElement.disabled = true;
