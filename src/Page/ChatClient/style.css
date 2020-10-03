@@ -214,16 +214,13 @@ textarea.sbj-inputpanel-text {
  *  timeline
  *---------------------------*/
 
-.sbj-timeline {
-    width: 100%;
-    height: calc(100% - 184px);
-    overflow-y: scroll;
+.sbj-timeline{
+    margin: 0px 6px;
 }
 
 .sbj-timeline-flex-right {
     display: flex;
     border: 0px;
-    margin: 0px 18px 0px 0px;
     clear: both;
     float: right;
 }
@@ -231,7 +228,6 @@ textarea.sbj-inputpanel-text {
 .sbj-timeline-flex-left {
     display: flex;
     border: 0px;
-    margin: 0px 0px 0px 18px;
     clear: both;
     float: left;
 }

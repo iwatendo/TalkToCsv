@@ -78,7 +78,7 @@ export class TimelineComponent extends React.Component<TimelineProp, any>{
 
 
         return (
-            <div id='sbj-timeline'>
+            <div className='sbj-timeline'>
                 {msgList}
                 {ingList}
             </div>

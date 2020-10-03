@@ -82,7 +82,7 @@ export class TimelineMsgItemComponent extends React.Component<TimelineMsgItemPro
 
             if (this.state && this.state.EditMid === tlmsg.mid) {
                 return (
-                    <textarea key={tlmsg.mid} id='sbj-timeline-edit-textarea' className='sbj-timeline-edit-textarea' onBlur={(e) => { this.OnEditEnd(e, tlmsg) }} onKeyDown={(e)=> {this.onKeyDown(e,tlmsg);}}>{tlmsg.text}</textarea>
+                    <textarea key={tlmsg.mid} id='sbj-timeline-edit-textarea' className='sbj-timeline-edit-textarea' onBlur={(e) => { this.OnEditEnd(e, tlmsg) }} onKeyDown={(e) => { this.onKeyDown(e, tlmsg); }}>{tlmsg.text}</textarea>
                 );
             }
             else {
@@ -119,10 +119,10 @@ export class TimelineMsgItemComponent extends React.Component<TimelineMsgItemPro
         let spc_div = (<div className='sbj-timeline-adjust'></div>);
 
         if (isMine) {
-            return (<div key="left" className='sbj-timeline-flex-left'>{image_div}{msg_div}{spc_div}</div>);
+            return (<div key="right" className='sbj-timeline-flex-right'>{spc_div}{msg_div}{image_div}</div>);
         }
         else {
-            return (<div key="right" className='sbj-timeline-flex-right'>{spc_div}{msg_div}{image_div}</div>);
+            return (<div key="left" className='sbj-timeline-flex-left'>{image_div}{msg_div}{spc_div}</div>);
         }
 
     }
@@ -130,7 +130,7 @@ export class TimelineMsgItemComponent extends React.Component<TimelineMsgItemPro
     /**
      * 
      */
-    public componentDidUpdate(){
+    public componentDidUpdate() {
         //  編集モードになった場合、テキストエリアにフォーカスを当てる
         let editTextArea = document.getElementById('sbj-timeline-edit-textarea') as HTMLInputElement;
         if (editTextArea) {
@@ -202,7 +202,7 @@ export class TimelineMsgItemComponent extends React.Component<TimelineMsgItemPro
         let name = this.props.MsgGroup[0].name;
         let datetime = this.ToDispDate(this.props.MsgGroup[0].ctime);
 
-        let namestyle: React.CSSProperties = { float: (isMine ? "left" : "right") };
+        let namestyle: React.CSSProperties = { float: (isMine ? "right" : "left") };
 
         let nameLabel = (name ? <label className='sbj-timeline-name'>{name}</label> : <span></span>);
         let dateLabel = (datetime ? <label className='sbj-timeline-time'>{datetime}</label> : <span></span>);
@@ -210,16 +210,16 @@ export class TimelineMsgItemComponent extends React.Component<TimelineMsgItemPro
         if (isMine) {
             return (
                 <div className="sbj-timeline-info" style={namestyle}>
-                    {nameLabel}
                     {dateLabel}
+                    {nameLabel}
                 </div>
             );
         }
         else {
             return (
                 <div className="sbj-timeline-info" style={namestyle}>
-                    {dateLabel}
                     {nameLabel}
+                    {dateLabel}
                 </div>
             );
         }
@@ -261,7 +261,7 @@ export class TimelineMsgItemComponent extends React.Component<TimelineMsgItemPro
      * @param tml 
      */
     private OnEditEnd(e: React.FocusEvent, tml: Timeline.Message) {
-        this.UpdateMessage(e.target,tml);
+        this.UpdateMessage(e.target, tml);
     }
 
 
@@ -270,15 +270,15 @@ export class TimelineMsgItemComponent extends React.Component<TimelineMsgItemPro
      * @param e 
      * @param tml 
      */
-    public onKeyDown(e: React.KeyboardEvent,tml: Timeline.Message) {
+    public onKeyDown(e: React.KeyboardEvent, tml: Timeline.Message) {
 
-        if (e.key === 'Escape'){
+        if (e.key === 'Escape') {
             this.setState((state) => {
                 return { EditMid: "" };
             });
         }
-        else if (e.key === 'Enter'){
-            this.UpdateMessage(e.target,tml);
+        else if (e.key === 'Enter') {
+            this.UpdateMessage(e.target, tml);
         }
     }
 
@@ -288,9 +288,9 @@ export class TimelineMsgItemComponent extends React.Component<TimelineMsgItemPro
      * @param target 
      * @param tml 
      */
-    private UpdateMessage(target : any, tml: Timeline.Message){
+    private UpdateMessage(target: any, tml: Timeline.Message) {
 
-        if(!this.state || !this.state.EditMid ){
+        if (!this.state || !this.state.EditMid) {
             return;
         }
 
