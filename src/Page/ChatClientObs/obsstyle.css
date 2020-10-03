@@ -61,8 +61,17 @@ label.sbj-timeline-name{
 .sbj-timeline-message,h4,h5{
     font-size: 72px !important;
     line-height: 80px;
-    text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
-    color: whitesmoke;
+    color          : #ffffff;           /* 文字の色 */
+    letter-spacing : 4px;               /* 文字間 */
+    text-shadow    : 
+         2px  2px 1px #003366,
+        -2px  2px 1px #003366,
+         2px -2px 1px #003366,
+        -2px -2px 1px #003366,
+         2px  0px 1px #003366,
+         0px  2px 1px #003366,
+        -2px  0px 1px #003366,
+         0px -2px 1px #003366;        /* 文字の影 */
 }
 
 img.emoji {
@@ -72,13 +81,12 @@ img.emoji {
   vertical-align: -0.1em;
 }
 
-.sbj-timeline-ignore{
-    display: none;
-}
-
 .sbj-timeline-icon-image{
     height: 72px;
     margin: 0px 4px 16px 4px;
 }
 
 
+.sbj-timeline-ignore{
+    display: none;
+}
