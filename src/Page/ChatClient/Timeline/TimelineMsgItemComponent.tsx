@@ -49,9 +49,6 @@ export class TimelineMsgItemComponent extends React.Component<TimelineMsgItemPro
 
             let mid = 'sbj-timeline-message-' + tlmsg.mid;
             let tmclass = "sbj-timeline-message" + (tlmsg.visible ? "" : " sbj-timeline-message-ignore");
-            let icon = (tlmsg.visible ? "clear" : "undo");
-
-
             let button = (<span></span>);
 
             //  音声再生ボタン
@@ -69,14 +66,16 @@ export class TimelineMsgItemComponent extends React.Component<TimelineMsgItemPro
             let msgs = StdUtil.TextLineSplit(tlmsg.text);
             let ln = 0;
             let dispText = msgs.map(n => {
-
                 ln += 1;
                 let linkText = this.SetAutoLink(n);
+
+                let textLink = (<span key={ln} className='sbj-timeline-text' onClick={(e) => { this.OnEditClick(tlmsg); }}>{linkText}</span>);
+
                 if (ln === msgs.length) {
-                    return (<span key={ln}>{linkText}{button}</span>);
+                    return (<span>{textLink}{button}</span>);
                 }
                 else {
-                    return (<span key={ln}>{linkText}<br /></span>);
+                    return (<span>{textLink}</span>);
                 }
             });
 
@@ -87,7 +86,7 @@ export class TimelineMsgItemComponent extends React.Component<TimelineMsgItemPro
             }
             else {
                 return (
-                    <p key={tlmsg.mid} className={tmclass} onDoubleClick={(e) => { this.OnEditClick(tlmsg); }}>{dispText}</p>
+                    <p key={tlmsg.mid} className={tmclass}>{dispText}</p>
                 );
             }
         });

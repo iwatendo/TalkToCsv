@@ -265,6 +265,12 @@ p.sbj-timeline-message {
     margin: 2px;
 }
 
+.sbj-timeline-text:hover{
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 4px;
+    cursor: pointer;
+}
+
 i.sbj-timeline-message-icon{
     color: var(--sbj-color-timeline-ballon);
 }
