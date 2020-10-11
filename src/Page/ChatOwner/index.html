@@ -27,7 +27,7 @@
         <header id="sbj-home-instance-header" class="mdl-layout__header mdl-color--grey-100 mdl-color-text--grey-600"
             hidden>
             <div class="sbj-home-instance-header-row mdl-layout__header-row">
-                <a href="/" id="sbj-home-instance-title" class="mdl-layout-title">Talk To CSV (Ver2.2)&nbsp; </a>
+                <a href="/" id="sbj-home-instance-title" class="mdl-layout-title">Talk To CSV (Ver2.3)&nbsp; </a>
                 <div id="sbj-home-instance-account-count" class="material-icons mdl-badge mdl-badge--overlap"
                     data-badge="0">person</div>
                 <div class="mdl-tooltip" data-mdl-for="sbj-home-instance-account-count">接続人数</div>
@@ -37,25 +37,23 @@
                     <i class="material-icons">chat</i>
                     &nbsp; チャットクライアント起動 &nbsp;
                 </button>
+                <form name="form">
+                    <div class="cp_ipselect cp_sl04">
+                        <select id="select-mode" name="mode">
+                            <option value="invite">招待用URL</option>
+                            <option value="obs-default">OBS字幕(標準)</option>
+                            <option value="obs-invert">OBS字幕(左右反転)</option>
+                        </select>
+                    </div>
+                </form>
                 <button id='sbj-start-linkcopy' class="mdl-button mdl-button--raised mdl-js-button mdl-button--colored">
-                    &nbsp; 招待用URL &nbsp;
+                    &nbsp; URLコピー &nbsp;
                 </button>
                 <div class="mdl-tooltip" data-mdl-for="sbj-start-linkcopy">
-                    クリップボードに<br>
-                    接続URLをコピーします<br>
+                    クリップボードに接続URLをコピーします<br>
+                    招待したいメンバーにURLを伝えてください<br>
                     <br>
-                    招待したいメンバーに<br>
-                    URLを伝えてください<br>
-                </div>
-                <button id='sbj-start-linkcopy-obs' class="mdl-button mdl-button--raised mdl-js-button mdl-button--colored">
-                    &nbsp; OBS用URL &nbsp;
-                </button>
-                <div class="mdl-tooltip" data-mdl-for="sbj-start-linkcopy-obs">
-                    クリップボードに<br>
-                    接続URLをコピーします<br>
-                    <br>
-                    OBSのブラウザソースに<br>
-                    指定するURLです
+                    OBS字幕はブラウザソースに指定するURLです<br>
                 </div>
                 <div class="mdl-layout-spacer"></div>
                 <button id='sbj-export-timeline-csv'

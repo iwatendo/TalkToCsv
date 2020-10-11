@@ -90,3 +90,7 @@ img.emoji {
 .sbj-timeline-ignore{
     display: none;
 }
+
+.flip-horizontal {
+    transform: scale(-1, 1);
+}

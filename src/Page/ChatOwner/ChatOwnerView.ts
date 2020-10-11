@@ -7,7 +7,6 @@ import LinkUtil from "../../Base/Util/LinkUtil";
 import ChatOwnerController from "./ChatOwnerController";
 import LocalCache from "../../Contents/Cache/LocalCache";
 import ClearTimelineSender from "../../Contents/Sender/ClearTimelineSender";
-import MdlUtil from "../../Contents/Util/MdlUtil";
 
 
 export default class ChatOwnerView extends AbstractServiceView<ChatOwnerController> {
@@ -24,17 +23,11 @@ export default class ChatOwnerView extends AbstractServiceView<ChatOwnerControll
             this.StartVisitor();
         };
 
-        //  「接続URL」
-        let linkurl = LinkUtil.CreateLink("../ChatClient/", LocalCache.BootChatOwnerPeerID);
         let clipcopybtn = document.getElementById('sbj-start-linkcopy') as HTMLButtonElement;
-        MdlUtil.SetCopyLinkButton(linkurl, "招待用URL", clipcopybtn);
-
-        //  「OBS用URL」
-        let linkurlobs = LinkUtil.CreateLink("../ChatClientObs/", LocalCache.BootChatOwnerPeerID);
-        let clipcopybtnobs = document.getElementById('sbj-start-linkcopy-obs') as HTMLButtonElement;
-        MdlUtil.SetCopyLinkButton(linkurlobs, "OBS用URL", clipcopybtnobs);
+        this.SetCopyLinkButton(clipcopybtn);
 
         //
+        let linkurl = LinkUtil.CreateLink("../ChatClient/", LocalCache.BootChatOwnerPeerID);
         (document.getElementById("sbj-chat-client") as HTMLFrameElement).src = linkurl;
 
         document.getElementById('sbj-clear-timeline').onclick = (e) => {
@@ -58,6 +51,53 @@ export default class ChatOwnerView extends AbstractServiceView<ChatOwnerControll
                 });
             }
         });
+    }
+
+
+    /**
+     * 
+     */
+    public GetLinkUrl(): string {
+
+        let mode = (document as any).form.mode.value as string;
+
+        switch (mode) {
+            case "invite": return LinkUtil.CreateLink("../ChatClient/", LocalCache.BootChatOwnerPeerID);
+            case "obs-default": return LinkUtil.CreateLink("../ChatClientObs/", LocalCache.BootChatOwnerPeerID);
+            case "obs-invert": return LinkUtil.CreateLink("../ChatClientObs/invert.html", LocalCache.BootChatOwnerPeerID);
+        }
+
+    }
+
+
+    /**
+     * 
+     * @param linkCopyBtn 
+     */
+    public SetCopyLinkButton(linkCopyBtn: HTMLButtonElement) {
+
+        if (linkCopyBtn) {
+            linkCopyBtn.onclick = (e) => {
+
+                let link = this.GetLinkUrl();
+                StdUtil.ClipBoardCopy(link);
+
+                linkCopyBtn.textContent = " クリップボードにコピーしました ";
+
+                linkCopyBtn.classList.remove('mdl-button--raised');
+                linkCopyBtn.classList.remove('mdl-button--colored');
+                linkCopyBtn.classList.add('mdl-button--accent');
+
+                window.setTimeout(() => {
+                    linkCopyBtn.textContent = "URLコピー";
+                    linkCopyBtn.classList.remove('mdl-button--accent');
+                    linkCopyBtn.classList.add('mdl-button--colored');
+                    linkCopyBtn.classList.add('mdl-button--raised');
+                }, 2500);
+
+            };
+        }
+
     }
 
 
