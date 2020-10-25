@@ -55,12 +55,15 @@ export default class ChatClientController extends AbstractServiceController<Chat
     public HasError: boolean;
 
     public IsFirstBoot: boolean;
+    
+    public IsDisplayMode: boolean;
 
     /**
      *
      */
-    constructor() {
+    constructor(isDispalyMode:boolean) {
         super();
+        this.IsDisplayMode = isDispalyMode;
         this.HasError = false;
         this.Log = new LogController(this);
         this.Receiver = new ChatClientReceiver(this);

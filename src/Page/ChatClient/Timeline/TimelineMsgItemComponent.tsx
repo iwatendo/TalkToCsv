@@ -250,6 +250,12 @@ export class TimelineMsgItemComponent extends React.Component<TimelineMsgItemPro
      * @param e 
      */
     private OnEditClick(tml: Timeline.Message) {
+
+        //  表示モードの場合は編集処理をしない
+        if(this.props.controller.IsDisplayMode){
+            return;
+        }
+
         this.setState((state) => {
             return { EditMid: tml.mid };
         });

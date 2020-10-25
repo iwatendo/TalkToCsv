@@ -35,7 +35,8 @@ export default class ChatClientReceiver extends AbstractServiceReceiver<ChatClie
 
             let ci = (sender as ConnInfoSender);
 
-            if (ci.isBootCheck) {
+            //  表示モードの場合は多重起動を許可する
+            if (ci.isBootCheck || this.Controller.IsDisplayMode) {
                 //  起動チェックに成功した場合、使用アクター情報を送信して画面を切替える
                 this.Controller.ConnStartTime = (sender as ConnInfoSender).starttime;
                 this.Controller.GetUseActors((ua) => { this.Controller.InitializeUseActors(ua); });

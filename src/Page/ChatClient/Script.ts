@@ -13,7 +13,7 @@ if (StdUtil.IsSupoortPlatform() && !StdUtil.IsMobile()) {
     let db = new Home.DB();
 
     db.Connect(() => {
-        let server = new ChatClientController();
+        let server = new ChatClientController(false);
         server.SwPeer = new SWPeer(server, LinkUtil.GetPeerID(), null);
     });
 

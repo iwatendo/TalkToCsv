@@ -10,7 +10,7 @@ import SWPeer from "../../Base/WebRTC/SWPeer";
 let db = new Home.DB();
 
 db.Connect(() => {
-    let server = new ChatClientController()
+    let server = new ChatClientController(true);
     server.UseTwemoji = true;
     server.SwPeer = new SWPeer(server, LinkUtil.GetPeerID(), null);
 });
