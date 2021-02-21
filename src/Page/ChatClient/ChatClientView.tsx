@@ -7,7 +7,7 @@ import * as Timeline from "../../Contents/IndexedDB/Timeline";
 import AbstractServiceView, { OnViewLoad } from "../../Base/AbstractServiceView";
 
 import { TimelineComponent } from "./Timeline/TimelineComponent";
-import CatClientController from "./ChatClientController";
+import ChatClientController from "./ChatClientController";
 import InputPaneController from "./InputPane/InputPaneController";
 import ChatInfoSender from '../../Contents/Sender/ChatInfoSender';
 import { Actor } from '../../Contents/IndexedDB/Personal';
@@ -15,7 +15,7 @@ import MdlUtil from '../../Contents/Util/MdlUtil';
 
 declare var twemoji;
 
-export default class CatClientView extends AbstractServiceView<CatClientController> {
+export default class ChatClientView extends AbstractServiceView<ChatClientController> {
 
     private _isBooting: boolean = true;
     private _bootElement = document.getElementById('sbj-home-visitor');
@@ -131,6 +131,7 @@ export default class CatClientView extends AbstractServiceView<CatClientControll
      */
     public SetTimeline(tlms: Array<Timeline.Message>, ings: Array<ChatInfoSender>) {
 
+
         let controller = this.Controller;
 
         //  キャッシュ化
@@ -150,8 +151,14 @@ export default class CatClientView extends AbstractServiceView<CatClientControll
                     this.MoveLastTimeline();
                 }
 
+                if(this.Controller.IsEveryTimeScrolling){
+                    //  強制スクロール時は、500ミリ秒後に再実行する
+                    //  ※翻訳処理で行数が増える事がある為、翻訳語にスクロールするように調整
+                    setTimeout(()=>{ this.MoveLastTimeline(); },500);
+                }
+
                 //  Twemojiが読み込まれている場合は絵文字変換する
-                if(this.Controller.UseTwemoji){
+                if (this.Controller.UseTwemoji) {
                     twemoji.parse(document.body);
                 }
 
@@ -159,14 +166,19 @@ export default class CatClientView extends AbstractServiceView<CatClientControll
         });
     }
 
-
     /**
      * タイムラインのスクロールイベント
      */
     public OnTimelineScroll() {
-        let te = this._timelineElement;
-        if (te.scrollHeight <= (te.scrollTop + te.offsetHeight)) {
+
+        if (this.Controller.IsEveryTimeScrolling) {
             this.MoveLastTimeline();
+        }
+        else {
+            let te = this._timelineElement;
+            if (te.scrollHeight <= (te.scrollTop + te.offsetHeight)) {
+                this.MoveLastTimeline();
+            }
         }
     }
 

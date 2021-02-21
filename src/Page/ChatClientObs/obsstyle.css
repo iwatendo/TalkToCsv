@@ -94,3 +94,22 @@ img.emoji {
 .flip-horizontal {
     transform: scale(-1, 1);
 }
+
+#google_translate_element{
+    position: absolute;
+    top: 0px;
+    right: 0px;
+}
+
+.goog-te-banner{
+    display: none;
+}
+
+.goog-te-banner-frame{
+    display: none !important;
+    z-index: 0 !important;
+}
+
+body{
+    top: 0px !important;
+}

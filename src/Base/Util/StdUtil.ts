@@ -1,6 +1,4 @@
-﻿import "platform";
-import LogUtil from "./LogUtil";
-import LinkUtil from "./LinkUtil";
+﻿import platform = require("platform");
 
 interface OnGetMobleDeviceId { (deviceId: string): void }
 

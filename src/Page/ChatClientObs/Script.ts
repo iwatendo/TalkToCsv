@@ -12,5 +12,15 @@ let db = new Home.DB();
 db.Connect(() => {
     let server = new ChatClientController(true);
     server.UseTwemoji = true;
+    server.IsEveryTimeScrolling = true;
     server.SwPeer = new SWPeer(server, LinkUtil.GetPeerID(), null);
 });
+
+
+document.getElementById("sbj-home-visitor-main").onmouseleave = ()=>{
+    document.getElementById("google_translate_element").hidden = true;
+}
+
+document.getElementById("sbj-home-visitor-main").onmouseenter = ()=>{
+    document.getElementById("google_translate_element").hidden = false;
+}
