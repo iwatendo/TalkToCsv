@@ -101,13 +101,8 @@ img.emoji {
     right: 0px;
 }
 
-.goog-te-banner{
-    display: none;
-}
-
 .goog-te-banner-frame{
-    display: none !important;
-    z-index: 0 !important;
+    position: absolute;
 }
 
 body{

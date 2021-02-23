@@ -17,10 +17,22 @@ db.Connect(() => {
 });
 
 
-document.getElementById("sbj-home-visitor-main").onmouseleave = ()=>{
+document.body.onmouseleave = ()=>{
     document.getElementById("google_translate_element").hidden = true;
+    for(let element of document.getElementsByClassName("goog-te-banner-frame")){
+        let frame = element as HTMLIFrameElement;
+        if(frame && frame.style){
+            frame.style.display ="none";
+        }
+    }
 }
 
-document.getElementById("sbj-home-visitor-main").onmouseenter = ()=>{
+document.body.onmouseenter = ()=>{
     document.getElementById("google_translate_element").hidden = false;
+    for(let element of document.getElementsByClassName("goog-te-banner-frame")){
+        let frame = element as HTMLIFrameElement;
+        if(frame && frame.style){
+            frame.style.display ="inherit";
+        }
+    }
 }
