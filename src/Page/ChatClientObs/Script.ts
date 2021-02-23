@@ -16,23 +16,17 @@ db.Connect(() => {
     server.SwPeer = new SWPeer(server, LinkUtil.GetPeerID(), null);
 });
 
-
-document.body.onmouseleave = ()=>{
-    document.getElementById("google_translate_element").hidden = true;
-    for(let element of document.getElementsByClassName("goog-te-banner-frame")){
+function displayGoogleTranslate(isDisplay: boolean) {
+    document.getElementById("google_translate_element").hidden = !isDisplay;
+    for (let element of document.getElementsByClassName("goog-te-banner-frame")) {
         let frame = element as HTMLIFrameElement;
-        if(frame && frame.style){
-            frame.style.display ="none";
+        if (frame && frame.style) {
+            frame.style.display = isDisplay ? "inherit" : "none";
         }
     }
 }
 
-document.body.onmouseenter = ()=>{
-    document.getElementById("google_translate_element").hidden = false;
-    for(let element of document.getElementsByClassName("goog-te-banner-frame")){
-        let frame = element as HTMLIFrameElement;
-        if(frame && frame.style){
-            frame.style.display ="inherit";
-        }
-    }
-}
+
+document.body.onmouseenter = () => { displayGoogleTranslate(true); }
+document.body.onmouseleave = () => { displayGoogleTranslate(false); }
+displayGoogleTranslate(false);
