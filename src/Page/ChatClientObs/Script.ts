@@ -16,6 +16,11 @@ db.Connect(() => {
     server.SwPeer = new SWPeer(server, LinkUtil.GetPeerID(), null);
 });
 
+function hasGoolgeTranslateBanner(): boolean{
+    let elements = document.getElementsByClassName("goog-te-banner-frame");
+    return (elements && elements.length > 0);
+}
+
 function displayGoogleTranslate(isDisplay: boolean) {
     document.getElementById("google_translate_element").hidden = !isDisplay;
     for (let element of document.getElementsByClassName("goog-te-banner-frame")) {
@@ -29,4 +34,16 @@ function displayGoogleTranslate(isDisplay: boolean) {
 
 document.body.onmouseenter = () => { displayGoogleTranslate(true); }
 document.body.onmouseleave = () => { displayGoogleTranslate(false); }
-displayGoogleTranslate(false);
+
+let banner_check_times = 10;
+
+let interval = setInterval(()=>{
+    if(hasGoolgeTranslateBanner()){
+        displayGoogleTranslate(false);
+        clearInterval(interval);
+    }
+    banner_check_times --;
+    if(banner_check_times <=0){
+        clearInterval(interval);
+    }
+},200);
