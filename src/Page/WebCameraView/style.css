@@ -1,0 +1,40 @@
+﻿html, body {
+    height: 100%;
+}
+
+body {
+    margin: 0px;
+    border: 0px;
+    padding: 0;
+    width: 100%;
+    font-family: "Roboto","Hiragino Kaku Gothic ProN","Meiryo", sans-serif;
+}
+
+#webcam-select-box{
+    position: absolute;
+    z-index: 1000;
+    background-color: rgba(255,255,255,0.5);
+    margin: 16px;
+    padding: 12px 24px 0px;
+    width: 240px;
+    border-radius: 16px;
+}
+
+#web-camera-view-main{
+    margin: 16px 32px;
+}
+
+.web-camera-view-device{
+    padding: 0px 0px 16px 0px;
+}
+
+.web-camera-view-device-select{
+    outline: 0;
+    width: 420px;
+}
+
+#web-camera-view-video {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+}

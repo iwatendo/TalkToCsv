@@ -107,6 +107,26 @@ export default class StreamUtil {
         return result;
     }
 
+    /**
+     * 
+     * @param videoSource 
+     * @param audioSource 
+     */
+     public static GetMediaStreamConstraintsHD(videoSource: string, audioSource: string): MediaStreamConstraints {
+
+        let result: MediaStreamConstraints = {
+            //  video: (videoSource ? { advanced: ([{ deviceId: videoSource }]) } : false),
+            video: (videoSource ? {
+                advanced: ([{
+                    deviceId: videoSource,
+                    width: 1920,
+                    height: 1080
+                }]) } : false),
+            audio: (audioSource ? { advanced: ([{ deviceId: audioSource }]) } : false),
+        };
+
+        return result;
+    }
 
     /**
      * デフォルトデバイスの取得

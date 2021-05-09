@@ -6,6 +6,7 @@ module.exports = {
     chatowner: './src/Page/ChatOwner/Script.ts',
     chatclient: './src/Page/ChatClient/Script.ts',
     chatclientobs: './src/Page/ChatClientObs/Script.ts',
+    webcameraview: './src/Page/WebCameraView/Script.ts',
   },
   output: {
     path: __dirname + '/dist',

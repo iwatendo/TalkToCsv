@@ -1,0 +1,48 @@
+<html>
+
+<head>
+    <title>Web Camera Viewer</title>
+    <meta charset='utf-8'>
+    <meta name="description" content="Web Camera Viewer" />
+    <meta property="og:title" content="Web Camera Viewer">
+    <meta property="og:description" content="Web Camera Viewer">
+    <meta property="og:url" content="https://skybeje.net/castinstance/">
+    <meta property="og:image" content="https://skybeje.net/image/ogp-image.jpg">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:description" content="Web Camera Viewer">
+    <link rel="icon" type="image/vnd.microsoft.icon" href="/image/favicon_cast.ico">
+    <link rel='stylesheet' href='../lib/material.min.css' />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel='stylesheet' href='style.css' />
+    <script src="../lib/material.min.js"></script>
+</head>
+
+<body>
+
+    <div id="web-camera-view-layout"
+        class="web-camera-view-layout mdl-layout mdl-js-layout mdl-color--grey-100 mdl-layout--fixed-header mdl-shadow--4dp">
+        <main class="mdl-layout__content">
+            <div id="webcam-select-box">
+                <div id="webcam-select-div"
+                    class="web-camera-view-device-select mdl-textfield mdl-js-textfield mdl-textfield--floating-label mdl-select">
+                    <input class="mdl-textfield__input" type="text" spellcheck="false" readonly id="webcam-select" />
+                    <label class="mdl-textfield__label" for="webcam-select" maxlength='32'>Web Camera Viewer</label>
+                    <ul id="webcam-list" class="mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect"
+                        for="webcam-select">
+                        <li class="mdl-menu__item" onclick=""></li>
+                    </ul>
+                </div>
+            </div>
+
+            <video id='web-camera-view-video' autoplay="true">
+            </video>
+        </main>
+    </div>
+
+    <script src="../lib/react.min.js"></script>
+    <script src="../lib/react-dom.min.js"></script>
+    <script src="bundle.js"></script>
+
+</body>
+
+</html>
