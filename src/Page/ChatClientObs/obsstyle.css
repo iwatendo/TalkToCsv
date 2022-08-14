@@ -1,26 +1,26 @@
-body{
-    background-color: rgba(0,0,0,0);
+body {
+    background-color: rgba(0, 0, 0, 0);
     line-height: 40px;
     overflow: hidden;
 }
 
-.timeline-pane{
-    background-color: rgba(0,0,0,0);
+.timeline-pane {
+    background-color: rgba(0, 0, 0, 0);
 }
 
-#sbj-home-visitor-main{
-    background-color: rgba(0,0,0,0);
+#sbj-home-visitor-main {
+    background-color: rgba(0, 0, 0, 0);
 }
 
-.sbj-inputpanel{
+.sbj-inputpanel {
     display: none;
 }
 
-#sbj-inputpanel{
+#sbj-inputpanel {
     height: 100%;
 }
 
-#sbj-home-visitor-timeline-component{
+#sbj-home-visitor-timeline-component {
     height: 100%;
 }
 
@@ -28,7 +28,7 @@ body{
     display: none;
 }
 
-.sbj-timeline-flex-right{
+.sbj-timeline-flex-right {
     float: none;
 }
 
@@ -37,57 +37,62 @@ body{
     min-height: 0px;
 }
 
-.sbj-timeline-time{
+.sbj-timeline-time {
     display: none;
 }
 
-.sbj-timeline-info{
+.sbj-timeline-info {
     float: none !important;
 }
 
-.sbj-timeline-balloon{
-    background-color: rgba(0,0,0,0) !important;
+.sbj-timeline-balloon {
+    background-color: rgba(0, 0, 0, 0) !important;
 }
 
-label.sbj-timeline-name{
+label.sbj-timeline-name {
     font-size: 36px;
     line-height: 40px;
     padding: 0px 16px;
     border-radius: 16px;
-    background: rgba(255,255,255,0.6);
-    color: rgba(0,0,0,1);
+    background: rgba(255, 255, 255, 0.6);
+    color: rgba(0, 0, 0, 1);
 }
 
-.sbj-timeline-message,h4,h5{
+.sbj-timeline-message,
+h4,
+h5 {
     font-size: 72px !important;
     line-height: 80px;
-    color          : #ffffff;           /* 文字の色 */
-    letter-spacing : 4px;               /* 文字間 */
-    text-shadow    : 
-         2px  2px 1px #003366,
-        -2px  2px 1px #003366,
-         2px -2px 1px #003366,
+    color: #ffffff;
+    /* 文字の色 */
+    letter-spacing: 4px;
+    /* 文字間 */
+    text-shadow:
+        2px 2px 1px #003366,
+        -2px 2px 1px #003366,
+        2px -2px 1px #003366,
         -2px -2px 1px #003366,
-         2px  0px 1px #003366,
-         0px  2px 1px #003366,
-        -2px  0px 1px #003366,
-         0px -2px 1px #003366;        /* 文字の影 */
+        2px 0px 1px #003366,
+        0px 2px 1px #003366,
+        -2px 0px 1px #003366,
+        0px -2px 1px #003366;
+    /* 文字の影 */
 }
 
 img.emoji {
-  height: 72px;
-  width: 72px;
-  margin: 0 .05em 0 .1em;
-  vertical-align: -0.1em;
+    height: 72px;
+    width: 72px;
+    margin: 0 .05em 0 .1em;
+    vertical-align: -0.1em;
 }
 
-.sbj-timeline-icon-image{
+.sbj-timeline-icon-image {
     height: 72px;
     margin: 0px 4px 16px 4px;
 }
 
 
-.sbj-timeline-ignore{
+.sbj-timeline-ignore {
     display: none;
 }
 
@@ -95,16 +100,17 @@ img.emoji {
     transform: scale(-1, 1);
 }
 
-#google_translate_element{
+#google_translate_element {
     position: absolute;
     top: 0px;
     right: 0px;
+    z-index: 1000;
 }
 
-.goog-te-banner-frame{
+.goog-te-banner-frame {
     position: absolute;
 }
 
-body{
+body {
     top: 0px !important;
 }

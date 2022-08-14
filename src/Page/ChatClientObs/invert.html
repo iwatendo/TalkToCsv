@@ -17,60 +17,77 @@
 	<script src="../lib/material.min.js"></script>
 </head>
 
-<body class="flip-horizontal">
+<body>
 
-	<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
-		<header id="sbj-home-visitor-header" class="mdl-layout__header mdl-color--grey-100 mdl-color-text--grey-600"
-			hidden>
-			<div class="sbj-home-visitor-header-row mdl-layout__header-row">
-			</div>
-		</header>
+	<!-- Google翻訳 -->
+	<div id="google_translate_element" hidden></div>
+	<script type="text/javascript">
+		function googleTranslateElementInit() {
+			new google.translate.TranslateElement(
+				{
+					pageLanguage: 'ja',
+					layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+				}, 'google_translate_element');
+		}
+	</script>
+	<script type="text/javascript"
+		src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
-        <div class="sbj-home-visitor mdl-color-text--grey-600" id="sbj-home-browser-error" hidden>
-			<div>
-				<h4 class="sbj-home-visitor-connecting">
-                    Talk To CSVはPC版のGoogle Chromeにのみ対応しています
-				</h4>
-			</div>
-        </div>
+	<div class="flip-horizontal">
 
-		<div class="sbj-home-visitor mdl-color-text--grey-600" id="sbj-home-visitor">
+		<div id="sbj-home-visitor-timeline-component">
 			<!---->
-			<div>
-				<h4 class="sbj-home-visitor-connecting">接続しています</h4>
-			</div>
-			<div class="mdl-card__supporting-text">
-				<div id="sbj-home-visitor-console-log"></div>
-			</div>
-			<div id="sbj-home-visitor-multi-boot" hidden>
-				<h4 class="sbj-home-visitor-connecting">
-					接続に失敗しました
-				</h4>
-				<h5 class="sbj-home-visitor-connecting">
-					・クライアントの多重起動が検出されました。</br>
-					・同一端末からの複数クライアントの起動はできません。</br>
-				</h5>
-			</div>
-			<div id="sbj-home-visitor-connection-timeout" hidden>
-				<h4 class="sbj-home-visitor-connecting">
-					接続に失敗しました
-				</h4>
-			</div>
 		</div>
 
-		<div class="timeline-pane" id="sbj-home-visitor-main" hidden>
-
-				<div id="sbj-home-visitor-timeline-component">
-					<!---->
+		<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+			<header id="sbj-home-visitor-header" class="mdl-layout__header mdl-color--grey-100 mdl-color-text--grey-600"
+				hidden>
+				<div class="sbj-home-visitor-header-row mdl-layout__header-row">
 				</div>
+			</header>
+
+			<div class="sbj-home-visitor mdl-color-text--grey-600" id="sbj-home-browser-error" hidden>
+				<div>
+					<h4 class="sbj-home-visitor-connecting">
+						Talk To CSVはPC版のGoogle Chromeにのみ対応しています
+					</h4>
+				</div>
+			</div>
+
+			<div class="sbj-home-visitor mdl-color-text--grey-600" id="sbj-home-visitor">
+				<!---->
+				<div>
+					<h4 class="sbj-home-visitor-connecting">接続しています</h4>
+				</div>
+				<div class="mdl-card__supporting-text">
+					<div id="sbj-home-visitor-console-log"></div>
+				</div>
+				<div id="sbj-home-visitor-multi-boot" hidden>
+					<h4 class="sbj-home-visitor-connecting">
+						接続に失敗しました
+					</h4>
+					<h5 class="sbj-home-visitor-connecting">
+						・クライアントの多重起動が検出されました。</br>
+						・同一端末からの複数クライアントの起動はできません。</br>
+					</h5>
+				</div>
+				<div id="sbj-home-visitor-connection-timeout" hidden>
+					<h4 class="sbj-home-visitor-connecting">
+						接続に失敗しました
+					</h4>
+				</div>
+			</div>
+
+			<div class="timeline-pane" id="sbj-home-visitor-main" hidden>
 
 				<div id="sbj-home-visitor-inputpane">
 					<div class="sbj-inputpanel" id="sbj-inputpanel">
 						<div class="mdl-card__actions sbj-inputpanel-action">
 							<div class="sbj-profile-text-left" id="sbj-inputpanel-header">
-								<div id="sbj-profile-name-field" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-									<input class="mdl-textfield__input" type="text" id="sbj-profile-name" spellcheck=false maxlength="16" autocomplete="off"
-										required></input>
+								<div id="sbj-profile-name-field"
+									class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+									<input class="mdl-textfield__input" type="text" id="sbj-profile-name"
+										spellcheck=false maxlength="16" autocomplete="off" required></input>
 									<label class="mdl-textfield__label" for="sbj-profile-name">Name</label>
 								</div>
 								<div id="sbj-chatmessage-color">
@@ -91,7 +108,9 @@
 									<span id="sbj-inputpanel-send-message-recognition-off">
 										<i class="material-icons">speaker_notes_off</i>音声認識OFF</span>
 								</button>
-								<label id="sbj-check-recording-label" class="sbj-cast-instance-option mdl-switch mdl-js-switch mdl-js-ripple-effect" for="sbj-check-recording">
+								<label id="sbj-check-recording-label"
+									class="sbj-cast-instance-option mdl-switch mdl-js-switch mdl-js-ripple-effect"
+									for="sbj-check-recording">
 									<input type="checkbox" id="sbj-check-recording" class="mdl-switch__input">
 									<span class="mdl-switch__label">録音</span>
 								</label>
@@ -107,23 +126,24 @@
 			</div>
 
 		</div>
+	</div>
 
-		<div class="sbj-home-visitor mdl-color-text--grey-600" id="sbj-home-visitor-disconnect" hidden>
-			<div class="mdl-card__supporting-text">
-				<h4>
-					接続先のチャットサーバーインスタンスが閉じられました。
-					<br /> または、ネットワークが切断されました。
-					<br />
-				</h4>
-			</div>
-			<div class="sbj-home-visitor-disconnect-action mdl-card__actions">
-				<button id='sbj-home-visitor-disconnect-retry'
-					class="mdl-button mdl-button--raised mdl-button--colored" hidden>
-					<i class="material-icons">exit_to_app</i>
-					&nbsp; 再接続 &nbsp;
-				</button>
-			</div>
+	<div class="sbj-home-visitor mdl-color-text--grey-600" id="sbj-home-visitor-disconnect" hidden>
+		<div class="mdl-card__supporting-text">
+			<h4>
+				接続先のチャットサーバーインスタンスが閉じられました。
+				<br /> または、ネットワークが切断されました。
+				<br />
+			</h4>
 		</div>
+		<div class="sbj-home-visitor-disconnect-action mdl-card__actions">
+			<button id='sbj-home-visitor-disconnect-retry' class="mdl-button mdl-button--raised mdl-button--colored"
+				hidden>
+				<i class="material-icons">exit_to_app</i>
+				&nbsp; 再接続 &nbsp;
+			</button>
+		</div>
+	</div>
 
 	</div>
 
