@@ -30,12 +30,16 @@ export default class StdUtil {
         //  対応ブラウザかチェック
         let name = platform.name.toLocaleLowerCase();
 
-        if (name === 'chrome' || name === 'chrome mobile') {
+        if (name === 'chrome' || name === 'chrome mobile' || name === 'microsoft edge') {
 
             if (useSpeechRecognition) {
-                //  Chromium版のEdgeの場合、SpeechRecognitionが利用できない
                 let ua = navigator.userAgent;
                 if (ua.indexOf('Edg') < 0) {
+                    return true;
+                }
+                else{
+                    //  Microsoft EdgeもSpeechRecognitionに対応した為、サポートブラウザとする
+                    //  但し、挙動が重い部分があるため、判定処理は残しておく
                     return true;
                 }
             }
