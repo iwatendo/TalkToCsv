@@ -1,5 +1,5 @@
 /*!
- * SkyWay Copyright(c) 2020 NTT Communications Corporation
+ * SkyWay Copyright(c) 2022 NTT Communications Corporation
  * peerjs Copyright(c) 2013 Michelle Bu <michelle@michellebu.com>
  */
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -11,7 +11,7 @@
 		exports["Peer"] = factory();
 	else
 		root["Peer"] = factory();
-})(window, function() {
+})(globalThis, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -99,6 +99,1696 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ })
 /************************************************************************/
 /******/ ({
+
+/***/ "./node_modules/@jitsi/sdp-interop/lib/array-equals.js":
+/*!*************************************************************!*\
+  !*** ./node_modules/@jitsi/sdp-interop/lib/array-equals.js ***!
+  \*************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports) {
+
+/* Copyright @ 2015 Atlassian Pty Ltd
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+module.exports = function arrayEquals(array) {
+    // if the other array is a falsy value, return
+    if (!array)
+        return false;
+
+    // compare lengths - can save a lot of time
+    if (this.length != array.length)
+        return false;
+
+    for (var i = 0, l = this.length; i < l; i++) {
+        // Check if we have nested arrays
+        if (this[i] instanceof Array && array[i] instanceof Array) {
+            // recurse into the nested arrays
+            if (!arrayEquals.apply(this[i], [array[i]]))
+                return false;
+        } else if (this[i] != array[i]) {
+            // Warning - two different object instances will never be equal:
+            // {x:20} != {x:20}
+            return false;
+        }
+    }
+    return true;
+};
+
+
+
+/***/ }),
+
+/***/ "./node_modules/@jitsi/sdp-interop/lib/index.js":
+/*!******************************************************!*\
+  !*** ./node_modules/@jitsi/sdp-interop/lib/index.js ***!
+  \******************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* Copyright @ 2015 Atlassian Pty Ltd
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+exports.Interop = __webpack_require__(/*! ./interop */ "./node_modules/@jitsi/sdp-interop/lib/interop.js");
+
+
+/***/ }),
+
+/***/ "./node_modules/@jitsi/sdp-interop/lib/interop.js":
+/*!********************************************************!*\
+  !*** ./node_modules/@jitsi/sdp-interop/lib/interop.js ***!
+  \********************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* Copyright @ 2015 Atlassian Pty Ltd
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/* global RTCSessionDescription */
+/* global RTCIceCandidate */
+/* jshint -W097 */
+
+
+var transform = __webpack_require__(/*! ./transform */ "./node_modules/@jitsi/sdp-interop/lib/transform.js");
+var arrayEquals = __webpack_require__(/*! ./array-equals */ "./node_modules/@jitsi/sdp-interop/lib/array-equals.js");
+
+/**
+ * Unified Plan mids may be parsed as integers
+ */
+function midToString(line) {
+    if (typeof line.mid === 'number') {
+        line.mid = line.mid.toString();
+    }
+}
+
+
+function Interop() {
+
+    /**
+     * This map holds the most recent Unified Plan offer/answer SDP that was
+     * converted to Plan B, with the SDP type ('offer' or 'answer') as keys and
+     * the SDP string as values.
+     *
+     * @type {{}}
+     */
+    this.cache = {
+        mlB2UMap : {},
+        mlU2BMap : {}
+    };
+}
+
+module.exports = Interop;
+
+/**
+ * Changes the candidate args to match with the related Unified Plan
+ */
+Interop.prototype.candidateToUnifiedPlan = function(candidate) {
+    var cand = new RTCIceCandidate(candidate);
+
+    cand.sdpMLineIndex = this.cache.mlB2UMap[cand.sdpMLineIndex];
+    /* TODO: change sdpMid to (audio|video)-SSRC */
+
+    return cand;
+};
+
+/**
+ * Changes the candidate args to match with the related Plan B
+ */
+Interop.prototype.candidateToPlanB = function(candidate) {
+    var cand = new RTCIceCandidate(candidate);
+
+    if (cand.sdpMid.indexOf('audio') === 0) {
+      cand.sdpMid = 'audio';
+    } else if (cand.sdpMid.indexOf('video') === 0) {
+      cand.sdpMid = 'video';
+    } else {
+      throw new Error('candidate with ' + cand.sdpMid + ' not allowed');
+    }
+
+    cand.sdpMLineIndex = this.cache.mlU2BMap[cand.sdpMLineIndex];
+
+    return cand;
+};
+
+/**
+ * Returns the index of the first m-line with the given media type and with a
+ * direction which allows sending, in the last Unified Plan description with
+ * type "answer" converted to Plan B. Returns {null} if there is no saved
+ * answer, or if none of its m-lines with the given type allow sending.
+ * @param type the media type ("audio" or "video").
+ * @returns {*}
+ */
+Interop.prototype.getFirstSendingIndexFromAnswer = function(type) {
+    if (!this.cache.answer) {
+        return null;
+    }
+
+    var session = transform.parse(this.cache.answer);
+    if (session && session.media && Array.isArray(session.media)){
+        for (var i = 0; i < session.media.length; i++) {
+            if (session.media[i].type == type &&
+                (!session.media[i].direction /* default to sendrecv */ ||
+                    session.media[i].direction === 'sendrecv' ||
+                    session.media[i].direction === 'sendonly')){
+                return i;
+            }
+        }
+    }
+
+    return null;
+};
+
+/**
+ * This method transforms a Unified Plan SDP to an equivalent Plan B SDP. A
+ * PeerConnection wrapper transforms the SDP to Plan B before passing it to the
+ * application.
+ *
+ * @param desc
+ * @returns {*}
+ */
+Interop.prototype.toPlanB = function(desc) {
+    var self = this;
+    //#region Preliminary input validation.
+
+    if (typeof desc !== 'object' || desc === null ||
+        typeof desc.sdp !== 'string') {
+        console.warn('An empty description was passed as an argument.');
+        return desc;
+    }
+
+    // Objectify the SDP for easier manipulation.
+    var session = transform.parse(desc.sdp);
+
+    // If the SDP contains no media, there's nothing to transform.
+    if (typeof session.media === 'undefined' ||
+        !Array.isArray(session.media) || session.media.length === 0) {
+        console.warn('The description has no media.');
+        return desc;
+    }
+
+    // Try some heuristics to "make sure" this is a Unified Plan SDP. Plan B
+    // SDP has a video, an audio and a data "channel" at most.
+    if (session.media.length <= 3 && session.media.every(function(m) {
+            return ['video', 'audio', 'data'].indexOf(m.mid) !== -1;
+        })) {
+        console.warn('This description does not look like Unified Plan.');
+        return desc;
+    }
+
+    //#endregion
+
+    // HACK https://bugzilla.mozilla.org/show_bug.cgi?id=1113443
+    var sdp = desc.sdp;
+    var rewrite = false;
+    for (var i = 0; i < session.media.length; i++) {
+        var uLine = session.media[i];
+        uLine.rtp.forEach(function(rtp) {
+            if (rtp.codec === 'NULL')
+            {
+                rewrite = true;
+                var offer = transform.parse(self.cache.offer);
+                rtp.codec = offer.media[i].rtp[0].codec;
+            }
+        });
+    }
+    if (rewrite) {
+        sdp = transform.write(session);
+    }
+
+    // Unified Plan SDP is our "precious". Cache it for later use in the Plan B
+    // -> Unified Plan transformation.
+    this.cache[desc.type] = sdp;
+
+    //#region Convert from Unified Plan to Plan B.
+
+    // We rebuild the session.media array.
+    var media = session.media;
+    session.media = [];
+
+    // Associative array that maps channel types to channel objects for fast
+    // access to channel objects by their type, e.g. type2bl['audio']->channel
+    // obj.
+    var type2bl = {};
+
+    // Used to build the group:BUNDLE value after the channels construction
+    // loop.
+    var types = [];
+
+    // Used to aggregate the directions of the m-lines.
+    var directionResult = {};
+
+    media.forEach(function(uLine) {
+        midToString(uLine);
+        // rtcp-mux is required in the Plan B SDP.
+        if ((typeof uLine.rtcpMux !== 'string' ||
+            uLine.rtcpMux !== 'rtcp-mux') &&
+            uLine.direction !== 'inactive' && uLine.type !== 'application') {
+            throw new Error('Cannot convert to Plan B because m-lines ' +
+                'without the rtcp-mux attribute were found.');
+        }
+
+        // If we don't have a channel for this uLine.type OR the selected is
+        // inactive, then select this uLine as the channel basis.
+        if (typeof type2bl[uLine.type] === 'undefined' ||
+            type2bl[uLine.type].direction === 'inactive') {
+            type2bl[uLine.type] = uLine;
+        }
+    });
+
+    // Implode the Unified Plan m-lines/tracks into Plan B channels.
+    media.forEach(function(uLine) {
+        var type = uLine.type;
+
+        if (type === 'application') {
+            uLine.mid = "data";
+            session.media.push(uLine);
+            types.push(uLine.mid);
+            return;
+        }
+
+        // Add sources to the channel and handle a=msid.
+        if (typeof uLine.sources === 'object') {
+            Object.keys(uLine.sources).forEach(function(ssrc) {
+                if (typeof type2bl[type].sources !== 'object')
+                    type2bl[type].sources = {};
+
+                // Assign the sources to the channel.
+                type2bl[type].sources[ssrc] = uLine.sources[ssrc];
+
+                if (typeof uLine.msid !== 'undefined') {
+                    // In Plan B the msid is an SSRC attribute. Also, we don't
+                    // care about the obsolete label and mslabel attributes.
+                    //
+                    // Note that it is not guaranteed that the uLine will
+                    // have an msid. recvonly channels in particular don't have
+                    // one.
+                    type2bl[type].sources[ssrc].msid = uLine.msid;
+                }
+                // NOTE ssrcs in ssrc groups will share msids, as
+                // draft-uberti-rtcweb-plan-00 mandates.
+            });
+        }
+
+        // Add ssrc groups to the channel.
+        if (typeof uLine.ssrcGroups !== 'undefined' &&
+                Array.isArray(uLine.ssrcGroups)) {
+
+            // Create the ssrcGroups array, if it's not defined.
+            if (typeof type2bl[type].ssrcGroups === 'undefined' ||
+                    !Array.isArray(type2bl[type].ssrcGroups)) {
+                type2bl[type].ssrcGroups = [];
+            }
+
+            // Different ssrc may belong to the same group
+            if (!arrayEquals.apply(type2bl[type].ssrcGroups,
+                                   [uLine.ssrcGroups])) {
+                type2bl[type].ssrcGroups
+                    = type2bl[type].ssrcGroups.concat(uLine.ssrcGroups);
+            }
+        }
+
+        var direction = uLine.direction;
+
+        directionResult[type]
+            = (directionResult[type] || 0 /* inactive */)
+                | directionMasks[direction || 'inactive'];
+
+        if (type2bl[type] === uLine) {
+            // Plan B mids are in ['audio', 'video', 'data']
+            uLine.mid = type;
+
+            // Plan B doesn't support/need the bundle-only attribute.
+            delete uLine.bundleOnly;
+
+            // In Plan B the msid is an SSRC attribute.
+            delete uLine.msid;
+
+            if (direction !== 'inactive') {
+              // Used to build the group:BUNDLE value after this loop.
+              types.push(type);
+            }
+
+            // Add the channel to the new media array.
+            session.media.push(uLine);
+        }
+    });
+
+    // We regenerate the BUNDLE group with the new mids.
+    session.groups.some(function(group) {
+        if (group.type === 'BUNDLE') {
+            group.mids = types.join(' ');
+            return true;
+        }
+    });
+
+    // msid semantic
+    session.msidSemantic = {
+        semantic: 'WMS',
+        token: '*'
+    };
+
+    var resStr = transform.write(session);
+
+    return new RTCSessionDescription({
+        type: desc.type,
+        sdp: resStr
+    });
+
+    //#endregion
+};
+
+/**
+ * This method transforms a Plan B SDP to an equivalent Unified Plan SDP. A
+ * PeerConnection wrapper transforms the SDP to Unified Plan before passing it
+ * to FF.
+ *
+ * @param desc
+ * @returns {*}
+ */
+Interop.prototype.toUnifiedPlan = function(desc) {
+    var self = this;
+    //#region Preliminary input validation.
+
+    if (typeof desc !== 'object' || desc === null ||
+        typeof desc.sdp !== 'string') {
+        console.warn('An empty description was passed as an argument.');
+        return desc;
+    }
+
+    var session = transform.parse(desc.sdp);
+
+    // If the SDP contains no media, there's nothing to transform.
+    if (typeof session.media === 'undefined' ||
+        !Array.isArray(session.media) || session.media.length === 0) {
+        console.warn('The description has no media.');
+        return desc;
+    }
+
+    // Try some heuristics to "make sure" this is a Plan B SDP. Plan B SDP has
+    // a video, an audio and a data "channel" at most.
+    if (session.media.length > 3 || !session.media.every(function(m) {
+            return ['video', 'audio', 'data'].indexOf(m.mid) !== -1;
+        })) {
+        console.warn('This description does not look like Plan B.');
+        return desc;
+    }
+
+    // Make sure this Plan B SDP can be converted to a Unified Plan SDP.
+    var mids = [];
+    session.media.forEach(function(m) {
+        mids.push(m.mid);
+    });
+
+    var hasBundle = false;
+    if (typeof session.groups !== 'undefined' &&
+        Array.isArray(session.groups)) {
+        hasBundle = session.groups.every(function(g) {
+            return g.type !== 'BUNDLE' ||
+                arrayEquals.apply(g.mids.sort(), [mids.sort()]);
+        });
+    }
+
+    if (!hasBundle) {
+        throw new Error("Cannot convert to Unified Plan because m-lines that" +
+            " are not bundled were found.");
+    }
+
+    //#endregion
+
+
+    //#region Convert from Plan B to Unified Plan.
+
+    // Unfortunately, a Plan B offer/answer doesn't have enough information to
+    // rebuild an equivalent Unified Plan offer/answer.
+    //
+    // For example, if this is a local answer (in Unified Plan style) that we
+    // convert to Plan B prior to handing it over to the application (the
+    // PeerConnection wrapper called us, for instance, after a successful
+    // createAnswer), we want to remember the m-line at which we've seen the
+    // (local) SSRC. That's because when the application wants to do call the
+    // SLD method, forcing us to do the inverse transformation (from Plan B to
+    // Unified Plan), we need to know to which m-line to assign the (local)
+    // SSRC. We also need to know all the other m-lines that the original
+    // answer had and include them in the transformed answer as well.
+    //
+    // Another example is if this is a remote offer that we convert to Plan B
+    // prior to giving it to the application, we want to remember the mid at
+    // which we've seen the (remote) SSRC.
+    //
+    // In the iteration that follows, we use the cached Unified Plan (if it
+    // exists) to assign mids to ssrcs.
+
+    var cached;
+    if (typeof this.cache[desc.type] !== 'undefined') {
+        cached = transform.parse(this.cache[desc.type]);
+    }
+
+    var recvonlySsrcs = {
+        audio: {},
+        video: {}
+    };
+
+    // A helper map that sends mids to m-line objects. We use it later to
+    // rebuild the Unified Plan style session.media array.
+    var mid2ul = {};
+    var bIdx = 0;
+    var uIdx = 0;
+
+    session.media.forEach(function(bLine) {
+
+        if ((typeof bLine.rtcpMux !== 'string' ||
+            bLine.rtcpMux !== 'rtcp-mux') &&
+            bLine.direction !== 'inactive' && bLine.type !== 'application') {
+            throw new Error("Cannot convert to Unified Plan because m-lines " +
+                "without the rtcp-mux attribute were found.");
+        }
+
+        if (bLine.type === 'application') {
+            var uLineData = null;
+            if (cached && cached.media) {
+                uLineData = cached.media.find(function(uLine) {
+                    return uLine.type === 'application';
+                });
+            }
+            if (uLineData) {
+                mid2ul[uLineData.mid] = uLineData;
+            } else {
+                mid2ul[bLine.mid] = bLine;
+            }
+            return;
+        }
+
+        // With rtcp-mux and bundle all the channels should have the same ICE
+        // stuff.
+        var sources = bLine.sources;
+        var ssrcGroups = bLine.ssrcGroups;
+        var candidates = bLine.candidates;
+        var iceUfrag = bLine.iceUfrag;
+        var icePwd = bLine.icePwd;
+        var fingerprint = bLine.fingerprint;
+        var port = bLine.port;
+
+        // We'll use the "bLine" object as a prototype for each new "mLine"
+        // that we create, but first we need to clean it up a bit.
+        delete bLine.sources;
+        delete bLine.ssrcGroups;
+        delete bLine.candidates;
+        delete bLine.iceUfrag;
+        delete bLine.icePwd;
+        delete bLine.fingerprint;
+        delete bLine.port;
+        delete bLine.mid;
+
+        // inverted ssrc group map
+        var ssrc2group = {};
+        if (typeof ssrcGroups !== 'undefined' && Array.isArray(ssrcGroups)) {
+            ssrcGroups.forEach(function (ssrcGroup) {
+
+                // TODO(gp) find out how to receive simulcast with FF. For the
+                // time being, hide it.
+                if (ssrcGroup.semantics === 'SIM') {
+                    return;
+                }
+
+                // XXX This might brake if an SSRC is in more than one group
+                // for some reason.
+                if (typeof ssrcGroup.ssrcs !== 'undefined' &&
+                    Array.isArray(ssrcGroup.ssrcs)) {
+                    ssrcGroup.ssrcs.forEach(function (ssrc) {
+                        if (typeof ssrc2group[ssrc] === 'undefined') {
+                            ssrc2group[ssrc] = [];
+                        }
+
+                        ssrc2group[ssrc].push(ssrcGroup);
+                    });
+                }
+            });
+        }
+
+        // ssrc to m-line index.
+        var ssrc2ml = {};
+
+        if (typeof sources === 'object') {
+
+            // Explode the Plan B channel sources with one m-line per source.
+            Object.keys(sources).forEach(function(ssrc) {
+
+                // The (unified) m-line for this SSRC. We either create it from
+                // scratch or, if it's a grouped SSRC, we re-use a related
+                // mline. In other words, if the source is grouped with another
+                // source, put the two together in the same m-line.
+                var uLine;
+
+                // We assume here that we are the answerer in the O/A, so any
+                // offers which we translate come from the remote side, while
+                // answers are local. So the check below is to make that we
+                // handle receive-only SSRCs in a special way only if they come
+                // from the remote side.
+                if (desc.type==='offer') {
+                    // We want to detect SSRCs which are used by a remote peer
+                    // in an m-line with direction=recvonly (i.e. they are
+                    // being used for RTCP only).
+                    // This information would have gotten lost if the remote
+                    // peer used Unified Plan and their local description was
+                    // translated to Plan B. So we use the lack of an MSID
+                    // attribute to deduce a "receive only" SSRC.
+                    if (!sources[ssrc].msid) {
+                        recvonlySsrcs[bLine.type][ssrc] = sources[ssrc];
+                        // Receive-only SSRCs must not create new m-lines. We
+                        // will assign them to an existing m-line later.
+                        return;
+                    }
+                }
+
+                if (typeof ssrc2group[ssrc] !== 'undefined' &&
+                    Array.isArray(ssrc2group[ssrc])) {
+                    ssrc2group[ssrc].some(function (ssrcGroup) {
+                        // ssrcGroup.ssrcs *is* an Array, no need to check
+                        // again here.
+                        return ssrcGroup.ssrcs.some(function (related) {
+                            if (typeof ssrc2ml[related] === 'object') {
+                                uLine = ssrc2ml[related];
+                                return true;
+                            }
+                        });
+                    });
+                }
+
+                if (typeof uLine === 'object') {
+                    // the m-line already exists. Just add the source.
+                    uLine.sources[ssrc] = sources[ssrc];
+                    delete sources[ssrc].msid;
+                } else {
+                    // Use the "bLine" as a prototype for the "uLine".
+                    uLine = Object.create(bLine);
+                    ssrc2ml[ssrc] = uLine;
+
+                    if (typeof sources[ssrc].msid !== 'undefined') {
+                        // Assign the msid of the source to the m-line. Note
+                        // that it is not guaranteed that the source will have
+                        // msid. In particular "recvonly" sources don't have an
+                        // msid. Note that "recvonly" is a term only defined
+                        // for m-lines.
+                        uLine.msid = sources[ssrc].msid;
+                        delete sources[ssrc].msid;
+                    }
+
+                    // We assign one SSRC per media line.
+                    uLine.sources = {};
+                    uLine.sources[ssrc] = sources[ssrc];
+                    uLine.ssrcGroups = ssrc2group[ssrc];
+
+                    // Use the cached Unified Plan SDP (if it exists) to assign
+                    // SSRCs to mids.
+                    if (typeof cached !== 'undefined' &&
+                        typeof cached.media !== 'undefined' &&
+                        Array.isArray(cached.media)) {
+
+                        cached.media.forEach(function (m) {
+                            if (typeof m.sources === 'object') {
+                                Object.keys(m.sources).forEach(function (s) {
+                                    if (s === ssrc) {
+                                        uLine.mid = m.mid;
+                                    }
+                                });
+                            }
+                        });
+                    }
+
+                    midToString(uLine);
+
+                    if (typeof uLine.mid === 'undefined') {
+
+                        // If this is an SSRC that we see for the first time
+                        // assign it a new mid. This is typically the case when
+                        // this method is called to transform a remote
+                        // description for the first time or when there is a
+                        // new SSRC in the remote description because a new
+                        // peer has joined the conference. Local SSRCs should
+                        // have already been added to the map in the toPlanB
+                        // method.
+                        //
+                        // Because FF generates answers in Unified Plan style,
+                        // we MUST already have a cached answer with all the
+                        // local SSRCs mapped to some m-line/mid.
+
+                        if (desc.type === 'answer') {
+                            throw new Error("An unmapped SSRC was found.");
+                        }
+
+                        uLine.mid = [bLine.type, '-', ssrc].join('');
+                    }
+
+                    // Include the candidates in the 1st media line.
+                    uLine.candidates = candidates;
+                    uLine.iceUfrag = iceUfrag;
+                    uLine.icePwd = icePwd;
+                    uLine.fingerprint = fingerprint;
+                    uLine.port = port;
+
+                    mid2ul[uLine.mid] = uLine;
+
+                    self.cache.mlU2BMap[uIdx] = bIdx;
+                    if (typeof self.cache.mlB2UMap[bIdx] === 'undefined') {
+                      self.cache.mlB2UMap[bIdx] = uIdx;
+                    }
+                    uIdx++;
+                }
+            });
+        }
+
+        bIdx++;
+    });
+
+    // Rebuild the media array in the right order and add the missing mLines
+    // (missing from the Plan B SDP).
+    session.media = [];
+    mids = []; // reuse
+
+    if (desc.type === 'answer') {
+
+        // The media lines in the answer must match the media lines in the
+        // offer. The order is important too. Here we assume that Firefox is
+        // the answerer, so we merely have to use the reconstructed (unified)
+        // answer to update the cached (unified) answer accordingly.
+        //
+        // In the general case, one would have to use the cached (unified)
+        // offer to find the m-lines that are missing from the reconstructed
+        // answer, potentially grabbing them from the cached (unified) answer.
+        // One has to be careful with this approach because inactive m-lines do
+        // not always have an mid, making it tricky (impossible?) to find where
+        // exactly and which m-lines are missing from the reconstructed answer.
+
+        for (var i = 0; i < cached.media.length; i++) {
+            var uLine = cached.media[i];
+            midToString(uLine);
+
+            if (typeof mid2ul[uLine.mid] === 'undefined') {
+
+                // The mid isn't in the reconstructed (unified) answer.
+                // This is either a (unified) m-line containing a remote
+                // track only, or a (unified) m-line containing a remote
+                // track and a local track that has been removed.
+                // In either case, it MUST exist in the cached
+                // (unified) answer.
+                //
+                // In case this is a removed local track, clean-up
+                // the (unified) m-line and make sure it's 'recvonly' or
+                // 'inactive'.
+
+                delete uLine.msid;
+                delete uLine.sources;
+                delete uLine.ssrcGroups;
+                if (!uLine.direction
+                    || uLine.direction === 'sendrecv')
+                    uLine.direction = 'recvonly';
+                else if (uLine.direction === 'sendonly')
+                    uLine.direction = 'inactive';
+            } else {
+                // This is an (unified) m-line/channel that contains a local
+                // track (sendrecv or sendonly channel) or it's a unified
+                // recvonly m-line/channel. In either case, since we're
+                // going from PlanB -> Unified Plan this m-line MUST
+                // exist in the cached answer.
+            }
+
+            session.media.push(uLine);
+            if (typeof uLine.mid === 'string') {
+                // inactive lines don't/may not have an mid.
+                mids.push(uLine.mid);
+            }
+        }
+    } else {
+
+        // SDP offer/answer (and the JSEP spec) forbids removing an m-section
+        // under any circumstances. If we are no longer interested in sending a
+        // track, we just remove the msid and ssrc attributes and set it to
+        // either a=recvonly (as the reofferer, we must use recvonly if the
+        // other side was previously sending on the m-section, but we can also
+        // leave the possibility open if it wasn't previously in use), or
+        // a=inactive.
+
+        if (typeof cached !== 'undefined' &&
+            typeof cached.media !== 'undefined' &&
+            Array.isArray(cached.media)) {
+            cached.media.forEach(function(uLine) {
+                midToString(uLine);
+                mids.push(uLine.mid);
+                if (typeof mid2ul[uLine.mid] !== 'undefined') {
+                    session.media.push(mid2ul[uLine.mid]);
+                } else {
+                    delete uLine.msid;
+                    delete uLine.sources;
+                    delete uLine.ssrcGroups;
+                    if (!uLine.direction
+                        || uLine.direction === 'sendrecv')
+                        uLine.direction = 'recvonly';
+                    if (!uLine.direction
+                        || uLine.direction === 'sendonly')
+                        uLine.direction = 'inactive';
+                    session.media.push(uLine);
+                }
+            });
+        }
+
+        // Add all the remaining (new) m-lines of the transformed SDP.
+        Object.keys(mid2ul).forEach(function(mid) {
+            if (mids.indexOf(mid) === -1) {
+                mids.push(mid);
+                if (mid2ul[mid].direction === 'recvonly') {
+                    // This is a remote recvonly channel. Add its SSRC to the
+                    // appropriate sendrecv or sendonly channel.
+                    // TODO(gp) what if we don't have sendrecv/sendonly
+                    // channel?
+
+                    session.media.some(function (uLine) {
+                        if ((uLine.direction === 'sendrecv' ||
+                            uLine.direction === 'sendonly') &&
+                            uLine.type === mid2ul[mid].type) {
+
+                            // mid2ul[mid] shouldn't have any ssrc-groups
+                            Object.keys(mid2ul[mid].sources).forEach(
+                                function (ssrc) {
+                                uLine.sources[ssrc] =
+                                    mid2ul[mid].sources[ssrc];
+                            });
+
+                            return true;
+                        }
+                    });
+                } else {
+                    session.media.push(mid2ul[mid]);
+                }
+            }
+        });
+    }
+
+    // After we have constructed the Plan Unified m-lines we can figure out
+    // where (in which m-line) to place the 'recvonly SSRCs'.
+    // Note: we assume here that we are the answerer in the O/A, so any offers
+    // which we translate come from the remote side, while answers are local
+    // (and so our last local description is cached as an 'answer').
+    ["audio", "video"].forEach(function (type) {
+        if (!session || !session.media || !Array.isArray(session.media))
+            return;
+
+        var idx = null;
+        if (Object.keys(recvonlySsrcs[type]).length > 0) {
+            idx = self.getFirstSendingIndexFromAnswer(type);
+            if (idx === null){
+                // If this is the first offer we receive, we don't have a
+                // cached answer. Assume that we will be sending media using
+                // the first m-line for each media type.
+
+                for (var i = 0; i < session.media.length; i++) {
+                    if (session.media[i].type === type) {
+                        idx = i;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (idx && session.media.length > idx) {
+            var mLine = session.media[idx];
+            Object.keys(recvonlySsrcs[type]).forEach(function(ssrc) {
+                if (mLine.sources && mLine.sources[ssrc]) {
+                    console.warn("Replacing an existing SSRC.");
+                }
+                if (!mLine.sources) {
+                    mLine.sources = {};
+                }
+
+                mLine.sources[ssrc] = recvonlySsrcs[type][ssrc];
+            });
+        }
+    });
+
+    // We regenerate the BUNDLE group (since we regenerated the mids)
+    session.groups.some(function(group) {
+        if (group.type === 'BUNDLE') {
+            group.mids = mids.join(' ');
+            return true;
+        }
+    });
+
+    // msid semantic
+    session.msidSemantic = {
+        semantic: 'WMS',
+        token: '*'
+    };
+
+    var resStr = transform.write(session);
+
+    // Cache the transformed SDP (Unified Plan) for later re-use in this
+    // function.
+    this.cache[desc.type] = resStr;
+
+    return new RTCSessionDescription({
+        type: desc.type,
+        sdp: resStr
+    });
+
+    //#endregion
+};
+
+/**
+ * Maps the direction strings to their binary representation. The binary
+ * representation of the directions will contain only 2 bits. The least
+ * significant bit will indicate the receiving direction and the other bit will
+ * indicate the sending direction.
+ *
+ * @type {Map<string, number>}
+ */
+var directionMasks = {
+    'inactive': 0, // 00
+    'recvonly': 1, // 01
+    'sendonly': 2, // 10
+    'sendrecv': 3  // 11
+};
+
+/**
+ * Parses a number into direction string.
+ *
+ * @param {number} direction - The number to be parsed.
+ * @returns {string} - The parsed direction string.
+ */
+function parseDirection(direction) { // eslint-disable-line no-unused-vars
+    // Filter all other bits except the 2 less significant.
+    var directionMask = direction & 3;
+
+    switch (directionMask) {
+    case 0:
+        return 'inactive';
+    case 1:
+        return 'recvonly';
+    case 2:
+        return 'sendonly';
+    case 3:
+        return 'sendrecv';
+    }
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/@jitsi/sdp-interop/lib/transform.js":
+/*!**********************************************************!*\
+  !*** ./node_modules/@jitsi/sdp-interop/lib/transform.js ***!
+  \**********************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* Copyright @ 2015 Atlassian Pty Ltd
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+var transform = __webpack_require__(/*! sdp-transform */ "./node_modules/@jitsi/sdp-interop/node_modules/sdp-transform/lib/index.js");
+
+exports.write = function(session, opts) {
+
+  if (typeof session !== 'undefined' &&
+      typeof session.media !== 'undefined' &&
+      Array.isArray(session.media)) {
+
+    session.media.forEach(function (mLine) {
+      // expand sources to ssrcs
+      if (typeof mLine.sources !== 'undefined' &&
+        Object.keys(mLine.sources).length !== 0) {
+          mLine.ssrcs = [];
+          Object.keys(mLine.sources).forEach(function (ssrc) {
+            var source = mLine.sources[ssrc];
+            Object.keys(source).forEach(function (attribute) {
+              mLine.ssrcs.push({
+                id: ssrc,
+                attribute: attribute,
+                value: source[attribute]
+              });
+            });
+          });
+          delete mLine.sources;
+        }
+
+      // join ssrcs in ssrc groups
+      if (typeof mLine.ssrcGroups !== 'undefined' &&
+        Array.isArray(mLine.ssrcGroups)) {
+          mLine.ssrcGroups.forEach(function (ssrcGroup) {
+            if (typeof ssrcGroup.ssrcs !== 'undefined' &&
+                Array.isArray(ssrcGroup.ssrcs)) {
+              ssrcGroup.ssrcs = ssrcGroup.ssrcs.join(' ');
+            }
+          });
+        }
+    });
+  }
+
+  // join group mids
+  if (typeof session !== 'undefined' &&
+      typeof session.groups !== 'undefined' && Array.isArray(session.groups)) {
+
+    session.groups.forEach(function (g) {
+      if (typeof g.mids !== 'undefined' && Array.isArray(g.mids)) {
+        g.mids = g.mids.join(' ');
+      }
+    });
+  }
+
+  return transform.write(session, opts);
+};
+
+exports.parse = function(sdp) {
+  var session = transform.parse(sdp);
+
+  if (typeof session !== 'undefined' && typeof session.media !== 'undefined' &&
+      Array.isArray(session.media)) {
+
+    session.media.forEach(function (mLine) {
+      // group sources attributes by ssrc
+      if (typeof mLine.ssrcs !== 'undefined' && Array.isArray(mLine.ssrcs)) {
+        mLine.sources = {};
+        mLine.ssrcs.forEach(function (ssrc) {
+          if (!mLine.sources[ssrc.id])
+          mLine.sources[ssrc.id] = {};
+        mLine.sources[ssrc.id][ssrc.attribute] = ssrc.value;
+        });
+
+        delete mLine.ssrcs;
+      }
+
+      // split ssrcs in ssrc groups
+      if (typeof mLine.ssrcGroups !== 'undefined' &&
+        Array.isArray(mLine.ssrcGroups)) {
+          mLine.ssrcGroups.forEach(function (ssrcGroup) {
+            if (typeof ssrcGroup.ssrcs === 'string') {
+              ssrcGroup.ssrcs = ssrcGroup.ssrcs.split(' ');
+            }
+          });
+        }
+    });
+  }
+  // split group mids
+  if (typeof session !== 'undefined' &&
+      typeof session.groups !== 'undefined' && Array.isArray(session.groups)) {
+
+    session.groups.forEach(function (g) {
+      if (typeof g.mids === 'string') {
+        g.mids = g.mids.split(' ');
+      }
+    });
+  }
+
+  return session;
+};
+
+
+
+/***/ }),
+
+/***/ "./node_modules/@jitsi/sdp-interop/node_modules/sdp-transform/lib/grammar.js":
+/*!***********************************************************************************!*\
+  !*** ./node_modules/@jitsi/sdp-interop/node_modules/sdp-transform/lib/grammar.js ***!
+  \***********************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports) {
+
+var grammar = module.exports = {
+  v: [{
+    name: 'version',
+    reg: /^(\d*)$/
+  }],
+  o: [{ //o=- 20518 0 IN IP4 203.0.113.1
+    // NB: sessionId will be a String in most cases because it is huge
+    name: 'origin',
+    reg: /^(\S*) (\d*) (\d*) (\S*) IP(\d) (\S*)/,
+    names: ['username', 'sessionId', 'sessionVersion', 'netType', 'ipVer', 'address'],
+    format: '%s %s %d %s IP%d %s'
+  }],
+  // default parsing of these only (though some of these feel outdated)
+  s: [{ name: 'name' }],
+  i: [{ name: 'description' }],
+  u: [{ name: 'uri' }],
+  e: [{ name: 'email' }],
+  p: [{ name: 'phone' }],
+  z: [{ name: 'timezones' }], // TODO: this one can actually be parsed properly..
+  r: [{ name: 'repeats' }],   // TODO: this one can also be parsed properly
+  //k: [{}], // outdated thing ignored
+  t: [{ //t=0 0
+    name: 'timing',
+    reg: /^(\d*) (\d*)/,
+    names: ['start', 'stop'],
+    format: '%d %d'
+  }],
+  c: [{ //c=IN IP4 10.47.197.26
+    name: 'connection',
+    reg: /^IN IP(\d) (\S*)/,
+    names: ['version', 'ip'],
+    format: 'IN IP%d %s'
+  }],
+  b: [{ //b=AS:4000
+    push: 'bandwidth',
+    reg: /^(TIAS|AS|CT|RR|RS):(\d*)/,
+    names: ['type', 'limit'],
+    format: '%s:%s'
+  }],
+  m: [{ //m=video 51744 RTP/AVP 126 97 98 34 31
+    // NB: special - pushes to session
+    // TODO: rtp/fmtp should be filtered by the payloads found here?
+    reg: /^(\w*) (\d*) ([\w\/]*)(?: (.*))?/,
+    names: ['type', 'port', 'protocol', 'payloads'],
+    format: '%s %d %s %s'
+  }],
+  a: [
+    { //a=rtpmap:110 opus/48000/2
+      push: 'rtp',
+      reg: /^rtpmap:(\d*) ([\w\-\.]*)(?:\s*\/(\d*)(?:\s*\/(\S*))?)?/,
+      names: ['payload', 'codec', 'rate', 'encoding'],
+      format: function (o) {
+        return (o.encoding) ?
+          'rtpmap:%d %s/%s/%s':
+          o.rate ?
+          'rtpmap:%d %s/%s':
+          'rtpmap:%d %s';
+      }
+    },
+    { //a=fmtp:108 profile-level-id=24;object=23;bitrate=64000
+      //a=fmtp:111 minptime=10; useinbandfec=1
+      push: 'fmtp',
+      reg: /^fmtp:(\d*) ([\S| ]*)/,
+      names: ['payload', 'config'],
+      format: 'fmtp:%d %s'
+    },
+    { //a=control:streamid=0
+      name: 'control',
+      reg: /^control:(.*)/,
+      format: 'control:%s'
+    },
+    { //a=rtcp:65179 IN IP4 193.84.77.194
+      name: 'rtcp',
+      reg: /^rtcp:(\d*)(?: (\S*) IP(\d) (\S*))?/,
+      names: ['port', 'netType', 'ipVer', 'address'],
+      format: function (o) {
+        return (o.address != null) ?
+          'rtcp:%d %s IP%d %s':
+          'rtcp:%d';
+      }
+    },
+    { //a=rtcp-fb:98 trr-int 100
+      push: 'rtcpFbTrrInt',
+      reg: /^rtcp-fb:(\*|\d*) trr-int (\d*)/,
+      names: ['payload', 'value'],
+      format: 'rtcp-fb:%d trr-int %d'
+    },
+    { //a=rtcp-fb:98 nack rpsi
+      push: 'rtcpFb',
+      reg: /^rtcp-fb:(\*|\d*) ([\w-_]*)(?: ([\w-_]*))?/,
+      names: ['payload', 'type', 'subtype'],
+      format: function (o) {
+        return (o.subtype != null) ?
+          'rtcp-fb:%s %s %s':
+          'rtcp-fb:%s %s';
+      }
+    },
+    { //a=extmap:2 urn:ietf:params:rtp-hdrext:toffset
+      //a=extmap:1/recvonly URI-gps-string
+      push: 'ext',
+      reg: /^extmap:(\d+)(?:\/(\w+))? (\S*)(?: (\S*))?/,
+      names: ['value', 'direction', 'uri', 'config'],
+      format: function (o) {
+        return 'extmap:%d' + (o.direction ? '/%s' : '%v') + ' %s' + (o.config ? ' %s' : '');
+      }
+    },
+    { //a=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:PS1uQCVeeCFCanVmcjkpPywjNWhcYD0mXXtxaVBR|2^20|1:32
+      push: 'crypto',
+      reg: /^crypto:(\d*) ([\w_]*) (\S*)(?: (\S*))?/,
+      names: ['id', 'suite', 'config', 'sessionConfig'],
+      format: function (o) {
+        return (o.sessionConfig != null) ?
+          'crypto:%d %s %s %s':
+          'crypto:%d %s %s';
+      }
+    },
+    { //a=setup:actpass
+      name: 'setup',
+      reg: /^setup:(\w*)/,
+      format: 'setup:%s'
+    },
+    { //a=mid:1
+      name: 'mid',
+      reg: /^mid:([^\s]*)/,
+      format: 'mid:%s'
+    },
+    { //a=msid:0c8b064d-d807-43b4-b434-f92a889d8587 98178685-d409-46e0-8e16-7ef0db0db64a
+      name: 'msid',
+      reg: /^msid:(.*)/,
+      format: 'msid:%s'
+    },
+    { //a=ptime:20
+      name: 'ptime',
+      reg: /^ptime:(\d*)/,
+      format: 'ptime:%d'
+    },
+    { //a=maxptime:60
+      name: 'maxptime',
+      reg: /^maxptime:(\d*)/,
+      format: 'maxptime:%d'
+    },
+    { //a=sendrecv
+      name: 'direction',
+      reg: /^(sendrecv|recvonly|sendonly|inactive)/
+    },
+    { //a=ice-lite
+      name: 'icelite',
+      reg: /^(ice-lite)/
+    },
+    { //a=ice-ufrag:F7gI
+      name: 'iceUfrag',
+      reg: /^ice-ufrag:(\S*)/,
+      format: 'ice-ufrag:%s'
+    },
+    { //a=ice-pwd:x9cml/YzichV2+XlhiMu8g
+      name: 'icePwd',
+      reg: /^ice-pwd:(\S*)/,
+      format: 'ice-pwd:%s'
+    },
+    { //a=fingerprint:SHA-1 00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33
+      name: 'fingerprint',
+      reg: /^fingerprint:(\S*) (\S*)/,
+      names: ['type', 'hash'],
+      format: 'fingerprint:%s %s'
+    },
+    { //a=candidate:0 1 UDP 2113667327 203.0.113.1 54400 typ host
+      //a=candidate:1162875081 1 udp 2113937151 192.168.34.75 60017 typ host generation 0 network-id 3 network-cost 10
+      //a=candidate:3289912957 2 udp 1845501695 193.84.77.194 60017 typ srflx raddr 192.168.34.75 rport 60017 generation 0 network-id 3 network-cost 10
+      //a=candidate:229815620 1 tcp 1518280447 192.168.150.19 60017 typ host tcptype active generation 0 network-id 3 network-cost 10
+      //a=candidate:3289912957 2 tcp 1845501695 193.84.77.194 60017 typ srflx raddr 192.168.34.75 rport 60017 tcptype passive generation 0 network-id 3 network-cost 10
+      push:'candidates',
+      reg: /^candidate:(\S*) (\d*) (\S*) (\d*) (\S*) (\d*) typ (\S*)(?: raddr (\S*) rport (\d*))?(?: tcptype (\S*))?(?: generation (\d*))?(?: network-id (\d*))?(?: network-cost (\d*))?/,
+      names: ['foundation', 'component', 'transport', 'priority', 'ip', 'port', 'type', 'raddr', 'rport', 'tcptype', 'generation', 'network-id', 'network-cost'],
+      format: function (o) {
+        var str = 'candidate:%s %d %s %d %s %d typ %s';
+
+        str += (o.raddr != null) ? ' raddr %s rport %d' : '%v%v';
+
+        // NB: candidate has three optional chunks, so %void middles one if it's missing
+        str += (o.tcptype != null) ? ' tcptype %s' : '%v';
+
+        if (o.generation != null) {
+          str += ' generation %d';
+        }
+
+        str += (o['network-id'] != null) ? ' network-id %d' : '%v';
+        str += (o['network-cost'] != null) ? ' network-cost %d' : '%v';
+        return str;
+      }
+    },
+    { //a=end-of-candidates (keep after the candidates line for readability)
+      name: 'endOfCandidates',
+      reg: /^(end-of-candidates)/
+    },
+    { //a=remote-candidates:1 203.0.113.1 54400 2 203.0.113.1 54401 ...
+      name: 'remoteCandidates',
+      reg: /^remote-candidates:(.*)/,
+      format: 'remote-candidates:%s'
+    },
+    { //a=ice-options:google-ice
+      name: 'iceOptions',
+      reg: /^ice-options:(\S*)/,
+      format: 'ice-options:%s'
+    },
+    { //a=ssrc:2566107569 cname:t9YU8M1UxTF8Y1A1
+      push: 'ssrcs',
+      reg: /^ssrc:(\d*) ([\w_]*)(?::(.*))?/,
+      names: ['id', 'attribute', 'value'],
+      format: function (o) {
+        var str = 'ssrc:%d';
+        if (o.attribute != null) {
+          str += ' %s';
+          if (o.value != null) {
+            str += ':%s';
+          }
+        }
+        return str;
+      }
+    },
+    { //a=ssrc-group:FEC 1 2
+      //a=ssrc-group:FEC-FR 3004364195 1080772241
+      push: 'ssrcGroups',
+      // token-char = %x21 / %x23-27 / %x2A-2B / %x2D-2E / %x30-39 / %x41-5A / %x5E-7E
+      reg: /^ssrc-group:([\x21\x23\x24\x25\x26\x27\x2A\x2B\x2D\x2E\w]*) (.*)/,
+      names: ['semantics', 'ssrcs'],
+      format: 'ssrc-group:%s %s'
+    },
+    { //a=msid-semantic: WMS Jvlam5X3SX1OP6pn20zWogvaKJz5Hjf9OnlV
+      name: 'msidSemantic',
+      reg: /^msid-semantic:\s?(\w*) (\S*)/,
+      names: ['semantic', 'token'],
+      format: 'msid-semantic: %s %s' // space after ':' is not accidental
+    },
+    { //a=group:BUNDLE audio video
+      push: 'groups',
+      reg: /^group:(\w*) (.*)/,
+      names: ['type', 'mids'],
+      format: 'group:%s %s'
+    },
+    { //a=rtcp-mux
+      name: 'rtcpMux',
+      reg: /^(rtcp-mux)/
+    },
+    { //a=rtcp-rsize
+      name: 'rtcpRsize',
+      reg: /^(rtcp-rsize)/
+    },
+    { //a=sctpmap:5000 webrtc-datachannel 1024
+      name: 'sctpmap',
+      reg: /^sctpmap:([\w_\/]*) (\S*)(?: (\S*))?/,
+      names: ['sctpmapNumber', 'app', 'maxMessageSize'],
+      format: function (o) {
+        return (o.maxMessageSize != null) ?
+          'sctpmap:%s %s %s' :
+          'sctpmap:%s %s';
+      }
+    },
+    { //a=x-google-flag:conference
+      name: 'xGoogleFlag',
+      reg: /^x-google-flag:([^\s]*)/,
+      format: 'x-google-flag:%s'
+    },
+    { //a=rid:1 send max-width=1280;max-height=720;max-fps=30;depend=0
+      push: 'rids',
+      reg: /^rid:([\d\w]+) (\w+)(?: ([\S| ]*))?/,
+      names: ['id', 'direction', 'params'],
+      format: function (o) {
+        return (o.params) ? 'rid:%s %s %s' : 'rid:%s %s';
+      }
+    },
+    { //a=imageattr:97 send [x=800,y=640,sar=1.1,q=0.6] [x=480,y=320] recv [x=330,y=250]
+      //a=imageattr:* send [x=800,y=640] recv *
+      //a=imageattr:100 recv [x=320,y=240]
+      push: 'imageattrs',
+      reg: new RegExp(
+        //a=imageattr:97
+        '^imageattr:(\\d+|\\*)' +
+        //send [x=800,y=640,sar=1.1,q=0.6] [x=480,y=320]
+        '[\\s\\t]+(send|recv)[\\s\\t]+(\\*|\\[\\S+\\](?:[\\s\\t]+\\[\\S+\\])*)' +
+        //recv [x=330,y=250]
+        '(?:[\\s\\t]+(recv|send)[\\s\\t]+(\\*|\\[\\S+\\](?:[\\s\\t]+\\[\\S+\\])*))?'
+      ),
+      names: ['pt', 'dir1', 'attrs1', 'dir2', 'attrs2'],
+      format: function (o) {
+        return 'imageattr:%s %s %s' + (o.dir2 ? ' %s %s' : '');
+      }
+    },
+    { //a=simulcast:send 1,2,3;~4,~5 recv 6;~7,~8
+      //a=simulcast:recv 1;4,5 send 6;7
+      name: 'simulcast',
+      reg: new RegExp(
+        //a=simulcast:
+        '^simulcast:' +
+        //send 1,2,3;~4,~5
+        '(send|recv) ([a-zA-Z0-9\\-_~;,]+)' +
+        //space + recv 6;~7,~8
+        '(?:\\s?(send|recv) ([a-zA-Z0-9\\-_~;,]+))?' +
+        //end
+        '$'
+      ),
+      names: ['dir1', 'list1', 'dir2', 'list2'],
+      format: function (o) {
+        return 'simulcast:%s %s' + (o.dir2 ? ' %s %s' : '');
+      }
+    },
+    { //Old simulcast draft 03 (implemented by Firefox)
+      //  https://tools.ietf.org/html/draft-ietf-mmusic-sdp-simulcast-03
+      //a=simulcast: recv pt=97;98 send pt=97
+      //a=simulcast: send rid=5;6;7 paused=6,7
+      name: 'simulcast_03',
+      reg: /^simulcast:[\s\t]+([\S+\s\t]+)$/,
+      names: ['value'],
+      format: 'simulcast: %s'
+    },
+    {
+      //a=framerate:25
+      //a=framerate:29.97
+      name: 'framerate',
+      reg: /^framerate:(\d+(?:$|\.\d+))/,
+      format: 'framerate:%s'
+    },
+    { // any a= that we don't understand is kepts verbatim on media.invalid
+      push: 'invalid',
+      names: ['value']
+    }
+  ]
+};
+
+// set sensible defaults to avoid polluting the grammar with boring details
+Object.keys(grammar).forEach(function (key) {
+  var objs = grammar[key];
+  objs.forEach(function (obj) {
+    if (!obj.reg) {
+      obj.reg = /(.*)/;
+    }
+    if (!obj.format) {
+      obj.format = '%s';
+    }
+  });
+});
+
+
+/***/ }),
+
+/***/ "./node_modules/@jitsi/sdp-interop/node_modules/sdp-transform/lib/index.js":
+/*!*********************************************************************************!*\
+  !*** ./node_modules/@jitsi/sdp-interop/node_modules/sdp-transform/lib/index.js ***!
+  \*********************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+var parser = __webpack_require__(/*! ./parser */ "./node_modules/@jitsi/sdp-interop/node_modules/sdp-transform/lib/parser.js");
+var writer = __webpack_require__(/*! ./writer */ "./node_modules/@jitsi/sdp-interop/node_modules/sdp-transform/lib/writer.js");
+
+exports.write = writer;
+exports.parse = parser.parse;
+exports.parseFmtpConfig = parser.parseFmtpConfig;
+exports.parseParams = parser.parseParams;
+exports.parsePayloads = parser.parsePayloads;
+exports.parseRemoteCandidates = parser.parseRemoteCandidates;
+exports.parseImageAttributes = parser.parseImageAttributes;
+exports.parseSimulcastStreamList = parser.parseSimulcastStreamList;
+
+
+/***/ }),
+
+/***/ "./node_modules/@jitsi/sdp-interop/node_modules/sdp-transform/lib/parser.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/@jitsi/sdp-interop/node_modules/sdp-transform/lib/parser.js ***!
+  \**********************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+var toIntIfInt = function (v) {
+  return String(Number(v)) === v ? Number(v) : v;
+};
+
+var attachProperties = function (match, location, names, rawName) {
+  if (rawName && !names) {
+    location[rawName] = toIntIfInt(match[1]);
+  }
+  else {
+    for (var i = 0; i < names.length; i += 1) {
+      if (match[i+1] != null) {
+        location[names[i]] = toIntIfInt(match[i+1]);
+      }
+    }
+  }
+};
+
+var parseReg = function (obj, location, content) {
+  var needsBlank = obj.name && obj.names;
+  if (obj.push && !location[obj.push]) {
+    location[obj.push] = [];
+  }
+  else if (needsBlank && !location[obj.name]) {
+    location[obj.name] = {};
+  }
+  var keyLocation = obj.push ?
+    {} :  // blank object that will be pushed
+    needsBlank ? location[obj.name] : location; // otherwise, named location or root
+
+  attachProperties(content.match(obj.reg), keyLocation, obj.names, obj.name);
+
+  if (obj.push) {
+    location[obj.push].push(keyLocation);
+  }
+};
+
+var grammar = __webpack_require__(/*! ./grammar */ "./node_modules/@jitsi/sdp-interop/node_modules/sdp-transform/lib/grammar.js");
+var validLine = RegExp.prototype.test.bind(/^([a-z])=(.*)/);
+
+exports.parse = function (sdp) {
+  var session = {}
+    , media = []
+    , location = session; // points at where properties go under (one of the above)
+
+  // parse lines we understand
+  sdp.split(/(\r\n|\r|\n)/).filter(validLine).forEach(function (l) {
+    var type = l[0];
+    var content = l.slice(2);
+    if (type === 'm') {
+      media.push({rtp: [], fmtp: []});
+      location = media[media.length-1]; // point at latest media line
+    }
+
+    for (var j = 0; j < (grammar[type] || []).length; j += 1) {
+      var obj = grammar[type][j];
+      if (obj.reg.test(content)) {
+        return parseReg(obj, location, content);
+      }
+    }
+  });
+
+  session.media = media; // link it up
+  return session;
+};
+
+var paramReducer = function (acc, expr) {
+  var s = expr.split(/=(.+)/, 2);
+  if (s.length === 2) {
+    acc[s[0]] = toIntIfInt(s[1]);
+  }
+  return acc;
+};
+
+exports.parseParams = function (str) {
+  return str.split(/\;\s?/).reduce(paramReducer, {});
+};
+
+// For backward compatibility - alias will be removed in 3.0.0
+exports.parseFmtpConfig = exports.parseParams;
+
+exports.parsePayloads = function (str) {
+  return str.split(' ').map(Number);
+};
+
+exports.parseRemoteCandidates = function (str) {
+  var candidates = [];
+  var parts = str.split(' ').map(toIntIfInt);
+  for (var i = 0; i < parts.length; i += 3) {
+    candidates.push({
+      component: parts[i],
+      ip: parts[i + 1],
+      port: parts[i + 2]
+    });
+  }
+  return candidates;
+};
+
+exports.parseImageAttributes = function (str) {
+  return str.split(' ').map(function (item) {
+    return item.substring(1, item.length-1).split(',').reduce(paramReducer, {});
+  });
+};
+
+exports.parseSimulcastStreamList = function (str) {
+  return str.split(';').map(function (stream) {
+    return stream.split(',').map(function (format) {
+      var scid, paused = false;
+
+      if (format[0] !== '~') {
+        scid = toIntIfInt(format);
+      } else {
+        scid = toIntIfInt(format.substring(1, format.length));
+        paused = true;
+      }
+
+      return {
+        scid: scid,
+        paused: paused
+      };
+    });
+  });
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/@jitsi/sdp-interop/node_modules/sdp-transform/lib/writer.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/@jitsi/sdp-interop/node_modules/sdp-transform/lib/writer.js ***!
+  \**********************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+var grammar = __webpack_require__(/*! ./grammar */ "./node_modules/@jitsi/sdp-interop/node_modules/sdp-transform/lib/grammar.js");
+
+// customized util.format - discards excess arguments and can void middle ones
+var formatRegExp = /%[sdv%]/g;
+var format = function (formatStr) {
+  var i = 1;
+  var args = arguments;
+  var len = args.length;
+  return formatStr.replace(formatRegExp, function (x) {
+    if (i >= len) {
+      return x; // missing argument
+    }
+    var arg = args[i];
+    i += 1;
+    switch (x) {
+    case '%%':
+      return '%';
+    case '%s':
+      return String(arg);
+    case '%d':
+      return Number(arg);
+    case '%v':
+      return '';
+    }
+  });
+  // NB: we discard excess arguments - they are typically undefined from makeLine
+};
+
+var makeLine = function (type, obj, location) {
+  var str = obj.format instanceof Function ?
+    (obj.format(obj.push ? location : location[obj.name])) :
+    obj.format;
+
+  var args = [type + '=' + str];
+  if (obj.names) {
+    for (var i = 0; i < obj.names.length; i += 1) {
+      var n = obj.names[i];
+      if (obj.name) {
+        args.push(location[obj.name][n]);
+      }
+      else { // for mLine and push attributes
+        args.push(location[obj.names[i]]);
+      }
+    }
+  }
+  else {
+    args.push(location[obj.name]);
+  }
+  return format.apply(null, args);
+};
+
+// RFC specified order
+// TODO: extend this with all the rest
+var defaultOuterOrder = [
+  'v', 'o', 's', 'i',
+  'u', 'e', 'p', 'c',
+  'b', 't', 'r', 'z', 'a'
+];
+var defaultInnerOrder = ['i', 'c', 'b', 'a'];
+
+
+module.exports = function (session, opts) {
+  opts = opts || {};
+  // ensure certain properties exist
+  if (session.version == null) {
+    session.version = 0; // 'v=0' must be there (only defined version atm)
+  }
+  if (session.name == null) {
+    session.name = ' '; // 's= ' must be there if no meaningful name set
+  }
+  session.media.forEach(function (mLine) {
+    if (mLine.payloads == null) {
+      mLine.payloads = '';
+    }
+  });
+
+  var outerOrder = opts.outerOrder || defaultOuterOrder;
+  var innerOrder = opts.innerOrder || defaultInnerOrder;
+  var sdp = [];
+
+  // loop through outerOrder for matching properties on session
+  outerOrder.forEach(function (type) {
+    grammar[type].forEach(function (obj) {
+      if (obj.name in session && session[obj.name] != null) {
+        sdp.push(makeLine(type, obj, session));
+      }
+      else if (obj.push in session && session[obj.push] != null) {
+        session[obj.push].forEach(function (el) {
+          sdp.push(makeLine(type, obj, el));
+        });
+      }
+    });
+  });
+
+  // then for each media line, follow the innerOrder
+  session.media.forEach(function (mLine) {
+    sdp.push(makeLine('m', grammar.m[0], mLine));
+
+    innerOrder.forEach(function (type) {
+      grammar[type].forEach(function (obj) {
+        if (obj.name in mLine && mLine[obj.name] != null) {
+          sdp.push(makeLine(type, obj, mLine));
+        }
+        else if (obj.push in mLine && mLine[obj.push] != null) {
+          mLine[obj.push].forEach(function (el) {
+            sdp.push(makeLine(type, obj, el));
+          });
+        }
+      });
+    });
+  });
+
+  return sdp.join('\r\n') + '\r\n';
+};
+
+
+/***/ }),
 
 /***/ "./node_modules/after/index.js":
 /*!*************************************!*\
@@ -293,16 +1983,8 @@ Backoff.prototype.setJitter = function(jitter){
  * Copyright (c) 2012 Niklas von Hertzen
  * Licensed under the MIT license.
  */
-(function(){
+(function(chars){
   "use strict";
-
-  var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-
-  // Use a lookup table to find the index.
-  var lookup = new Uint8Array(256);
-  for (var i = 0; i < chars.length; i++) {
-    lookup[chars.charCodeAt(i)] = i;
-  }
 
   exports.encode = function(arraybuffer) {
     var bytes = new Uint8Array(arraybuffer),
@@ -340,10 +2022,10 @@ Backoff.prototype.setJitter = function(jitter){
     bytes = new Uint8Array(arraybuffer);
 
     for (i = 0; i < len; i+=4) {
-      encoded1 = lookup[base64.charCodeAt(i)];
-      encoded2 = lookup[base64.charCodeAt(i+1)];
-      encoded3 = lookup[base64.charCodeAt(i+2)];
-      encoded4 = lookup[base64.charCodeAt(i+3)];
+      encoded1 = chars.indexOf(base64[i]);
+      encoded2 = chars.indexOf(base64[i+1]);
+      encoded3 = chars.indexOf(base64[i+2]);
+      encoded4 = chars.indexOf(base64[i+3]);
 
       bytes[p++] = (encoded1 << 2) | (encoded2 >> 4);
       bytes[p++] = ((encoded2 & 15) << 4) | (encoded3 >> 2);
@@ -352,7 +2034,7 @@ Backoff.prototype.setJitter = function(jitter){
 
     return arraybuffer;
   };
-})();
+})("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/");
 
 
 /***/ }),
@@ -493,9 +2175,7 @@ function fromByteArray (uint8) {
 
   // go through the array every three bytes, we'll deal with trailing stuff later
   for (var i = 0, len2 = len - extraBytes; i < len2; i += maxChunkLength) {
-    parts.push(encodeChunk(
-      uint8, i, (i + maxChunkLength) > len2 ? len2 : (i + maxChunkLength)
-    ))
+    parts.push(encodeChunk(uint8, i, (i + maxChunkLength) > len2 ? len2 : (i + maxChunkLength)))
   }
 
   // pad the end with zeros, but make sure to not forget the extra bytes
@@ -790,6 +2470,13 @@ Emitter.prototype.removeEventListener = function(event, fn){
       break;
     }
   }
+
+  // Remove event specific arrays for event types that no
+  // one is subscribed for to avoid memory leak.
+  if (callbacks.length === 0) {
+    delete this._callbacks['$' + event];
+  }
+
   return this;
 };
 
@@ -803,8 +2490,13 @@ Emitter.prototype.removeEventListener = function(event, fn){
 
 Emitter.prototype.emit = function(event){
   this._callbacks = this._callbacks || {};
-  var args = [].slice.call(arguments, 1)
+
+  var args = new Array(arguments.length - 1)
     , callbacks = this._callbacks['$' + event];
+
+  for (var i = 1; i < arguments.length; i++) {
+    args[i - 1] = arguments[i];
+  }
 
   if (callbacks) {
     callbacks = callbacks.slice(0);
@@ -870,100 +2562,39 @@ module.exports = function(a, b){
 /*! ModuleConcatenation bailout: Module is not an ECMAScript module */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(process) {/* eslint-env browser */
-
-/**
+/* WEBPACK VAR INJECTION */(function(process) {/**
  * This is the web browser implementation of `debug()`.
+ *
+ * Expose `debug()` as the module.
  */
 
+exports = module.exports = __webpack_require__(/*! ./debug */ "./node_modules/debug/src/debug.js");
 exports.log = log;
 exports.formatArgs = formatArgs;
 exports.save = save;
 exports.load = load;
 exports.useColors = useColors;
-exports.storage = localstorage();
+exports.storage = 'undefined' != typeof chrome
+               && 'undefined' != typeof chrome.storage
+                  ? chrome.storage.local
+                  : localstorage();
 
 /**
  * Colors.
  */
 
 exports.colors = [
-	'#0000CC',
-	'#0000FF',
-	'#0033CC',
-	'#0033FF',
-	'#0066CC',
-	'#0066FF',
-	'#0099CC',
-	'#0099FF',
-	'#00CC00',
-	'#00CC33',
-	'#00CC66',
-	'#00CC99',
-	'#00CCCC',
-	'#00CCFF',
-	'#3300CC',
-	'#3300FF',
-	'#3333CC',
-	'#3333FF',
-	'#3366CC',
-	'#3366FF',
-	'#3399CC',
-	'#3399FF',
-	'#33CC00',
-	'#33CC33',
-	'#33CC66',
-	'#33CC99',
-	'#33CCCC',
-	'#33CCFF',
-	'#6600CC',
-	'#6600FF',
-	'#6633CC',
-	'#6633FF',
-	'#66CC00',
-	'#66CC33',
-	'#9900CC',
-	'#9900FF',
-	'#9933CC',
-	'#9933FF',
-	'#99CC00',
-	'#99CC33',
-	'#CC0000',
-	'#CC0033',
-	'#CC0066',
-	'#CC0099',
-	'#CC00CC',
-	'#CC00FF',
-	'#CC3300',
-	'#CC3333',
-	'#CC3366',
-	'#CC3399',
-	'#CC33CC',
-	'#CC33FF',
-	'#CC6600',
-	'#CC6633',
-	'#CC9900',
-	'#CC9933',
-	'#CCCC00',
-	'#CCCC33',
-	'#FF0000',
-	'#FF0033',
-	'#FF0066',
-	'#FF0099',
-	'#FF00CC',
-	'#FF00FF',
-	'#FF3300',
-	'#FF3333',
-	'#FF3366',
-	'#FF3399',
-	'#FF33CC',
-	'#FF33FF',
-	'#FF6600',
-	'#FF6633',
-	'#FF9900',
-	'#FF9933',
-	'#FFCC00',
-	'#FFCC33'
+  '#0000CC', '#0000FF', '#0033CC', '#0033FF', '#0066CC', '#0066FF', '#0099CC',
+  '#0099FF', '#00CC00', '#00CC33', '#00CC66', '#00CC99', '#00CCCC', '#00CCFF',
+  '#3300CC', '#3300FF', '#3333CC', '#3333FF', '#3366CC', '#3366FF', '#3399CC',
+  '#3399FF', '#33CC00', '#33CC33', '#33CC66', '#33CC99', '#33CCCC', '#33CCFF',
+  '#6600CC', '#6600FF', '#6633CC', '#6633FF', '#66CC00', '#66CC33', '#9900CC',
+  '#9900FF', '#9933CC', '#9933FF', '#99CC00', '#99CC33', '#CC0000', '#CC0033',
+  '#CC0066', '#CC0099', '#CC00CC', '#CC00FF', '#CC3300', '#CC3333', '#CC3366',
+  '#CC3399', '#CC33CC', '#CC33FF', '#CC6600', '#CC6633', '#CC9900', '#CC9933',
+  '#CCCC00', '#CCCC33', '#FF0000', '#FF0033', '#FF0066', '#FF0099', '#FF00CC',
+  '#FF00FF', '#FF3300', '#FF3333', '#FF3366', '#FF3399', '#FF33CC', '#FF33FF',
+  '#FF6600', '#FF6633', '#FF9900', '#FF9933', '#FFCC00', '#FFCC33'
 ];
 
 /**
@@ -974,31 +2605,43 @@ exports.colors = [
  * TODO: add a `localStorage` variable to explicitly enable/disable colors
  */
 
-// eslint-disable-next-line complexity
 function useColors() {
-	// NB: In an Electron preload script, document will be defined but not fully
-	// initialized. Since we know we're in Chrome, we'll just detect this case
-	// explicitly
-	if (typeof window !== 'undefined' && window.process && (window.process.type === 'renderer' || window.process.__nwjs)) {
-		return true;
-	}
+  // NB: In an Electron preload script, document will be defined but not fully
+  // initialized. Since we know we're in Chrome, we'll just detect this case
+  // explicitly
+  if (typeof window !== 'undefined' && window.process && window.process.type === 'renderer') {
+    return true;
+  }
 
-	// Internet Explorer and Edge do not support colors.
-	if (typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/(edge|trident)\/(\d+)/)) {
-		return false;
-	}
+  // Internet Explorer and Edge do not support colors.
+  if (typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/(edge|trident)\/(\d+)/)) {
+    return false;
+  }
 
-	// Is webkit? http://stackoverflow.com/a/16459606/376773
-	// document is undefined in react-native: https://github.com/facebook/react-native/pull/1632
-	return (typeof document !== 'undefined' && document.documentElement && document.documentElement.style && document.documentElement.style.WebkitAppearance) ||
-		// Is firebug? http://stackoverflow.com/a/398120/376773
-		(typeof window !== 'undefined' && window.console && (window.console.firebug || (window.console.exception && window.console.table))) ||
-		// Is firefox >= v31?
-		// https://developer.mozilla.org/en-US/docs/Tools/Web_Console#Styling_messages
-		(typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/) && parseInt(RegExp.$1, 10) >= 31) ||
-		// Double check webkit in userAgent just in case we are in a worker
-		(typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/applewebkit\/(\d+)/));
+  // is webkit? http://stackoverflow.com/a/16459606/376773
+  // document is undefined in react-native: https://github.com/facebook/react-native/pull/1632
+  return (typeof document !== 'undefined' && document.documentElement && document.documentElement.style && document.documentElement.style.WebkitAppearance) ||
+    // is firebug? http://stackoverflow.com/a/398120/376773
+    (typeof window !== 'undefined' && window.console && (window.console.firebug || (window.console.exception && window.console.table))) ||
+    // is firefox >= v31?
+    // https://developer.mozilla.org/en-US/docs/Tools/Web_Console#Styling_messages
+    (typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/) && parseInt(RegExp.$1, 10) >= 31) ||
+    // double check webkit in userAgent just in case we are in a worker
+    (typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/applewebkit\/(\d+)/));
 }
+
+/**
+ * Map %j to `JSON.stringify()`, since no Web Inspectors do that by default.
+ */
+
+exports.formatters.j = function(v) {
+  try {
+    return JSON.stringify(v);
+  } catch (err) {
+    return '[UnexpectedJSONParseError]: ' + err.message;
+  }
+};
+
 
 /**
  * Colorize log arguments if enabled.
@@ -1007,38 +2650,36 @@ function useColors() {
  */
 
 function formatArgs(args) {
-	args[0] = (this.useColors ? '%c' : '') +
-		this.namespace +
-		(this.useColors ? ' %c' : ' ') +
-		args[0] +
-		(this.useColors ? '%c ' : ' ') +
-		'+' + module.exports.humanize(this.diff);
+  var useColors = this.useColors;
 
-	if (!this.useColors) {
-		return;
-	}
+  args[0] = (useColors ? '%c' : '')
+    + this.namespace
+    + (useColors ? ' %c' : ' ')
+    + args[0]
+    + (useColors ? '%c ' : ' ')
+    + '+' + exports.humanize(this.diff);
 
-	const c = 'color: ' + this.color;
-	args.splice(1, 0, c, 'color: inherit');
+  if (!useColors) return;
 
-	// The final "%c" is somewhat tricky, because there could be other
-	// arguments passed either before or after the %c, so we need to
-	// figure out the correct index to insert the CSS into
-	let index = 0;
-	let lastC = 0;
-	args[0].replace(/%[a-zA-Z%]/g, match => {
-		if (match === '%%') {
-			return;
-		}
-		index++;
-		if (match === '%c') {
-			// We only are interested in the *last* %c
-			// (the user may have provided their own)
-			lastC = index;
-		}
-	});
+  var c = 'color: ' + this.color;
+  args.splice(1, 0, c, 'color: inherit')
 
-	args.splice(lastC, 0, c);
+  // the final "%c" is somewhat tricky, because there could be other
+  // arguments passed either before or after the %c, so we need to
+  // figure out the correct index to insert the CSS into
+  var index = 0;
+  var lastC = 0;
+  args[0].replace(/%[a-zA-Z%]/g, function(match) {
+    if ('%%' === match) return;
+    index++;
+    if ('%c' === match) {
+      // we only are interested in the *last* %c
+      // (the user may have provided their own)
+      lastC = index;
+    }
+  });
+
+  args.splice(lastC, 0, c);
 }
 
 /**
@@ -1047,12 +2688,13 @@ function formatArgs(args) {
  *
  * @api public
  */
-function log(...args) {
-	// This hackery is required for IE8/9, where
-	// the `console.log` function doesn't have 'apply'
-	return typeof console === 'object' &&
-		console.log &&
-		console.log(...args);
+
+function log() {
+  // this hackery is required for IE8/9, where
+  // the `console.log` function doesn't have 'apply'
+  return 'object' === typeof console
+    && console.log
+    && Function.prototype.apply.call(console.log, console, arguments);
 }
 
 /**
@@ -1061,17 +2703,15 @@ function log(...args) {
  * @param {String} namespaces
  * @api private
  */
+
 function save(namespaces) {
-	try {
-		if (namespaces) {
-			exports.storage.setItem('debug', namespaces);
-		} else {
-			exports.storage.removeItem('debug');
-		}
-	} catch (error) {
-		// Swallow
-		// XXX (@Qix-) should we be logging these?
-	}
+  try {
+    if (null == namespaces) {
+      exports.storage.removeItem('debug');
+    } else {
+      exports.storage.debug = namespaces;
+    }
+  } catch(e) {}
 }
 
 /**
@@ -1080,22 +2720,26 @@ function save(namespaces) {
  * @return {String} returns the previously persisted debug modes
  * @api private
  */
+
 function load() {
-	let r;
-	try {
-		r = exports.storage.getItem('debug');
-	} catch (error) {
-		// Swallow
-		// XXX (@Qix-) should we be logging these?
-	}
+  var r;
+  try {
+    r = exports.storage.debug;
+  } catch(e) {}
 
-	// If debug isn't set in LS, and we're in Electron, try to load $DEBUG
-	if (!r && typeof process !== 'undefined' && 'env' in process) {
-		r = process.env.DEBUG;
-	}
+  // If debug isn't set in LS, and we're in Electron, try to load $DEBUG
+  if (!r && typeof process !== 'undefined' && 'env' in process) {
+    r = process.env.DEBUG;
+  }
 
-	return r;
+  return r;
 }
+
+/**
+ * Enable namespaces listed in `localStorage.debug` initially.
+ */
+
+exports.enable(load());
 
 /**
  * Localstorage attempts to return the localstorage.
@@ -1109,40 +2753,19 @@ function load() {
  */
 
 function localstorage() {
-	try {
-		// TVMLKit (Apple TV JS Runtime) does not have a window object, just localStorage in the global context
-		// The Browser also has localStorage in the global context.
-		return localStorage;
-	} catch (error) {
-		// Swallow
-		// XXX (@Qix-) should we be logging these?
-	}
+  try {
+    return window.localStorage;
+  } catch (e) {}
 }
-
-module.exports = __webpack_require__(/*! ./common */ "./node_modules/debug/src/common.js")(exports);
-
-const {formatters} = module.exports;
-
-/**
- * Map %j to `JSON.stringify()`, since no Web Inspectors do that by default.
- */
-
-formatters.j = function (v) {
-	try {
-		return JSON.stringify(v);
-	} catch (error) {
-		return '[UnexpectedJSONParseError]: ' + error.message;
-	}
-};
 
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../process/browser.js */ "./node_modules/process/browser.js")))
 
 /***/ }),
 
-/***/ "./node_modules/debug/src/common.js":
-/*!******************************************!*\
-  !*** ./node_modules/debug/src/common.js ***!
-  \******************************************/
+/***/ "./node_modules/debug/src/debug.js":
+/*!*****************************************!*\
+  !*** ./node_modules/debug/src/debug.js ***!
+  \*****************************************/
 /*! no static exports found */
 /*! ModuleConcatenation bailout: Module is not an ECMAScript module */
 /***/ (function(module, exports, __webpack_require__) {
@@ -1151,268 +2774,227 @@ formatters.j = function (v) {
 /**
  * This is the common logic for both the Node.js and web browser
  * implementations of `debug()`.
+ *
+ * Expose `debug()` as the module.
  */
 
-function setup(env) {
-	createDebug.debug = createDebug;
-	createDebug.default = createDebug;
-	createDebug.coerce = coerce;
-	createDebug.disable = disable;
-	createDebug.enable = enable;
-	createDebug.enabled = enabled;
-	createDebug.humanize = __webpack_require__(/*! ms */ "./node_modules/ms/index.js");
+exports = module.exports = createDebug.debug = createDebug['default'] = createDebug;
+exports.coerce = coerce;
+exports.disable = disable;
+exports.enable = enable;
+exports.enabled = enabled;
+exports.humanize = __webpack_require__(/*! ms */ "./node_modules/ms/index.js");
 
-	Object.keys(env).forEach(key => {
-		createDebug[key] = env[key];
-	});
+/**
+ * Active `debug` instances.
+ */
+exports.instances = [];
 
-	/**
-	* Active `debug` instances.
-	*/
-	createDebug.instances = [];
+/**
+ * The currently active debug mode names, and names to skip.
+ */
 
-	/**
-	* The currently active debug mode names, and names to skip.
-	*/
+exports.names = [];
+exports.skips = [];
 
-	createDebug.names = [];
-	createDebug.skips = [];
+/**
+ * Map of special "%n" handling functions, for the debug "format" argument.
+ *
+ * Valid key names are a single, lower or upper-case letter, i.e. "n" and "N".
+ */
 
-	/**
-	* Map of special "%n" handling functions, for the debug "format" argument.
-	*
-	* Valid key names are a single, lower or upper-case letter, i.e. "n" and "N".
-	*/
-	createDebug.formatters = {};
+exports.formatters = {};
 
-	/**
-	* Selects a color for a debug namespace
-	* @param {String} namespace The namespace string for the for the debug instance to be colored
-	* @return {Number|String} An ANSI color code for the given namespace
-	* @api private
-	*/
-	function selectColor(namespace) {
-		let hash = 0;
+/**
+ * Select a color.
+ * @param {String} namespace
+ * @return {Number}
+ * @api private
+ */
 
-		for (let i = 0; i < namespace.length; i++) {
-			hash = ((hash << 5) - hash) + namespace.charCodeAt(i);
-			hash |= 0; // Convert to 32bit integer
-		}
+function selectColor(namespace) {
+  var hash = 0, i;
 
-		return createDebug.colors[Math.abs(hash) % createDebug.colors.length];
-	}
-	createDebug.selectColor = selectColor;
+  for (i in namespace) {
+    hash  = ((hash << 5) - hash) + namespace.charCodeAt(i);
+    hash |= 0; // Convert to 32bit integer
+  }
 
-	/**
-	* Create a debugger with the given `namespace`.
-	*
-	* @param {String} namespace
-	* @return {Function}
-	* @api public
-	*/
-	function createDebug(namespace) {
-		let prevTime;
-
-		function debug(...args) {
-			// Disabled?
-			if (!debug.enabled) {
-				return;
-			}
-
-			const self = debug;
-
-			// Set `diff` timestamp
-			const curr = Number(new Date());
-			const ms = curr - (prevTime || curr);
-			self.diff = ms;
-			self.prev = prevTime;
-			self.curr = curr;
-			prevTime = curr;
-
-			args[0] = createDebug.coerce(args[0]);
-
-			if (typeof args[0] !== 'string') {
-				// Anything else let's inspect with %O
-				args.unshift('%O');
-			}
-
-			// Apply any `formatters` transformations
-			let index = 0;
-			args[0] = args[0].replace(/%([a-zA-Z%])/g, (match, format) => {
-				// If we encounter an escaped % then don't increase the array index
-				if (match === '%%') {
-					return match;
-				}
-				index++;
-				const formatter = createDebug.formatters[format];
-				if (typeof formatter === 'function') {
-					const val = args[index];
-					match = formatter.call(self, val);
-
-					// Now we need to remove `args[index]` since it's inlined in the `format`
-					args.splice(index, 1);
-					index--;
-				}
-				return match;
-			});
-
-			// Apply env-specific formatting (colors, etc.)
-			createDebug.formatArgs.call(self, args);
-
-			const logFn = self.log || createDebug.log;
-			logFn.apply(self, args);
-		}
-
-		debug.namespace = namespace;
-		debug.enabled = createDebug.enabled(namespace);
-		debug.useColors = createDebug.useColors();
-		debug.color = selectColor(namespace);
-		debug.destroy = destroy;
-		debug.extend = extend;
-		// Debug.formatArgs = formatArgs;
-		// debug.rawLog = rawLog;
-
-		// env-specific initialization logic for debug instances
-		if (typeof createDebug.init === 'function') {
-			createDebug.init(debug);
-		}
-
-		createDebug.instances.push(debug);
-
-		return debug;
-	}
-
-	function destroy() {
-		const index = createDebug.instances.indexOf(this);
-		if (index !== -1) {
-			createDebug.instances.splice(index, 1);
-			return true;
-		}
-		return false;
-	}
-
-	function extend(namespace, delimiter) {
-		const newDebug = createDebug(this.namespace + (typeof delimiter === 'undefined' ? ':' : delimiter) + namespace);
-		newDebug.log = this.log;
-		return newDebug;
-	}
-
-	/**
-	* Enables a debug mode by namespaces. This can include modes
-	* separated by a colon and wildcards.
-	*
-	* @param {String} namespaces
-	* @api public
-	*/
-	function enable(namespaces) {
-		createDebug.save(namespaces);
-
-		createDebug.names = [];
-		createDebug.skips = [];
-
-		let i;
-		const split = (typeof namespaces === 'string' ? namespaces : '').split(/[\s,]+/);
-		const len = split.length;
-
-		for (i = 0; i < len; i++) {
-			if (!split[i]) {
-				// ignore empty strings
-				continue;
-			}
-
-			namespaces = split[i].replace(/\*/g, '.*?');
-
-			if (namespaces[0] === '-') {
-				createDebug.skips.push(new RegExp('^' + namespaces.substr(1) + '$'));
-			} else {
-				createDebug.names.push(new RegExp('^' + namespaces + '$'));
-			}
-		}
-
-		for (i = 0; i < createDebug.instances.length; i++) {
-			const instance = createDebug.instances[i];
-			instance.enabled = createDebug.enabled(instance.namespace);
-		}
-	}
-
-	/**
-	* Disable debug output.
-	*
-	* @return {String} namespaces
-	* @api public
-	*/
-	function disable() {
-		const namespaces = [
-			...createDebug.names.map(toNamespace),
-			...createDebug.skips.map(toNamespace).map(namespace => '-' + namespace)
-		].join(',');
-		createDebug.enable('');
-		return namespaces;
-	}
-
-	/**
-	* Returns true if the given mode name is enabled, false otherwise.
-	*
-	* @param {String} name
-	* @return {Boolean}
-	* @api public
-	*/
-	function enabled(name) {
-		if (name[name.length - 1] === '*') {
-			return true;
-		}
-
-		let i;
-		let len;
-
-		for (i = 0, len = createDebug.skips.length; i < len; i++) {
-			if (createDebug.skips[i].test(name)) {
-				return false;
-			}
-		}
-
-		for (i = 0, len = createDebug.names.length; i < len; i++) {
-			if (createDebug.names[i].test(name)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	* Convert regexp to namespace
-	*
-	* @param {RegExp} regxep
-	* @return {String} namespace
-	* @api private
-	*/
-	function toNamespace(regexp) {
-		return regexp.toString()
-			.substring(2, regexp.toString().length - 2)
-			.replace(/\.\*\?$/, '*');
-	}
-
-	/**
-	* Coerce `val`.
-	*
-	* @param {Mixed} val
-	* @return {Mixed}
-	* @api private
-	*/
-	function coerce(val) {
-		if (val instanceof Error) {
-			return val.stack || val.message;
-		}
-		return val;
-	}
-
-	createDebug.enable(createDebug.load());
-
-	return createDebug;
+  return exports.colors[Math.abs(hash) % exports.colors.length];
 }
 
-module.exports = setup;
+/**
+ * Create a debugger with the given `namespace`.
+ *
+ * @param {String} namespace
+ * @return {Function}
+ * @api public
+ */
+
+function createDebug(namespace) {
+
+  var prevTime;
+
+  function debug() {
+    // disabled?
+    if (!debug.enabled) return;
+
+    var self = debug;
+
+    // set `diff` timestamp
+    var curr = +new Date();
+    var ms = curr - (prevTime || curr);
+    self.diff = ms;
+    self.prev = prevTime;
+    self.curr = curr;
+    prevTime = curr;
+
+    // turn the `arguments` into a proper Array
+    var args = new Array(arguments.length);
+    for (var i = 0; i < args.length; i++) {
+      args[i] = arguments[i];
+    }
+
+    args[0] = exports.coerce(args[0]);
+
+    if ('string' !== typeof args[0]) {
+      // anything else let's inspect with %O
+      args.unshift('%O');
+    }
+
+    // apply any `formatters` transformations
+    var index = 0;
+    args[0] = args[0].replace(/%([a-zA-Z%])/g, function(match, format) {
+      // if we encounter an escaped % then don't increase the array index
+      if (match === '%%') return match;
+      index++;
+      var formatter = exports.formatters[format];
+      if ('function' === typeof formatter) {
+        var val = args[index];
+        match = formatter.call(self, val);
+
+        // now we need to remove `args[index]` since it's inlined in the `format`
+        args.splice(index, 1);
+        index--;
+      }
+      return match;
+    });
+
+    // apply env-specific formatting (colors, etc.)
+    exports.formatArgs.call(self, args);
+
+    var logFn = debug.log || exports.log || console.log.bind(console);
+    logFn.apply(self, args);
+  }
+
+  debug.namespace = namespace;
+  debug.enabled = exports.enabled(namespace);
+  debug.useColors = exports.useColors();
+  debug.color = selectColor(namespace);
+  debug.destroy = destroy;
+
+  // env-specific initialization logic for debug instances
+  if ('function' === typeof exports.init) {
+    exports.init(debug);
+  }
+
+  exports.instances.push(debug);
+
+  return debug;
+}
+
+function destroy () {
+  var index = exports.instances.indexOf(this);
+  if (index !== -1) {
+    exports.instances.splice(index, 1);
+    return true;
+  } else {
+    return false;
+  }
+}
+
+/**
+ * Enables a debug mode by namespaces. This can include modes
+ * separated by a colon and wildcards.
+ *
+ * @param {String} namespaces
+ * @api public
+ */
+
+function enable(namespaces) {
+  exports.save(namespaces);
+
+  exports.names = [];
+  exports.skips = [];
+
+  var i;
+  var split = (typeof namespaces === 'string' ? namespaces : '').split(/[\s,]+/);
+  var len = split.length;
+
+  for (i = 0; i < len; i++) {
+    if (!split[i]) continue; // ignore empty strings
+    namespaces = split[i].replace(/\*/g, '.*?');
+    if (namespaces[0] === '-') {
+      exports.skips.push(new RegExp('^' + namespaces.substr(1) + '$'));
+    } else {
+      exports.names.push(new RegExp('^' + namespaces + '$'));
+    }
+  }
+
+  for (i = 0; i < exports.instances.length; i++) {
+    var instance = exports.instances[i];
+    instance.enabled = exports.enabled(instance.namespace);
+  }
+}
+
+/**
+ * Disable debug output.
+ *
+ * @api public
+ */
+
+function disable() {
+  exports.enable('');
+}
+
+/**
+ * Returns true if the given mode name is enabled, false otherwise.
+ *
+ * @param {String} name
+ * @return {Boolean}
+ * @api public
+ */
+
+function enabled(name) {
+  if (name[name.length - 1] === '*') {
+    return true;
+  }
+  var i, len;
+  for (i = 0, len = exports.skips.length; i < len; i++) {
+    if (exports.skips[i].test(name)) {
+      return false;
+    }
+  }
+  for (i = 0, len = exports.names.length; i < len; i++) {
+    if (exports.names[i].test(name)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Coerce `val`.
+ *
+ * @param {Mixed} val
+ * @return {Mixed}
+ * @api private
+ */
+
+function coerce(val) {
+  if (val instanceof Error) return val.stack || val.message;
+  return val;
+}
 
 
 /***/ }),
@@ -1710,6 +3292,27 @@ function createVersionParts(count) {
 
 /***/ }),
 
+/***/ "./node_modules/engine.io-client/lib/globalThis.browser.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/engine.io-client/lib/globalThis.browser.js ***!
+  \*****************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports) {
+
+module.exports = (function () {
+  if (typeof self !== 'undefined') {
+    return self;
+  } else if (typeof window !== 'undefined') {
+    return window;
+  } else {
+    return Function('return this')(); // eslint-disable-line no-new-func
+  }
+})();
+
+
+/***/ }),
+
 /***/ "./node_modules/engine.io-client/lib/index.js":
 /*!****************************************************!*\
   !*** ./node_modules/engine.io-client/lib/index.js ***!
@@ -1828,12 +3431,12 @@ function Socket (uri, opts) {
   }
 
   // SSL options for Node.js client
-  this.pfx = opts.pfx || null;
-  this.key = opts.key || null;
-  this.passphrase = opts.passphrase || null;
-  this.cert = opts.cert || null;
-  this.ca = opts.ca || null;
-  this.ciphers = opts.ciphers || null;
+  this.pfx = opts.pfx || undefined;
+  this.key = opts.key || undefined;
+  this.passphrase = opts.passphrase || undefined;
+  this.cert = opts.cert || undefined;
+  this.ca = opts.ca || undefined;
+  this.ciphers = opts.ciphers || undefined;
   this.rejectUnauthorized = opts.rejectUnauthorized === undefined ? true : opts.rejectUnauthorized;
   this.forceNode = !!opts.forceNode;
 
@@ -2738,12 +4341,13 @@ function polling (opts) {
 /*! ModuleConcatenation bailout: Module is not an ECMAScript module */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(global) {/**
+/**
  * Module requirements.
  */
 
 var Polling = __webpack_require__(/*! ./polling */ "./node_modules/engine.io-client/lib/transports/polling.js");
 var inherit = __webpack_require__(/*! component-inherit */ "./node_modules/component-inherit/index.js");
+var globalThis = __webpack_require__(/*! ../globalThis */ "./node_modules/engine.io-client/lib/globalThis.browser.js");
 
 /**
  * Module exports.
@@ -2771,15 +4375,6 @@ var callbacks;
 function empty () { }
 
 /**
- * Until https://github.com/tc39/proposal-global is shipped.
- */
-function glob () {
-  return typeof self !== 'undefined' ? self
-      : typeof window !== 'undefined' ? window
-      : typeof global !== 'undefined' ? global : {};
-}
-
-/**
  * JSONP Polling constructor.
  *
  * @param {Object} opts.
@@ -2795,8 +4390,7 @@ function JSONPPolling (opts) {
   // we do this here (lazily) to avoid unneeded global pollution
   if (!callbacks) {
     // we need to consider multiple engines in the same page
-    var global = glob();
-    callbacks = global.___eio = (global.___eio || []);
+    callbacks = globalThis.___eio = (globalThis.___eio || []);
   }
 
   // callback identifier
@@ -2978,7 +4572,6 @@ JSONPPolling.prototype.doWrite = function (data, fn) {
   }
 };
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../../webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js")))
 
 /***/ }),
 
@@ -3001,6 +4594,7 @@ var Polling = __webpack_require__(/*! ./polling */ "./node_modules/engine.io-cli
 var Emitter = __webpack_require__(/*! component-emitter */ "./node_modules/component-emitter/index.js");
 var inherit = __webpack_require__(/*! component-inherit */ "./node_modules/component-inherit/index.js");
 var debug = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js")('engine.io-client:polling-xhr');
+var globalThis = __webpack_require__(/*! ../globalThis */ "./node_modules/engine.io-client/lib/globalThis.browser.js");
 
 /**
  * Module exports.
@@ -3395,7 +4989,7 @@ if (typeof document !== 'undefined') {
   if (typeof attachEvent === 'function') {
     attachEvent('onunload', unloadHandler);
   } else if (typeof addEventListener === 'function') {
-    var terminationEvent = 'onpagehide' in self ? 'pagehide' : 'unload';
+    var terminationEvent = 'onpagehide' in globalThis ? 'pagehide' : 'unload';
     addEventListener(terminationEvent, unloadHandler, false);
   }
 }
@@ -3551,7 +5145,7 @@ Polling.prototype.onData = function (data) {
   debug('polling got data %s', data);
   var callback = function (packet, index, total) {
     // if its the first message we consider the transport open
-    if ('opening' === self.readyState) {
+    if ('opening' === self.readyState && packet.type === 'open') {
       self.onOpen();
     }
 
@@ -3770,19 +5364,23 @@ WS.prototype.doOpen = function () {
 
   var uri = this.uri();
   var protocols = this.protocols;
-  var opts = {
-    agent: this.agent,
-    perMessageDeflate: this.perMessageDeflate
-  };
 
-  // SSL options for Node.js client
-  opts.pfx = this.pfx;
-  opts.key = this.key;
-  opts.passphrase = this.passphrase;
-  opts.cert = this.cert;
-  opts.ca = this.ca;
-  opts.ciphers = this.ciphers;
-  opts.rejectUnauthorized = this.rejectUnauthorized;
+  var opts = {};
+
+  if (!this.isReactNative) {
+    opts.agent = this.agent;
+    opts.perMessageDeflate = this.perMessageDeflate;
+
+    // SSL options for Node.js client
+    opts.pfx = this.pfx;
+    opts.key = this.key;
+    opts.passphrase = this.passphrase;
+    opts.cert = this.cert;
+    opts.ca = this.ca;
+    opts.ciphers = this.ciphers;
+    opts.rejectUnauthorized = this.rejectUnauthorized;
+  }
+
   if (this.extraHeaders) {
     opts.headers = this.extraHeaders;
   }
@@ -3987,6 +5585,7 @@ WS.prototype.check = function () {
 // browser shim for xmlhttprequest module
 
 var hasCORS = __webpack_require__(/*! has-cors */ "./node_modules/has-cors/index.js");
+var globalThis = __webpack_require__(/*! ./globalThis */ "./node_modules/engine.io-client/lib/globalThis.browser.js");
 
 module.exports = function (opts) {
   var xdomain = opts.xdomain;
@@ -4017,7 +5616,7 @@ module.exports = function (opts) {
 
   if (!xdomain) {
     try {
-      return new self[['Active'].concat('Object').join('X')]('Microsoft.XMLHTTP');
+      return new globalThis[['Active'].concat('Object').join('X')]('Microsoft.XMLHTTP');
     } catch (e) { }
   }
 };
@@ -4895,109 +6494,118 @@ module.exports = {
 
 /***/ }),
 
-/***/ "./node_modules/enum/dist/enum.js":
-/*!****************************************!*\
-  !*** ./node_modules/enum/dist/enum.js ***!
-  \****************************************/
-/*! no static exports found */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ "./node_modules/enum/lib/enum.js":
+/*!***************************************!*\
+  !*** ./node_modules/enum/lib/enum.js ***!
+  \***************************************/
+/*! exports provided: default */
+/*! ModuleConcatenation bailout: Module uses injected variables (global) */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(global) {
+__webpack_require__.r(__webpack_exports__);
+/* WEBPACK VAR INJECTION */(function(global) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Enum; });
+/* harmony import */ var _enumItem_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./enumItem.js */ "./node_modules/enum/lib/enumItem.js");
+/* harmony import */ var _isType_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./isType.js */ "./node_modules/enum/lib/isType.js");
+/* harmony import */ var _indexOf_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./indexOf.js */ "./node_modules/enum/lib/indexOf.js");
 
-var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
-var EnumItem = _interopRequire(__webpack_require__(/*! ./enumItem */ "./node_modules/enum/dist/enumItem.js"));
 
-var isString = __webpack_require__(/*! ./isType */ "./node_modules/enum/dist/isType.js").isString;
+const isBuffer = (obj) => {
+  return obj != null && obj.constructor != null &&
+    typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj)
+}
 
-var indexOf = __webpack_require__(/*! ./indexOf */ "./node_modules/enum/dist/indexOf.js").indexOf;
+/**
+ * Returns a string identifying the endianness of the CPU for which the Deno
+ * binary was compiled. Possible values are 'BE' for big endian and 'LE' for
+ * little endian.
+ **/
+const getEndianess = () => {
+  // Source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView#Endianness
+  const buffer = new ArrayBuffer(2)
+  new DataView(buffer).setInt16(0, 256, true /* littleEndian */)
+  // Int16Array uses the platform's endianness.
+  return new Int16Array(buffer)[0] === 256 ? 'LE' : 'BE'
+}
 
-var isBuffer = _interopRequire(__webpack_require__(/*! is-buffer */ "./node_modules/is-buffer/index.js"));
-
-var endianness = "LE"; // for react-native
+const endianness = getEndianess()
 
 /**
  * Represents an Enum with enum items.
  * @param {Array || Object}  map     This are the enum items.
  * @param {String || Object} options This are options. [optional]
  */
-
-var Enum = (function () {
-  function Enum(map, options) {
-    var _this = this;
-
-    _classCallCheck(this, Enum);
-
+class Enum {
+  constructor (map, options) {
     /* implement the "ref type interface", so that Enum types can
      * be used in `node-ffi` function declarations and invokations.
      * In C, these Enums act as `uint32_t` types.
      *
      * https://github.com/TooTallNate/ref#the-type-interface
      */
-    this.size = 4;
-    this.indirection = 1;
+    this.size = 4
+    this.indirection = 1
 
-    if (options && isString(options)) {
-      options = { name: options };
+    if (options && Object(_isType_js__WEBPACK_IMPORTED_MODULE_1__["isString"])(options)) {
+      options = { name: options }
     }
 
-    this._options = options || {};
-    this._options.separator = this._options.separator || " | ";
-    this._options.endianness = this._options.endianness || endianness;
-    this._options.ignoreCase = this._options.ignoreCase || false;
-    this._options.freez = this._options.freez || false;
+    this._options = options || {}
+    this._options.separator = this._options.separator || ' | '
+    this._options.endianness = this._options.endianness || endianness
+    this._options.ignoreCase = this._options.ignoreCase || false
+    this._options.freez = this._options.freez || false // backword compatability
+    this._options.freeze = this._options.freeze || this._options.freez || false
 
-    this.enums = [];
+    this.enums = []
 
     if (map.length) {
-      this._enumLastIndex = map.length;
-      var array = map;
-      map = {};
+      this._enumLastIndex = map.length
+      var array = map
+      map = {}
 
       for (var i = 0; i < array.length; i++) {
-        map[array[i]] = Math.pow(2, i);
+        map[array[i]] = Math.pow(2, i)
       }
     }
 
     for (var member in map) {
-      guardReservedKeys(this._options.name, member);
-      this[member] = new EnumItem(member, map[member], { ignoreCase: this._options.ignoreCase });
-      this.enums.push(this[member]);
+      guardReservedKeys(this._options.name, member)
+      this[member] = new _enumItem_js__WEBPACK_IMPORTED_MODULE_0__["default"](member, map[member], { ignoreCase: this._options.ignoreCase })
+      this.enums.push(this[member])
     }
-    this._enumMap = map;
+    this._enumMap = map
 
     if (this._options.ignoreCase) {
       this.getLowerCaseEnums = function () {
-        var res = {};
+        var res = {}
         for (var i = 0, len = this.enums.length; i < len; i++) {
-          res[this.enums[i].key.toLowerCase()] = this.enums[i];
+          res[this.enums[i].key.toLowerCase()] = this.enums[i]
         }
-        return res;
-      };
+        return res
+      }
     }
 
     if (this._options.name) {
-      this.name = this._options.name;
+      this.name = this._options.name
     }
 
-    var isFlaggable = function () {
-      for (var i = 0, len = _this.enums.length; i < len; i++) {
-        var e = _this.enums[i];
+    const isFlaggable = () => {
+      for (var i = 0, len = this.enums.length; i < len; i++) {
+        var e = this.enums[i]
 
         if (!(e.value !== 0 && !(e.value & e.value - 1))) {
-          return false;
+          return false
         }
       }
-      return true;
-    };
+      return true
+    }
 
-    this.isFlaggable = isFlaggable();
-    if (this._options.freez) {
-      this.freezeEnums(); //this will make instances of Enum non-extensible
+    this.isFlaggable = isFlaggable()
+    if (this._options.freeze) {
+      this.freezeEnums() // this will make instances of Enum non-extensible
     }
   }
 
@@ -5006,101 +6614,99 @@ var Enum = (function () {
    * @param  {EnumItem || String || Number} key The object to get with.
    * @return {String}                           The get result.
    */
-
-  Enum.prototype.getKey = function getKey(value) {
-    var item = this.get(value);
+  getKey (value) {
+    var item = this.get(value)
     if (item) {
-      return item.key;
+      return item.key
     }
-  };
+  }
 
   /**
    * Returns the appropriate EnumItem value.
    * @param  {EnumItem || String || Number} key The object to get with.
    * @return {Number}                           The get result.
    */
-
-  Enum.prototype.getValue = function getValue(key) {
-    var item = this.get(key);
+  getValue (key) {
+    var item = this.get(key)
     if (item) {
-      return item.value;
+      return item.value
     }
-  };
+  }
 
   /**
    * Returns the appropriate EnumItem.
    * @param  {EnumItem || String || Number} key The object to get with.
    * @return {EnumItem}                         The get result.
    */
-
-  Enum.prototype.get = function get(key, offset) {
+  get (key, offset) {
     if (key === null || key === undefined) {
-      return;
+      return
     } // Buffer instance support, part of the ref Type interface
     if (isBuffer(key)) {
-      key = key["readUInt32" + this._options.endianness](offset || 0);
+      key = key['readUInt32' + this._options.endianness](offset || 0)
     }
 
-    if (EnumItem.isEnumItem(key)) {
-      var foundIndex = indexOf.call(this.enums, key);
+    if (_enumItem_js__WEBPACK_IMPORTED_MODULE_0__["default"].isEnumItem(key)) {
+      var foundIndex = _indexOf_js__WEBPACK_IMPORTED_MODULE_2__["indexOf"].call(this.enums, key)
       if (foundIndex >= 0) {
-        return key;
+        return key
       }
-      if (!this.isFlaggable || this.isFlaggable && key.key.indexOf(this._options.separator) < 0) {
-        return;
+      if (!this.isFlaggable || (this.isFlaggable && key.key.indexOf(this._options.separator) < 0)) {
+        return
       }
-      return this.get(key.key);
-    } else if (isString(key)) {
-
-      var enums = this;
+      return this.get(key.key)
+    } else if (Object(_isType_js__WEBPACK_IMPORTED_MODULE_1__["isString"])(key)) {
+      var enums = this
       if (this._options.ignoreCase) {
-        enums = this.getLowerCaseEnums();
-        key = key.toLowerCase();
+        enums = this.getLowerCaseEnums()
+        key = key.toLowerCase()
       }
 
       if (key.indexOf(this._options.separator) > 0) {
-        var parts = key.split(this._options.separator);
+        var parts = key.split(this._options.separator)
 
-        var value = 0;
+        var value = 0
         for (var i = 0; i < parts.length; i++) {
-          var part = parts[i];
+          var part = parts[i]
 
-          value |= enums[part].value;
+          value |= enums[part].value
         }
 
-        return new EnumItem(key, value);
+        return new _enumItem_js__WEBPACK_IMPORTED_MODULE_0__["default"](key, value)
       } else {
-        return enums[key];
+        return enums[key]
       }
     } else {
       for (var m in this) {
+        // eslint-disable-next-line no-prototype-builtins
         if (this.hasOwnProperty(m)) {
           if (this[m].value === key) {
-            return this[m];
+            return this[m]
           }
         }
       }
 
-      var result = null;
+      var result = null
 
       if (this.isFlaggable) {
         for (var n in this) {
+          // eslint-disable-next-line no-prototype-builtins
           if (this.hasOwnProperty(n)) {
             if ((key & this[n].value) !== 0) {
               if (result) {
-                result += this._options.separator;
+                result += this._options.separator
               } else {
-                result = "";
+                result = ''
               }
-              result += n;
+              result += n
             }
           }
         }
       }
 
-      return this.get(result || null);
+      return this.get(result || null)
     }
-  };
+  }
 
   /**
    * Sets the Enum "value" onto the give `buffer` at the specified `offset`.
@@ -5110,106 +6716,120 @@ var Enum = (function () {
    * @param  {Number} offset The offset in the buffer to write to. Default 0.
    * @param  {EnumItem || String || Number} value The EnumItem to write.
    */
-
-  Enum.prototype.set = function set(buffer, offset, value) {
-    var item = this.get(value);
+  set (buffer, offset, value) {
+    var item = this.get(value)
     if (item) {
-      return buffer["writeUInt32" + this._options.endianness](item.value, offset || 0);
+      return buffer['writeUInt32' + this._options.endianness](item.value, offset || 0)
     }
-  };
+  }
 
   /**
    * Define freezeEnums() as a property of the prototype.
    * make enumerable items nonconfigurable and deep freeze the properties. Throw Error on property setter.
    */
-
-  Enum.prototype.freezeEnums = function freezeEnums() {
-    function envSupportsFreezing() {
-      return Object.isFrozen && Object.isSealed && Object.getOwnPropertyNames && Object.getOwnPropertyDescriptor && Object.defineProperties && Object.__defineGetter__ && Object.__defineSetter__;
+  freezeEnums () {
+    function envSupportsFreezing () {
+      return (
+        Object.isFrozen && Object.isSealed &&
+        Object.getOwnPropertyNames && Object.getOwnPropertyDescriptor &&
+        Object.defineProperties && Object.__defineGetter__ && Object.__defineSetter__
+      )
     }
 
-    function freezer(o) {
-      var props = Object.getOwnPropertyNames(o);
+    function freezer (o) {
+      var props = Object.getOwnPropertyNames(o)
       props.forEach(function (p) {
         if (!Object.getOwnPropertyDescriptor(o, p).configurable) {
-          return;
+          return
         }
 
-        Object.defineProperties(o, p, { writable: false, configurable: false });
-      });
-      return o;
+        Object.defineProperties(o, p, { writable: false, configurable: false })
+      })
+      return o
     }
 
-    function getPropertyValue(value) {
-      return value;
+    function getPropertyValue (value) {
+      return value
     }
 
-    function deepFreezeEnums(o) {
-      if (typeof o !== "object" || o === null || Object.isFrozen(o) || Object.isSealed(o)) {
-        return;
+    function deepFreezeEnums (o) {
+      if (typeof o !== 'object' || o === null || Object.isFrozen(o) || Object.isSealed(o)) {
+        return
       }
       for (var key in o) {
+        // eslint-disable-next-line no-prototype-builtins
         if (o.hasOwnProperty(key)) {
-          o.__defineGetter__(key, getPropertyValue.bind(null, o[key]));
-          o.__defineSetter__(key, function throwPropertySetError(value) {
-            throw TypeError("Cannot redefine property; Enum Type is not extensible.");
-          });
-          deepFreezeEnums(o[key]);
+          o.__defineGetter__(key, getPropertyValue.bind(null, o[key]))
+          o.__defineSetter__(key, function throwPropertySetError (value) {
+            throw TypeError('Cannot redefine property; Enum Type is not extensible.')
+          })
+          deepFreezeEnums(o[key])
         }
       }
       if (Object.freeze) {
-        Object.freeze(o);
+        Object.freeze(o)
       } else {
-        freezer(o);
+        freezer(o)
       }
     }
 
     if (envSupportsFreezing()) {
-      deepFreezeEnums(this);
+      deepFreezeEnums(this)
     }
 
-    return this;
-  };
+    return this
+  }
+
+  /**
+   * Return true whether the enumItem parameter passed in is an EnumItem object and
+   * has been included as constant of this Enum
+   * @param  {EnumItem} enumItem
+   */
+  isDefined (enumItem) {
+    let condition = (e) => e === enumItem
+    if (Object(_isType_js__WEBPACK_IMPORTED_MODULE_1__["isString"])(enumItem) || Object(_isType_js__WEBPACK_IMPORTED_MODULE_1__["isNumber"])(enumItem)) {
+      condition = (e) => e.is(enumItem)
+    }
+    return this.enums.some(condition)
+  }
 
   /**
    * Returns JSON object representation of this Enum.
    * @return {String} JSON object representation of this Enum.
    */
-
-  Enum.prototype.toJSON = function toJSON() {
-    return this._enumMap;
-  };
+  toJSON () {
+    return this._enumMap
+  }
 
   /**
    * Extends the existing Enum with a New Map.
    * @param  {Array}  map  Map to extend from
    */
-
-  Enum.prototype.extend = function extend(map) {
+  extend (map) {
     if (map.length) {
-      var array = map;
-      map = {};
+      var array = map
+      map = {}
 
       for (var i = 0; i < array.length; i++) {
-        var exponent = this._enumLastIndex + i;
-        map[array[i]] = Math.pow(2, exponent);
+        var exponent = this._enumLastIndex + i
+        map[array[i]] = Math.pow(2, exponent)
       }
 
       for (var member in map) {
-        guardReservedKeys(this._options.name, member);
-        this[member] = new EnumItem(member, map[member], { ignoreCase: this._options.ignoreCase });
-        this.enums.push(this[member]);
+        guardReservedKeys(this._options.name, member)
+        this[member] = new _enumItem_js__WEBPACK_IMPORTED_MODULE_0__["default"](member, map[member], { ignoreCase: this._options.ignoreCase })
+        this.enums.push(this[member])
       }
 
       for (var key in this._enumMap) {
-        map[key] = this._enumMap[key];
+        map[key] = this._enumMap[key]
       }
 
-      this._enumLastIndex += map.length;
-      this._enumMap = map;
+      this._enumLastIndex += map.length
+      this._enumMap = map
 
-      if (this._options.freez) {
-        this.freezeEnums(); //this will make instances of new Enum non-extensible
+      if (this._options.freeze) {
+        this.freezeEnums() // this will make instances of new Enum non-extensible
       }
     }
   };
@@ -5218,71 +6838,62 @@ var Enum = (function () {
    * Registers the Enum Type globally in node.js.
    * @param  {String} key Global variable. [optional]
    */
-
-  Enum.register = function register() {
-    var key = arguments[0] === undefined ? "Enum" : arguments[0];
-
-    if (!global[key]) {
-      global[key] = Enum;
+  static register (key = 'Enum') {
+    if (typeof global !== 'undefined' && !global[key]) {
+      global[key] = Enum
+    } else if (typeof window !== 'undefined' && !window[key]) {
+      window[key] = Enum
     }
-  };
+  }
 
-  return Enum;
-})();
-
-module.exports = Enum;
+  [Symbol.iterator] () {
+    let index = 0
+    return {
+      next: () => index < this.enums.length ? { done: false, value: this.enums[index++] } : { done: true }
+    }
+  }
+};
 
 // private
 
-var reservedKeys = ["_options", "get", "getKey", "getValue", "enums", "isFlaggable", "_enumMap", "toJSON", "_enumLastIndex"];
+var reservedKeys = ['_options', 'get', 'getKey', 'getValue', 'enums', 'isFlaggable', '_enumMap', 'toJSON', '_enumLastIndex']
 
-function guardReservedKeys(customName, key) {
-  if (customName && key === "name" || indexOf.call(reservedKeys, key) >= 0) {
-    throw new Error("Enum key " + key + " is a reserved word!");
+function guardReservedKeys (customName, key) {
+  if ((customName && key === 'name') || _indexOf_js__WEBPACK_IMPORTED_MODULE_2__["indexOf"].call(reservedKeys, key) >= 0) {
+    throw new Error(`Enum key ${key} is a reserved word!`)
   }
 }
+
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js")))
 
 /***/ }),
 
-/***/ "./node_modules/enum/dist/enumItem.js":
-/*!********************************************!*\
-  !*** ./node_modules/enum/dist/enumItem.js ***!
-  \********************************************/
-/*! no static exports found */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ "./node_modules/enum/lib/enumItem.js":
+/*!*******************************************!*\
+  !*** ./node_modules/enum/lib/enumItem.js ***!
+  \*******************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return EnumItem; });
+/* harmony import */ var _isType_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./isType.js */ "./node_modules/enum/lib/isType.js");
 
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
-
-var _isType = __webpack_require__(/*! ./isType */ "./node_modules/enum/dist/isType.js");
-
-var isObject = _isType.isObject;
-var isString = _isType.isString;
 
 /**
  * Represents an Item of an Enum.
  * @param {String} key   The Enum key.
  * @param {Number} value The Enum value.
  */
+class EnumItem {
+  /* constructor reference so that, this.constructor===EnumItem//=>true */
+  constructor (key, value, options = {}) {
+    this.key = key
+    this.value = value
 
-var EnumItem = (function () {
-
-  /*constructor reference so that, this.constructor===EnumItem//=>true */
-
-  function EnumItem(key, value) {
-    var options = arguments[2] === undefined ? {} : arguments[2];
-
-    _classCallCheck(this, EnumItem);
-
-    this.key = key;
-    this.value = value;
-
-    this._options = options;
-    this._options.ignoreCase = this._options.ignoreCase || false;
+    this._options = options
+    this._options.ignoreCase = this._options.ignoreCase || false
   }
 
   /**
@@ -5290,136 +6901,110 @@ var EnumItem = (function () {
    * @param  {EnumItem || String || Number} value The object to check with.
    * @return {Boolean}                            The check result.
    */
-
-  EnumItem.prototype.has = function has(value) {
+  has (value) {
     if (EnumItem.isEnumItem(value)) {
-      return (this.value & value.value) !== 0;
-    } else if (isString(value)) {
+      return (this.value & value.value) !== 0
+    } else if (Object(_isType_js__WEBPACK_IMPORTED_MODULE_0__["isString"])(value)) {
       if (this._options.ignoreCase) {
-        return this.key.toLowerCase().indexOf(value.toLowerCase()) >= 0;
+        return this.key.toLowerCase().indexOf(value.toLowerCase()) >= 0
       }
-      return this.key.indexOf(value) >= 0;
+      return this.key.indexOf(value) >= 0
     } else {
-      return (this.value & value) !== 0;
+      return (this.value & value) !== 0
     }
-  };
+  }
 
   /**
    * Checks if the EnumItem is the same as the passing object.
    * @param  {EnumItem || String || Number} key The object to check with.
    * @return {Boolean}                          The check result.
    */
-
-  EnumItem.prototype.is = function is(key) {
+  is (key) {
     if (EnumItem.isEnumItem(key)) {
-      return this.key === key.key;
-    } else if (isString(key)) {
+      return this.key === key.key
+    } else if (Object(_isType_js__WEBPACK_IMPORTED_MODULE_0__["isString"])(key)) {
       if (this._options.ignoreCase) {
-        return this.key.toLowerCase() === key.toLowerCase();
+        return this.key.toLowerCase() === key.toLowerCase()
       }
-      return this.key === key;
+      return this.key === key
     } else {
-      return this.value === key;
+      return this.value === key
     }
-  };
+  }
 
   /**
    * Returns String representation of this EnumItem.
    * @return {String} String representation of this EnumItem.
    */
-
-  EnumItem.prototype.toString = function toString() {
-    return this.key;
-  };
+  toString () {
+    return this.key
+  }
 
   /**
    * Returns JSON object representation of this EnumItem.
    * @return {String} JSON object representation of this EnumItem.
    */
-
-  EnumItem.prototype.toJSON = function toJSON() {
-    return this.key;
-  };
+  toJSON () {
+    return this.key
+  }
 
   /**
    * Returns the value to compare with.
    * @return {String} The value to compare with.
    */
+  valueOf () {
+    return this.value
+  }
 
-  EnumItem.prototype.valueOf = function valueOf() {
-    return this.value;
-  };
-
-  EnumItem.isEnumItem = function isEnumItem(value) {
-    return value instanceof EnumItem || isObject(value) && value.key !== undefined && value.value !== undefined;
-  };
-
-  return EnumItem;
-})();
-
-module.exports = EnumItem;
-
-/***/ }),
-
-/***/ "./node_modules/enum/dist/indexOf.js":
-/*!*******************************************!*\
-  !*** ./node_modules/enum/dist/indexOf.js ***!
-  \*******************************************/
-/*! no static exports found */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-exports.__esModule = true;
-var indexOf = Array.prototype.indexOf || function (find, i /*opt*/) {
-  if (i === undefined) i = 0;
-  if (i < 0) i += this.length;
-  if (i < 0) i = 0;
-  for (var n = this.length; i < n; i++) if (i in this && this[i] === find) return i;
-  return -1;
+  static isEnumItem (value) {
+    return value instanceof EnumItem || (Object(_isType_js__WEBPACK_IMPORTED_MODULE_0__["isObject"])(value) && value.key !== undefined && value.value !== undefined)
+  }
 };
-exports.indexOf = indexOf;
+
 
 /***/ }),
 
-/***/ "./node_modules/enum/dist/isType.js":
+/***/ "./node_modules/enum/lib/indexOf.js":
 /*!******************************************!*\
-  !*** ./node_modules/enum/dist/isType.js ***!
+  !*** ./node_modules/enum/lib/indexOf.js ***!
   \******************************************/
-/*! no static exports found */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports, __webpack_require__) {
+/*! exports provided: indexOf */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "indexOf", function() { return indexOf; });
+const indexOf = Array.prototype.indexOf || function (find, i /* opt */) {
+  if (i === undefined) i = 0
+  if (i < 0) i += this.length
+  if (i < 0) i = 0
+  for (var n = this.length; i < n; i++) {
+    if (i in this && this[i] === find) { return i }
+  }
+  return -1
+}
 
-
-exports.__esModule = true;
-var isType = function (type, value) {
-  return typeof value === type;
-};
-exports.isType = isType;
-var isObject = function (value) {
-  return isType("object", value);
-};
-exports.isObject = isObject;
-var isString = function (value) {
-  return isType("string", value);
-};
-exports.isString = isString;
 
 /***/ }),
 
-/***/ "./node_modules/enum/index.js":
-/*!************************************!*\
-  !*** ./node_modules/enum/index.js ***!
-  \************************************/
-/*! no static exports found */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ "./node_modules/enum/lib/isType.js":
+/*!*****************************************!*\
+  !*** ./node_modules/enum/lib/isType.js ***!
+  \*****************************************/
+/*! exports provided: isType, isObject, isString, isNumber */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! ./dist/enum */ "./node_modules/enum/dist/enum.js");
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isType", function() { return isType; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isObject", function() { return isObject; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isString", function() { return isString; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isNumber", function() { return isNumber; });
+// eslint-disable-next-line valid-typeof
+const isType = (type, value) => typeof value === type
+const isObject = (value) => isType('object', value)
+const isString = (value) => isType('string', value)
+const isNumber = (value) => isType('number', value)
 
 
 /***/ }),
@@ -5489,6 +7074,7 @@ function EventEmitter() {
   EventEmitter.init.call(this);
 }
 module.exports = EventEmitter;
+module.exports.once = once;
 
 // Backwards-compat with node 0.10.x
 EventEmitter.EventEmitter = EventEmitter;
@@ -5500,6 +7086,12 @@ EventEmitter.prototype._maxListeners = undefined;
 // By default EventEmitters will print a warning if more than 10 listeners are
 // added to it. This is a useful default which helps finding memory leaks.
 var defaultMaxListeners = 10;
+
+function checkListener(listener) {
+  if (typeof listener !== 'function') {
+    throw new TypeError('The "listener" argument must be of type Function. Received type ' + typeof listener);
+  }
+}
 
 Object.defineProperty(EventEmitter, 'defaultMaxListeners', {
   enumerable: true,
@@ -5535,14 +7127,14 @@ EventEmitter.prototype.setMaxListeners = function setMaxListeners(n) {
   return this;
 };
 
-function $getMaxListeners(that) {
+function _getMaxListeners(that) {
   if (that._maxListeners === undefined)
     return EventEmitter.defaultMaxListeners;
   return that._maxListeners;
 }
 
 EventEmitter.prototype.getMaxListeners = function getMaxListeners() {
-  return $getMaxListeners(this);
+  return _getMaxListeners(this);
 };
 
 EventEmitter.prototype.emit = function emit(type) {
@@ -5594,9 +7186,7 @@ function _addListener(target, type, listener, prepend) {
   var events;
   var existing;
 
-  if (typeof listener !== 'function') {
-    throw new TypeError('The "listener" argument must be of type Function. Received type ' + typeof listener);
-  }
+  checkListener(listener);
 
   events = target._events;
   if (events === undefined) {
@@ -5633,7 +7223,7 @@ function _addListener(target, type, listener, prepend) {
     }
 
     // Check for listener leak
-    m = $getMaxListeners(target);
+    m = _getMaxListeners(target);
     if (m > 0 && existing.length > m && !existing.warned) {
       existing.warned = true;
       // No error code for this since it is a Warning
@@ -5665,12 +7255,12 @@ EventEmitter.prototype.prependListener =
     };
 
 function onceWrapper() {
-  var args = [];
-  for (var i = 0; i < arguments.length; i++) args.push(arguments[i]);
   if (!this.fired) {
     this.target.removeListener(this.type, this.wrapFn);
     this.fired = true;
-    ReflectApply(this.listener, this.target, args);
+    if (arguments.length === 0)
+      return this.listener.call(this.target);
+    return this.listener.apply(this.target, arguments);
   }
 }
 
@@ -5683,18 +7273,14 @@ function _onceWrap(target, type, listener) {
 }
 
 EventEmitter.prototype.once = function once(type, listener) {
-  if (typeof listener !== 'function') {
-    throw new TypeError('The "listener" argument must be of type Function. Received type ' + typeof listener);
-  }
+  checkListener(listener);
   this.on(type, _onceWrap(this, type, listener));
   return this;
 };
 
 EventEmitter.prototype.prependOnceListener =
     function prependOnceListener(type, listener) {
-      if (typeof listener !== 'function') {
-        throw new TypeError('The "listener" argument must be of type Function. Received type ' + typeof listener);
-      }
+      checkListener(listener);
       this.prependListener(type, _onceWrap(this, type, listener));
       return this;
     };
@@ -5704,9 +7290,7 @@ EventEmitter.prototype.removeListener =
     function removeListener(type, listener) {
       var list, events, position, i, originalListener;
 
-      if (typeof listener !== 'function') {
-        throw new TypeError('The "listener" argument must be of type Function. Received type ' + typeof listener);
-      }
+      checkListener(listener);
 
       events = this._events;
       if (events === undefined)
@@ -5882,6 +7466,86 @@ function unwrapListeners(arr) {
   return ret;
 }
 
+function once(emitter, name) {
+  return new Promise(function (resolve, reject) {
+    function errorListener(err) {
+      emitter.removeListener(name, resolver);
+      reject(err);
+    }
+
+    function resolver() {
+      if (typeof emitter.removeListener === 'function') {
+        emitter.removeListener('error', errorListener);
+      }
+      resolve([].slice.call(arguments));
+    };
+
+    eventTargetAgnosticAddListener(emitter, name, resolver, { once: true });
+    if (name !== 'error') {
+      addErrorHandlerIfEventEmitter(emitter, errorListener, { once: true });
+    }
+  });
+}
+
+function addErrorHandlerIfEventEmitter(emitter, handler, flags) {
+  if (typeof emitter.on === 'function') {
+    eventTargetAgnosticAddListener(emitter, 'error', handler, flags);
+  }
+}
+
+function eventTargetAgnosticAddListener(emitter, name, listener, flags) {
+  if (typeof emitter.on === 'function') {
+    if (flags.once) {
+      emitter.once(name, listener);
+    } else {
+      emitter.on(name, listener);
+    }
+  } else if (typeof emitter.addEventListener === 'function') {
+    // EventTarget does not have `error` event semantics like Node
+    // EventEmitters, we do not listen for `error` events here.
+    emitter.addEventListener(name, function wrapListener(arg) {
+      // IE does not have builtin `{ once: true }` support so we
+      // have to do it manually.
+      if (flags.once) {
+        emitter.removeEventListener(name, wrapListener);
+      }
+      listener(arg);
+    });
+  } else {
+    throw new TypeError('The "emitter" argument must be of type EventEmitter. Received type ' + typeof emitter);
+  }
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/filter-obj/index.js":
+/*!******************************************!*\
+  !*** ./node_modules/filter-obj/index.js ***!
+  \******************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+module.exports = function (obj, predicate) {
+	var ret = {};
+	var keys = Object.keys(obj);
+	var isArr = Array.isArray(predicate);
+
+	for (var i = 0; i < keys.length; i++) {
+		var key = keys[i];
+		var val = obj[key];
+
+		if (isArr ? predicate.indexOf(key) !== -1 : predicate(key, val, obj)) {
+			ret[key] = val;
+		}
+	}
+
+	return ret;
+};
+
 
 /***/ }),
 
@@ -5999,6 +7663,7 @@ try {
 /*! ModuleConcatenation bailout: Module is not an ECMAScript module */
 /***/ (function(module, exports) {
 
+/*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = (nBytes * 8) - mLen - 1
@@ -6105,39 +7770,6 @@ module.exports = function(arr, obj){
   }
   return -1;
 };
-
-/***/ }),
-
-/***/ "./node_modules/is-buffer/index.js":
-/*!*****************************************!*\
-  !*** ./node_modules/is-buffer/index.js ***!
-  \*****************************************/
-/*! no static exports found */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports) {
-
-/*!
- * Determine if an object is a Buffer
- *
- * @author   Feross Aboukhadijeh <https://feross.org>
- * @license  MIT
- */
-
-// The _isBuffer check is for Safari 5-7 support, because it's missing
-// Object.prototype.constructor. Remove this eventually
-module.exports = function (obj) {
-  return obj != null && (isBuffer(obj) || isSlowBuffer(obj) || !!obj._isBuffer)
-}
-
-function isBuffer (obj) {
-  return !!obj.constructor && typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj)
-}
-
-// For Node v0.10 support. Remove this eventually.
-function isSlowBuffer (obj) {
-  return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
-}
-
 
 /***/ }),
 
@@ -6781,7 +8413,6 @@ var s = 1000;
 var m = s * 60;
 var h = m * 60;
 var d = h * 24;
-var w = d * 7;
 var y = d * 365.25;
 
 /**
@@ -6803,7 +8434,7 @@ module.exports = function(val, options) {
   var type = typeof val;
   if (type === 'string' && val.length > 0) {
     return parse(val);
-  } else if (type === 'number' && isFinite(val)) {
+  } else if (type === 'number' && isNaN(val) === false) {
     return options.long ? fmtLong(val) : fmtShort(val);
   }
   throw new Error(
@@ -6825,7 +8456,7 @@ function parse(str) {
   if (str.length > 100) {
     return;
   }
-  var match = /^(-?(?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|weeks?|w|years?|yrs?|y)?$/i.exec(
+  var match = /^((?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|years?|yrs?|y)?$/i.exec(
     str
   );
   if (!match) {
@@ -6840,10 +8471,6 @@ function parse(str) {
     case 'yr':
     case 'y':
       return n * y;
-    case 'weeks':
-    case 'week':
-    case 'w':
-      return n * w;
     case 'days':
     case 'day':
     case 'd':
@@ -6886,17 +8513,16 @@ function parse(str) {
  */
 
 function fmtShort(ms) {
-  var msAbs = Math.abs(ms);
-  if (msAbs >= d) {
+  if (ms >= d) {
     return Math.round(ms / d) + 'd';
   }
-  if (msAbs >= h) {
+  if (ms >= h) {
     return Math.round(ms / h) + 'h';
   }
-  if (msAbs >= m) {
+  if (ms >= m) {
     return Math.round(ms / m) + 'm';
   }
-  if (msAbs >= s) {
+  if (ms >= s) {
     return Math.round(ms / s) + 's';
   }
   return ms + 'ms';
@@ -6911,29 +8537,25 @@ function fmtShort(ms) {
  */
 
 function fmtLong(ms) {
-  var msAbs = Math.abs(ms);
-  if (msAbs >= d) {
-    return plural(ms, msAbs, d, 'day');
-  }
-  if (msAbs >= h) {
-    return plural(ms, msAbs, h, 'hour');
-  }
-  if (msAbs >= m) {
-    return plural(ms, msAbs, m, 'minute');
-  }
-  if (msAbs >= s) {
-    return plural(ms, msAbs, s, 'second');
-  }
-  return ms + ' ms';
+  return plural(ms, d, 'day') ||
+    plural(ms, h, 'hour') ||
+    plural(ms, m, 'minute') ||
+    plural(ms, s, 'second') ||
+    ms + ' ms';
 }
 
 /**
  * Pluralization helper.
  */
 
-function plural(ms, msAbs, n, name) {
-  var isPlural = msAbs >= n * 1.5;
-  return Math.round(ms / n) + ' ' + name + (isPlural ? 's' : '');
+function plural(ms, n, name) {
+  if (ms < n) {
+    return;
+  }
+  if (ms < n * 1.5) {
+    return Math.floor(ms / n) + ' ' + name;
+  }
+  return Math.ceil(ms / n) + ' ' + name + 's';
 }
 
 
@@ -8796,22 +10418,40 @@ module.exports = {
 
 
 var ECMA_SIZES = __webpack_require__(/*! ./byte_size */ "./node_modules/object-sizeof/byte_size.js")
-var Buffer = __webpack_require__(/*! buffer */ "./node_modules/node-libs-browser/node_modules/buffer/index.js").Buffer
+var Buffer = __webpack_require__(/*! buffer/ */ "./node_modules/node-libs-browser/node_modules/buffer/index.js").Buffer
 
-function sizeOfObject (object) {
+function allProperties(obj) {
+  const stringProperties = []
+  for (var prop in obj) { 
+      stringProperties.push(prop)
+  }
+  if (Object.getOwnPropertySymbols) {
+      var symbolProperties = Object.getOwnPropertySymbols(obj)
+      Array.prototype.push.apply(stringProperties, symbolProperties)
+  }
+  return stringProperties
+}
+
+function sizeOfObject (seen, object) {
   if (object == null) {
     return 0
   }
 
   var bytes = 0
-  for (var key in object) {
-    if (!Object.hasOwnProperty.call(object, key)) {
-      continue
+  var properties = allProperties(object)
+  for (var i = 0; i < properties.length; i++) {
+    var key = properties[i]
+    // Do not recalculate circular references
+    if (typeof object[key] === 'object' && object[key] !== null) {
+      if (seen.has(object[key])) {
+        continue
+      }
+      seen.add(object[key])
     }
 
-    bytes += sizeof(key)
+    bytes += getCalculator(seen)(key)
     try {
-      bytes += sizeof(object[key])
+      bytes += getCalculator(seen)(object[key])
     } catch (ex) {
       if (ex instanceof RangeError) {
         // circular reference detected, final result might be incorrect
@@ -8824,6 +10464,37 @@ function sizeOfObject (object) {
   return bytes
 }
 
+function getCalculator (seen) {
+  return function calculator(object) {
+    if (Buffer.isBuffer(object)) {
+      return object.length
+    }
+
+    var objectType = typeof (object)
+    switch (objectType) {
+      case 'string':
+        return object.length * ECMA_SIZES.STRING
+      case 'boolean':
+        return ECMA_SIZES.BOOLEAN
+      case 'number':
+        return ECMA_SIZES.NUMBER
+      case 'symbol':
+        const isGlobalSymbol = Symbol.keyFor && Symbol.keyFor(object)
+        return isGlobalSymbol ? Symbol.keyFor(object).length * ECMA_SIZES.STRING : (object.toString().length - 8) * ECMA_SIZES.STRING 
+      case 'object':
+        if (Array.isArray(object)) {
+          return object.map(getCalculator(seen)).reduce(function (acc, curr) {
+            return acc + curr
+          }, 0)
+        } else {
+          return sizeOfObject(seen, object)
+        }
+      default:
+        return 0
+    }
+  }
+}
+
 /**
  * Main module's entry point
  * Calculates Bytes for the provided parameter
@@ -8831,29 +10502,7 @@ function sizeOfObject (object) {
  * @returns {*}
  */
 function sizeof (object) {
-  if (Buffer.isBuffer(object)) {
-    return object.length
-  }
-
-  var objectType = typeof (object)
-  switch (objectType) {
-    case 'string':
-      return object.length * ECMA_SIZES.STRING
-    case 'boolean':
-      return ECMA_SIZES.BOOLEAN
-    case 'number':
-      return ECMA_SIZES.NUMBER
-    case 'object':
-      if (Array.isArray(object)) {
-        return object.map(sizeof).reduce(function (acc, curr) {
-          return acc + curr
-        }, 0)
-      } else {
-        return sizeOfObject(object)
-      }
-    default:
-      return 0
-  }
+  return getCalculator(new WeakSet())(object)
 }
 
 module.exports = sizeof
@@ -8955,8 +10604,37 @@ module.exports = function parseuri(str) {
         uri.ipv6uri = true;
     }
 
+    uri.pathNames = pathNames(uri, uri['path']);
+    uri.queryKey = queryKey(uri, uri['query']);
+
     return uri;
 };
+
+function pathNames(obj, path) {
+    var regx = /\/{2,9}/g,
+        names = path.replace(regx, "/").split("/");
+
+    if (path.substr(0, 1) == '/' || path.length === 0) {
+        names.splice(0, 1);
+    }
+    if (path.substr(path.length - 1, 1) == '/') {
+        names.splice(names.length - 1, 1);
+    }
+
+    return names;
+}
+
+function queryKey(uri, query) {
+    var data = {};
+
+    query.replace(/(?:^|&)([^&=]*)=?([^&]*)/g, function ($0, $1, $2) {
+        if ($1) {
+            data[$1] = $2;
+        }
+    });
+
+    return data;
+}
 
 
 /***/ }),
@@ -9170,13 +10848,21 @@ process.umask = function() { return 0; };
 const strictUriEncode = __webpack_require__(/*! strict-uri-encode */ "./node_modules/strict-uri-encode/index.js");
 const decodeComponent = __webpack_require__(/*! decode-uri-component */ "./node_modules/decode-uri-component/index.js");
 const splitOnFirst = __webpack_require__(/*! split-on-first */ "./node_modules/split-on-first/index.js");
+const filterObject = __webpack_require__(/*! filter-obj */ "./node_modules/filter-obj/index.js");
+
+const isNullOrUndefined = value => value === null || value === undefined;
 
 function encoderForArrayFormat(options) {
 	switch (options.arrayFormat) {
 		case 'index':
 			return key => (result, value) => {
 				const index = result.length;
-				if (value === undefined || (options.skipNull && value === null)) {
+
+				if (
+					value === undefined ||
+					(options.skipNull && value === null) ||
+					(options.skipEmptyString && value === '')
+				) {
 					return result;
 				}
 
@@ -9192,7 +10878,11 @@ function encoderForArrayFormat(options) {
 
 		case 'bracket':
 			return key => (result, value) => {
-				if (value === undefined || (options.skipNull && value === null)) {
+				if (
+					value === undefined ||
+					(options.skipNull && value === null) ||
+					(options.skipEmptyString && value === '')
+				) {
 					return result;
 				}
 
@@ -9204,6 +10894,7 @@ function encoderForArrayFormat(options) {
 			};
 
 		case 'comma':
+		case 'separator':
 			return key => (result, value) => {
 				if (value === null || value === undefined || value.length === 0) {
 					return result;
@@ -9213,12 +10904,16 @@ function encoderForArrayFormat(options) {
 					return [[encode(key, options), '=', encode(value, options)].join('')];
 				}
 
-				return [[result, encode(value, options)].join(',')];
+				return [[result, encode(value, options)].join(options.arrayFormatSeparator)];
 			};
 
 		default:
 			return key => (result, value) => {
-				if (value === undefined || (options.skipNull && value === null)) {
+				if (
+					value === undefined ||
+					(options.skipNull && value === null) ||
+					(options.skipEmptyString && value === '')
+				) {
 					return result;
 				}
 
@@ -9272,9 +10967,12 @@ function parserForArrayFormat(options) {
 			};
 
 		case 'comma':
+		case 'separator':
 			return (key, value, accumulator) => {
-				const isArray = typeof value === 'string' && value.split('').indexOf(',') > -1;
-				const newValue = isArray ? value.split(',') : value;
+				const isArray = typeof value === 'string' && value.includes(options.arrayFormatSeparator);
+				const isEncodedArray = (typeof value === 'string' && !isArray && decode(value, options).includes(options.arrayFormatSeparator));
+				value = isEncodedArray ? decode(value, options) : value;
+				const newValue = isArray || isEncodedArray ? value.split(options.arrayFormatSeparator).map(item => decode(item, options)) : value === null ? value : decode(value, options);
 				accumulator[key] = newValue;
 			};
 
@@ -9287,6 +10985,12 @@ function parserForArrayFormat(options) {
 
 				accumulator[key] = [].concat(accumulator[key], value);
 			};
+	}
+}
+
+function validateArrayFormatSeparator(value) {
+	if (typeof value !== 'string' || value.length !== 1) {
+		throw new TypeError('arrayFormatSeparator must be single character string');
 	}
 }
 
@@ -9329,6 +11033,16 @@ function removeHash(input) {
 	return input;
 }
 
+function getHash(url) {
+	let hash = '';
+	const hashStart = url.indexOf('#');
+	if (hashStart !== -1) {
+		hash = url.slice(hashStart);
+	}
+
+	return hash;
+}
+
 function extract(input) {
 	input = removeHash(input);
 	const queryStart = input.indexOf('?');
@@ -9349,36 +11063,43 @@ function parseValue(value, options) {
 	return value;
 }
 
-function parse(input, options) {
+function parse(query, options) {
 	options = Object.assign({
 		decode: true,
 		sort: true,
 		arrayFormat: 'none',
+		arrayFormatSeparator: ',',
 		parseNumbers: false,
 		parseBooleans: false
 	}, options);
+
+	validateArrayFormatSeparator(options.arrayFormatSeparator);
 
 	const formatter = parserForArrayFormat(options);
 
 	// Create an object with no prototype
 	const ret = Object.create(null);
 
-	if (typeof input !== 'string') {
+	if (typeof query !== 'string') {
 		return ret;
 	}
 
-	input = input.trim().replace(/^[?#&]/, '');
+	query = query.trim().replace(/^[?#&]/, '');
 
-	if (!input) {
+	if (!query) {
 		return ret;
 	}
 
-	for (const param of input.split('&')) {
+	for (const param of query.split('&')) {
+		if (param === '') {
+			continue;
+		}
+
 		let [key, value] = splitOnFirst(options.decode ? param.replace(/\+/g, ' ') : param, '=');
 
 		// Missing `=` should be `null`:
 		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
-		value = value === undefined ? null : decode(value, options);
+		value = value === undefined ? null : ['comma', 'separator'].includes(options.arrayFormat) ? value : decode(value, options);
 		formatter(decode(key, options), value, ret);
 	}
 
@@ -9421,17 +11142,24 @@ exports.stringify = (object, options) => {
 	options = Object.assign({
 		encode: true,
 		strict: true,
-		arrayFormat: 'none'
+		arrayFormat: 'none',
+		arrayFormatSeparator: ','
 	}, options);
+
+	validateArrayFormatSeparator(options.arrayFormatSeparator);
+
+	const shouldFilter = key => (
+		(options.skipNull && isNullOrUndefined(object[key])) ||
+		(options.skipEmptyString && object[key] === '')
+	);
 
 	const formatter = encoderForArrayFormat(options);
 
-	const objectCopy = Object.assign({}, object);
-	if (options.skipNull) {
-		for (const key of Object.keys(objectCopy)) {
-			if (objectCopy[key] === undefined || objectCopy[key] === null) {
-				delete objectCopy[key];
-			}
+	const objectCopy = {};
+
+	for (const key of Object.keys(object)) {
+		if (!shouldFilter(key)) {
+			objectCopy[key] = object[key];
 		}
 	}
 
@@ -9462,1671 +11190,63 @@ exports.stringify = (object, options) => {
 	}).filter(x => x.length > 0).join('&');
 };
 
-exports.parseUrl = (input, options) => {
-	return {
-		url: removeHash(input).split('?')[0] || '',
-		query: parse(extract(input), options)
-	};
+exports.parseUrl = (url, options) => {
+	options = Object.assign({
+		decode: true
+	}, options);
+
+	const [url_, hash] = splitOnFirst(url, '#');
+
+	return Object.assign(
+		{
+			url: url_.split('?')[0] || '',
+			query: parse(extract(url), options)
+		},
+		options && options.parseFragmentIdentifier && hash ? {fragmentIdentifier: decode(hash, options)} : {}
+	);
 };
 
+exports.stringifyUrl = (object, options) => {
+	options = Object.assign({
+		encode: true,
+		strict: true
+	}, options);
 
-/***/ }),
+	const url = removeHash(object.url).split('?')[0] || '';
+	const queryFromUrl = exports.extract(object.url);
+	const parsedQueryFromUrl = exports.parse(queryFromUrl, {sort: false});
 
-/***/ "./node_modules/sdp-interop/lib/array-equals.js":
-/*!******************************************************!*\
-  !*** ./node_modules/sdp-interop/lib/array-equals.js ***!
-  \******************************************************/
-/*! no static exports found */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports) {
+	const query = Object.assign(parsedQueryFromUrl, object.query);
+	let queryString = exports.stringify(query, options);
+	if (queryString) {
+		queryString = `?${queryString}`;
+	}
 
-/* Copyright @ 2015 Atlassian Pty Ltd
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+	let hash = getHash(object.url);
+	if (object.fragmentIdentifier) {
+		hash = `#${encode(object.fragmentIdentifier, options)}`;
+	}
 
-module.exports = function arrayEquals(array) {
-    // if the other array is a falsy value, return
-    if (!array)
-        return false;
-
-    // compare lengths - can save a lot of time
-    if (this.length != array.length)
-        return false;
-
-    for (var i = 0, l = this.length; i < l; i++) {
-        // Check if we have nested arrays
-        if (this[i] instanceof Array && array[i] instanceof Array) {
-            // recurse into the nested arrays
-            if (!arrayEquals.apply(this[i], [array[i]]))
-                return false;
-        } else if (this[i] != array[i]) {
-            // Warning - two different object instances will never be equal:
-            // {x:20} != {x:20}
-            return false;
-        }
-    }
-    return true;
+	return `${url}${queryString}${hash}`;
 };
 
+exports.pick = (input, filter, options) => {
+	options = Object.assign({
+		parseFragmentIdentifier: true
+	}, options);
 
-
-/***/ }),
-
-/***/ "./node_modules/sdp-interop/lib/index.js":
-/*!***********************************************!*\
-  !*** ./node_modules/sdp-interop/lib/index.js ***!
-  \***********************************************/
-/*! no static exports found */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* Copyright @ 2015 Atlassian Pty Ltd
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-exports.Interop = __webpack_require__(/*! ./interop */ "./node_modules/sdp-interop/lib/interop.js");
-
-
-/***/ }),
-
-/***/ "./node_modules/sdp-interop/lib/interop.js":
-/*!*************************************************!*\
-  !*** ./node_modules/sdp-interop/lib/interop.js ***!
-  \*************************************************/
-/*! no static exports found */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* Copyright @ 2015 Atlassian Pty Ltd
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-/* global RTCSessionDescription */
-/* global RTCIceCandidate */
-/* jshint -W097 */
-
-
-var transform = __webpack_require__(/*! ./transform */ "./node_modules/sdp-interop/lib/transform.js");
-var arrayEquals = __webpack_require__(/*! ./array-equals */ "./node_modules/sdp-interop/lib/array-equals.js");
-
-function Interop() {
-
-    /**
-     * This map holds the most recent Unified Plan offer/answer SDP that was
-     * converted to Plan B, with the SDP type ('offer' or 'answer') as keys and
-     * the SDP string as values.
-     *
-     * @type {{}}
-     */
-    this.cache = {
-        mlB2UMap : {},
-        mlU2BMap : {}
-    };
-}
-
-module.exports = Interop;
-
-/**
- * Changes the candidate args to match with the related Unified Plan
- */
-Interop.prototype.candidateToUnifiedPlan = function(candidate) {
-    var cand = new RTCIceCandidate(candidate);
-
-    cand.sdpMLineIndex = this.cache.mlB2UMap[cand.sdpMLineIndex];
-    /* TODO: change sdpMid to (audio|video)-SSRC */
-
-    return cand;
+	const {url, query, fragmentIdentifier} = exports.parseUrl(input, options);
+	return exports.stringifyUrl({
+		url,
+		query: filterObject(query, filter),
+		fragmentIdentifier
+	}, options);
 };
 
-/**
- * Changes the candidate args to match with the related Plan B
- */
-Interop.prototype.candidateToPlanB = function(candidate) {
-    var cand = new RTCIceCandidate(candidate);
+exports.exclude = (input, filter, options) => {
+	const exclusionFilter = Array.isArray(filter) ? key => !filter.includes(key) : (key, value) => !filter(key, value);
 
-    if (cand.sdpMid.indexOf('audio') === 0) {
-      cand.sdpMid = 'audio';
-    } else if (cand.sdpMid.indexOf('video') === 0) {
-      cand.sdpMid = 'video';
-    } else {
-      throw new Error('candidate with ' + cand.sdpMid + ' not allowed');
-    }
-
-    cand.sdpMLineIndex = this.cache.mlU2BMap[cand.sdpMLineIndex];
-
-    return cand;
-};
-
-/**
- * Returns the index of the first m-line with the given media type and with a
- * direction which allows sending, in the last Unified Plan description with
- * type "answer" converted to Plan B. Returns {null} if there is no saved
- * answer, or if none of its m-lines with the given type allow sending.
- * @param type the media type ("audio" or "video").
- * @returns {*}
- */
-Interop.prototype.getFirstSendingIndexFromAnswer = function(type) {
-    if (!this.cache.answer) {
-        return null;
-    }
-
-    var session = transform.parse(this.cache.answer);
-    if (session && session.media && Array.isArray(session.media)){
-        for (var i = 0; i < session.media.length; i++) {
-            if (session.media[i].type == type &&
-                (!session.media[i].direction /* default to sendrecv */ ||
-                    session.media[i].direction === 'sendrecv' ||
-                    session.media[i].direction === 'sendonly')){
-                return i;
-            }
-        }
-    }
-
-    return null;
-};
-
-/**
- * This method transforms a Unified Plan SDP to an equivalent Plan B SDP. A
- * PeerConnection wrapper transforms the SDP to Plan B before passing it to the
- * application.
- *
- * @param desc
- * @returns {*}
- */
-Interop.prototype.toPlanB = function(desc) {
-    var self = this;
-    //#region Preliminary input validation.
-
-    if (typeof desc !== 'object' || desc === null ||
-        typeof desc.sdp !== 'string') {
-        console.warn('An empty description was passed as an argument.');
-        return desc;
-    }
-
-    // Objectify the SDP for easier manipulation.
-    var session = transform.parse(desc.sdp);
-
-    // If the SDP contains no media, there's nothing to transform.
-    if (typeof session.media === 'undefined' ||
-        !Array.isArray(session.media) || session.media.length === 0) {
-        console.warn('The description has no media.');
-        return desc;
-    }
-
-    // Try some heuristics to "make sure" this is a Unified Plan SDP. Plan B
-    // SDP has a video, an audio and a data "channel" at most.
-    if (session.media.length <= 3 && session.media.every(function(m) {
-            return ['video', 'audio', 'data'].indexOf(m.mid) !== -1;
-        })) {
-        console.warn('This description does not look like Unified Plan.');
-        return desc;
-    }
-
-    //#endregion
-
-    // HACK https://bugzilla.mozilla.org/show_bug.cgi?id=1113443
-    var sdp = desc.sdp;
-    var rewrite = false;
-    for (var i = 0; i < session.media.length; i++) {
-        var uLine = session.media[i];
-        uLine.rtp.forEach(function(rtp) {
-            if (rtp.codec === 'NULL')
-            {
-                rewrite = true;
-                var offer = transform.parse(self.cache.offer);
-                rtp.codec = offer.media[i].rtp[0].codec;
-            }
-        });
-    }
-    if (rewrite) {
-        sdp = transform.write(session);
-    }
-
-    // Unified Plan SDP is our "precious". Cache it for later use in the Plan B
-    // -> Unified Plan transformation.
-    this.cache[desc.type] = sdp;
-
-    //#region Convert from Unified Plan to Plan B.
-
-    // We rebuild the session.media array.
-    var media = session.media;
-    session.media = [];
-
-    // Associative array that maps channel types to channel objects for fast
-    // access to channel objects by their type, e.g. type2bl['audio']->channel
-    // obj.
-    var type2bl = {};
-
-    // Used to build the group:BUNDLE value after the channels construction
-    // loop.
-    var types = [];
-
-    // Used to aggregate the directions of the m-lines.
-    var directionResult = {};
-
-    media.forEach(function(uLine) {
-        // rtcp-mux is required in the Plan B SDP.
-        if ((typeof uLine.rtcpMux !== 'string' ||
-            uLine.rtcpMux !== 'rtcp-mux') &&
-            uLine.direction !== 'inactive') {
-            throw new Error('Cannot convert to Plan B because m-lines ' +
-                'without the rtcp-mux attribute were found.');
-        }
-
-        // If we don't have a channel for this uLine.type OR the selected is
-        // inactive, then select this uLine as the channel basis.
-        if (typeof type2bl[uLine.type] === 'undefined' ||
-            type2bl[uLine.type].direction === 'inactive') {
-            type2bl[uLine.type] = uLine;
-        }
-    });
-
-    // Implode the Unified Plan m-lines/tracks into Plan B channels.
-    media.forEach(function(uLine) {
-        var type = uLine.type;
-
-        if (type === 'application') {
-            session.media.push(uLine);
-            types.push(uLine.mid);
-            return;
-        }
-
-        // Add sources to the channel and handle a=msid.
-        if (typeof uLine.sources === 'object') {
-            Object.keys(uLine.sources).forEach(function(ssrc) {
-                if (typeof type2bl[type].sources !== 'object')
-                    type2bl[type].sources = {};
-
-                // Assign the sources to the channel.
-                type2bl[type].sources[ssrc] = uLine.sources[ssrc];
-
-                if (typeof uLine.msid !== 'undefined') {
-                    // In Plan B the msid is an SSRC attribute. Also, we don't
-                    // care about the obsolete label and mslabel attributes.
-                    //
-                    // Note that it is not guaranteed that the uLine will
-                    // have an msid. recvonly channels in particular don't have
-                    // one.
-                    type2bl[type].sources[ssrc].msid = uLine.msid;
-                }
-                // NOTE ssrcs in ssrc groups will share msids, as
-                // draft-uberti-rtcweb-plan-00 mandates.
-            });
-        }
-
-        // Add ssrc groups to the channel.
-        if (typeof uLine.ssrcGroups !== 'undefined' &&
-                Array.isArray(uLine.ssrcGroups)) {
-
-            // Create the ssrcGroups array, if it's not defined.
-            if (typeof type2bl[type].ssrcGroups === 'undefined' ||
-                    !Array.isArray(type2bl[type].ssrcGroups)) {
-                type2bl[type].ssrcGroups = [];
-            }
-
-            type2bl[type].ssrcGroups
-                = type2bl[type].ssrcGroups.concat(uLine.ssrcGroups);
-        }
-
-        var direction = uLine.direction;
-
-        directionResult[type]
-            = (directionResult[type] || 0 /* inactive */)
-                | directionMasks[direction || 'inactive'];
-
-        if (type2bl[type] === uLine) {
-            // Plan B mids are in ['audio', 'video', 'data']
-            uLine.mid = type;
-
-            // Plan B doesn't support/need the bundle-only attribute.
-            delete uLine.bundleOnly;
-
-            // In Plan B the msid is an SSRC attribute.
-            delete uLine.msid;
-
-            if (direction !== 'inactive') {
-              // Used to build the group:BUNDLE value after this loop.
-              types.push(type);
-            }
-
-            // Add the channel to the new media array.
-            session.media.push(uLine);
-        }
-    });
-
-    // We regenerate the BUNDLE group with the new mids.
-    session.groups.some(function(group) {
-        if (group.type === 'BUNDLE') {
-            group.mids = types.join(' ');
-            return true;
-        }
-    });
-
-    // msid semantic
-    session.msidSemantic = {
-        semantic: 'WMS',
-        token: '*'
-    };
-
-    var resStr = transform.write(session);
-
-    return new RTCSessionDescription({
-        type: desc.type,
-        sdp: resStr
-    });
-
-    //#endregion
-};
-
-/**
- * This method transforms a Plan B SDP to an equivalent Unified Plan SDP. A
- * PeerConnection wrapper transforms the SDP to Unified Plan before passing it
- * to FF.
- *
- * @param desc
- * @returns {*}
- */
-Interop.prototype.toUnifiedPlan = function(desc) {
-    var self = this;
-    //#region Preliminary input validation.
-
-    if (typeof desc !== 'object' || desc === null ||
-        typeof desc.sdp !== 'string') {
-        console.warn('An empty description was passed as an argument.');
-        return desc;
-    }
-
-    var session = transform.parse(desc.sdp);
-
-    // If the SDP contains no media, there's nothing to transform.
-    if (typeof session.media === 'undefined' ||
-        !Array.isArray(session.media) || session.media.length === 0) {
-        console.warn('The description has no media.');
-        return desc;
-    }
-
-    // Try some heuristics to "make sure" this is a Plan B SDP. Plan B SDP has
-    // a video, an audio and a data "channel" at most.
-    if (session.media.length > 3 || !session.media.every(function(m) {
-            return ['video', 'audio', 'data'].indexOf(m.mid) !== -1;
-        })) {
-        console.warn('This description does not look like Plan B.');
-        return desc;
-    }
-
-    // Make sure this Plan B SDP can be converted to a Unified Plan SDP.
-    var mids = [];
-    session.media.forEach(function(m) {
-        mids.push(m.mid);
-    });
-
-    var hasBundle = false;
-    if (typeof session.groups !== 'undefined' &&
-        Array.isArray(session.groups)) {
-        hasBundle = session.groups.every(function(g) {
-            return g.type !== 'BUNDLE' ||
-                arrayEquals.apply(g.mids.sort(), [mids.sort()]);
-        });
-    }
-
-    if (!hasBundle) {
-        throw new Error("Cannot convert to Unified Plan because m-lines that" +
-            " are not bundled were found.");
-    }
-
-    //#endregion
-
-
-    //#region Convert from Plan B to Unified Plan.
-
-    // Unfortunately, a Plan B offer/answer doesn't have enough information to
-    // rebuild an equivalent Unified Plan offer/answer.
-    //
-    // For example, if this is a local answer (in Unified Plan style) that we
-    // convert to Plan B prior to handing it over to the application (the
-    // PeerConnection wrapper called us, for instance, after a successful
-    // createAnswer), we want to remember the m-line at which we've seen the
-    // (local) SSRC. That's because when the application wants to do call the
-    // SLD method, forcing us to do the inverse transformation (from Plan B to
-    // Unified Plan), we need to know to which m-line to assign the (local)
-    // SSRC. We also need to know all the other m-lines that the original
-    // answer had and include them in the transformed answer as well.
-    //
-    // Another example is if this is a remote offer that we convert to Plan B
-    // prior to giving it to the application, we want to remember the mid at
-    // which we've seen the (remote) SSRC.
-    //
-    // In the iteration that follows, we use the cached Unified Plan (if it
-    // exists) to assign mids to ssrcs.
-
-    var cached;
-    if (typeof this.cache[desc.type] !== 'undefined') {
-        cached = transform.parse(this.cache[desc.type]);
-    }
-
-    var recvonlySsrcs = {
-        audio: {},
-        video: {}
-    };
-
-    // A helper map that sends mids to m-line objects. We use it later to
-    // rebuild the Unified Plan style session.media array.
-    var mid2ul = {};
-    var bIdx = 0;
-    var uIdx = 0;
-
-    session.media.forEach(function(bLine) {
-        if ((typeof bLine.rtcpMux !== 'string' ||
-            bLine.rtcpMux !== 'rtcp-mux') &&
-            bLine.direction !== 'inactive') {
-            throw new Error("Cannot convert to Unified Plan because m-lines " +
-                "without the rtcp-mux attribute were found.");
-        }
-
-        if (bLine.type === 'application') {
-            mid2ul[bLine.mid] = bLine;
-            return;
-        }
-
-        // With rtcp-mux and bundle all the channels should have the same ICE
-        // stuff.
-        var sources = bLine.sources;
-        var ssrcGroups = bLine.ssrcGroups;
-        var candidates = bLine.candidates;
-        var iceUfrag = bLine.iceUfrag;
-        var icePwd = bLine.icePwd;
-        var fingerprint = bLine.fingerprint;
-        var port = bLine.port;
-
-        // We'll use the "bLine" object as a prototype for each new "mLine"
-        // that we create, but first we need to clean it up a bit.
-        delete bLine.sources;
-        delete bLine.ssrcGroups;
-        delete bLine.candidates;
-        delete bLine.iceUfrag;
-        delete bLine.icePwd;
-        delete bLine.fingerprint;
-        delete bLine.port;
-        delete bLine.mid;
-
-        // inverted ssrc group map
-        var ssrc2group = {};
-        if (typeof ssrcGroups !== 'undefined' && Array.isArray(ssrcGroups)) {
-            ssrcGroups.forEach(function (ssrcGroup) {
-
-                // TODO(gp) find out how to receive simulcast with FF. For the
-                // time being, hide it.
-                if (ssrcGroup.semantics === 'SIM') {
-                    return;
-                }
-
-                // XXX This might brake if an SSRC is in more than one group
-                // for some reason.
-                if (typeof ssrcGroup.ssrcs !== 'undefined' &&
-                    Array.isArray(ssrcGroup.ssrcs)) {
-                    ssrcGroup.ssrcs.forEach(function (ssrc) {
-                        if (typeof ssrc2group[ssrc] === 'undefined') {
-                            ssrc2group[ssrc] = [];
-                        }
-
-                        ssrc2group[ssrc].push(ssrcGroup);
-                    });
-                }
-            });
-        }
-
-        // ssrc to m-line index.
-        var ssrc2ml = {};
-
-        if (typeof sources === 'object') {
-
-            // Explode the Plan B channel sources with one m-line per source.
-            Object.keys(sources).forEach(function(ssrc) {
-
-                // The (unified) m-line for this SSRC. We either create it from
-                // scratch or, if it's a grouped SSRC, we re-use a related
-                // mline. In other words, if the source is grouped with another
-                // source, put the two together in the same m-line.
-                var uLine;
-
-                // We assume here that we are the answerer in the O/A, so any
-                // offers which we translate come from the remote side, while
-                // answers are local. So the check below is to make that we
-                // handle receive-only SSRCs in a special way only if they come
-                // from the remote side.
-                if (desc.type==='offer') {
-                    // We want to detect SSRCs which are used by a remote peer
-                    // in an m-line with direction=recvonly (i.e. they are
-                    // being used for RTCP only).
-                    // This information would have gotten lost if the remote
-                    // peer used Unified Plan and their local description was
-                    // translated to Plan B. So we use the lack of an MSID
-                    // attribute to deduce a "receive only" SSRC.
-                    if (!sources[ssrc].msid) {
-                        recvonlySsrcs[bLine.type][ssrc] = sources[ssrc];
-                        // Receive-only SSRCs must not create new m-lines. We
-                        // will assign them to an existing m-line later.
-                        return;
-                    }
-                }
-
-                if (typeof ssrc2group[ssrc] !== 'undefined' &&
-                    Array.isArray(ssrc2group[ssrc])) {
-                    ssrc2group[ssrc].some(function (ssrcGroup) {
-                        // ssrcGroup.ssrcs *is* an Array, no need to check
-                        // again here.
-                        return ssrcGroup.ssrcs.some(function (related) {
-                            if (typeof ssrc2ml[related] === 'object') {
-                                uLine = ssrc2ml[related];
-                                return true;
-                            }
-                        });
-                    });
-                }
-
-                if (typeof uLine === 'object') {
-                    // the m-line already exists. Just add the source.
-                    uLine.sources[ssrc] = sources[ssrc];
-                    delete sources[ssrc].msid;
-                } else {
-                    // Use the "bLine" as a prototype for the "uLine".
-                    uLine = Object.create(bLine);
-                    ssrc2ml[ssrc] = uLine;
-
-                    if (typeof sources[ssrc].msid !== 'undefined') {
-                        // Assign the msid of the source to the m-line. Note
-                        // that it is not guaranteed that the source will have
-                        // msid. In particular "recvonly" sources don't have an
-                        // msid. Note that "recvonly" is a term only defined
-                        // for m-lines.
-                        uLine.msid = sources[ssrc].msid;
-                        delete sources[ssrc].msid;
-                    }
-
-                    // We assign one SSRC per media line.
-                    uLine.sources = {};
-                    uLine.sources[ssrc] = sources[ssrc];
-                    uLine.ssrcGroups = ssrc2group[ssrc];
-
-                    // Use the cached Unified Plan SDP (if it exists) to assign
-                    // SSRCs to mids.
-                    if (typeof cached !== 'undefined' &&
-                        typeof cached.media !== 'undefined' &&
-                        Array.isArray(cached.media)) {
-
-                        cached.media.forEach(function (m) {
-                            if (typeof m.sources === 'object') {
-                                Object.keys(m.sources).forEach(function (s) {
-                                    if (s === ssrc) {
-                                        uLine.mid = m.mid;
-                                    }
-                                });
-                            }
-                        });
-                    }
-
-                    if (typeof uLine.mid === 'undefined') {
-
-                        // If this is an SSRC that we see for the first time
-                        // assign it a new mid. This is typically the case when
-                        // this method is called to transform a remote
-                        // description for the first time or when there is a
-                        // new SSRC in the remote description because a new
-                        // peer has joined the conference. Local SSRCs should
-                        // have already been added to the map in the toPlanB
-                        // method.
-                        //
-                        // Because FF generates answers in Unified Plan style,
-                        // we MUST already have a cached answer with all the
-                        // local SSRCs mapped to some m-line/mid.
-
-                        if (desc.type === 'answer') {
-                            throw new Error("An unmapped SSRC was found.");
-                        }
-
-                        uLine.mid = [bLine.type, '-', ssrc].join('');
-                    }
-
-                    // Include the candidates in the 1st media line.
-                    uLine.candidates = candidates;
-                    uLine.iceUfrag = iceUfrag;
-                    uLine.icePwd = icePwd;
-                    uLine.fingerprint = fingerprint;
-                    uLine.port = port;
-
-                    mid2ul[uLine.mid] = uLine;
-
-                    self.cache.mlU2BMap[uIdx] = bIdx;
-                    if (typeof self.cache.mlB2UMap[bIdx] === 'undefined') {
-                      self.cache.mlB2UMap[bIdx] = uIdx;
-                    }
-                    uIdx++;
-                }
-            });
-        }
-
-        bIdx++;
-    });
-
-    // Rebuild the media array in the right order and add the missing mLines
-    // (missing from the Plan B SDP).
-    session.media = [];
-    mids = []; // reuse
-
-    if (desc.type === 'answer') {
-
-        // The media lines in the answer must match the media lines in the
-        // offer. The order is important too. Here we assume that Firefox is
-        // the answerer, so we merely have to use the reconstructed (unified)
-        // answer to update the cached (unified) answer accordingly.
-        //
-        // In the general case, one would have to use the cached (unified)
-        // offer to find the m-lines that are missing from the reconstructed
-        // answer, potentially grabbing them from the cached (unified) answer.
-        // One has to be careful with this approach because inactive m-lines do
-        // not always have an mid, making it tricky (impossible?) to find where
-        // exactly and which m-lines are missing from the reconstructed answer.
-
-        for (var i = 0; i < cached.media.length; i++) {
-            var uLine = cached.media[i];
-
-            if (typeof mid2ul[uLine.mid] === 'undefined') {
-
-                // The mid isn't in the reconstructed (unified) answer.
-                // This is either a (unified) m-line containing a remote
-                // track only, or a (unified) m-line containing a remote
-                // track and a local track that has been removed.
-                // In either case, it MUST exist in the cached
-                // (unified) answer.
-                //
-                // In case this is a removed local track, clean-up
-                // the (unified) m-line and make sure it's 'recvonly' or
-                // 'inactive'.
-
-                delete uLine.msid;
-                delete uLine.sources;
-                delete uLine.ssrcGroups;
-                if (!uLine.direction
-                    || uLine.direction === 'sendrecv')
-                    uLine.direction = 'recvonly';
-                else if (uLine.direction === 'sendonly')
-                    uLine.direction = 'inactive';
-            } else {
-                // This is an (unified) m-line/channel that contains a local
-                // track (sendrecv or sendonly channel) or it's a unified
-                // recvonly m-line/channel. In either case, since we're
-                // going from PlanB -> Unified Plan this m-line MUST
-                // exist in the cached answer.
-            }
-
-            session.media.push(uLine);
-
-            if (typeof uLine.mid === 'string') {
-                // inactive lines don't/may not have an mid.
-                mids.push(uLine.mid);
-            }
-        }
-    } else {
-
-        // SDP offer/answer (and the JSEP spec) forbids removing an m-section
-        // under any circumstances. If we are no longer interested in sending a
-        // track, we just remove the msid and ssrc attributes and set it to
-        // either a=recvonly (as the reofferer, we must use recvonly if the
-        // other side was previously sending on the m-section, but we can also
-        // leave the possibility open if it wasn't previously in use), or
-        // a=inactive.
-
-        if (typeof cached !== 'undefined' &&
-            typeof cached.media !== 'undefined' &&
-            Array.isArray(cached.media)) {
-            cached.media.forEach(function(uLine) {
-                mids.push(uLine.mid);
-                if (typeof mid2ul[uLine.mid] !== 'undefined') {
-                    session.media.push(mid2ul[uLine.mid]);
-                } else {
-                    delete uLine.msid;
-                    delete uLine.sources;
-                    delete uLine.ssrcGroups;
-                    if (!uLine.direction
-                        || uLine.direction === 'sendrecv')
-                        uLine.direction = 'recvonly';
-                    if (!uLine.direction
-                        || uLine.direction === 'sendonly')
-                        uLine.direction = 'inactive';
-                    session.media.push(uLine);
-                }
-            });
-        }
-
-        // Add all the remaining (new) m-lines of the transformed SDP.
-        Object.keys(mid2ul).forEach(function(mid) {
-            if (mids.indexOf(mid) === -1) {
-                mids.push(mid);
-                if (mid2ul[mid].direction === 'recvonly') {
-                    // This is a remote recvonly channel. Add its SSRC to the
-                    // appropriate sendrecv or sendonly channel.
-                    // TODO(gp) what if we don't have sendrecv/sendonly
-                    // channel?
-
-                    session.media.some(function (uLine) {
-                        if ((uLine.direction === 'sendrecv' ||
-                            uLine.direction === 'sendonly') &&
-                            uLine.type === mid2ul[mid].type) {
-
-                            // mid2ul[mid] shouldn't have any ssrc-groups
-                            Object.keys(mid2ul[mid].sources).forEach(
-                                function (ssrc) {
-                                uLine.sources[ssrc] =
-                                    mid2ul[mid].sources[ssrc];
-                            });
-
-                            return true;
-                        }
-                    });
-                } else {
-                    session.media.push(mid2ul[mid]);
-                }
-            }
-        });
-    }
-
-    // After we have constructed the Plan Unified m-lines we can figure out
-    // where (in which m-line) to place the 'recvonly SSRCs'.
-    // Note: we assume here that we are the answerer in the O/A, so any offers
-    // which we translate come from the remote side, while answers are local
-    // (and so our last local description is cached as an 'answer').
-    ["audio", "video"].forEach(function (type) {
-        if (!session || !session.media || !Array.isArray(session.media))
-            return;
-
-        var idx = null;
-        if (Object.keys(recvonlySsrcs[type]).length > 0) {
-            idx = self.getFirstSendingIndexFromAnswer(type);
-            if (idx === null){
-                // If this is the first offer we receive, we don't have a
-                // cached answer. Assume that we will be sending media using
-                // the first m-line for each media type.
-
-                for (var i = 0; i < session.media.length; i++) {
-                    if (session.media[i].type === type) {
-                        idx = i;
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (idx && session.media.length > idx) {
-            var mLine = session.media[idx];
-            Object.keys(recvonlySsrcs[type]).forEach(function(ssrc) {
-                if (mLine.sources && mLine.sources[ssrc]) {
-                    console.warn("Replacing an existing SSRC.");
-                }
-                if (!mLine.sources) {
-                    mLine.sources = {};
-                }
-
-                mLine.sources[ssrc] = recvonlySsrcs[type][ssrc];
-            });
-        }
-    });
-
-    // We regenerate the BUNDLE group (since we regenerated the mids)
-    session.groups.some(function(group) {
-        if (group.type === 'BUNDLE') {
-            group.mids = mids.join(' ');
-            return true;
-        }
-    });
-
-    // msid semantic
-    session.msidSemantic = {
-        semantic: 'WMS',
-        token: '*'
-    };
-
-    var resStr = transform.write(session);
-
-    // Cache the transformed SDP (Unified Plan) for later re-use in this
-    // function.
-    this.cache[desc.type] = resStr;
-
-    return new RTCSessionDescription({
-        type: desc.type,
-        sdp: resStr
-    });
-
-    //#endregion
-};
-
-/**
- * Maps the direction strings to their binary representation. The binary
- * representation of the directions will contain only 2 bits. The least
- * significant bit will indicate the receiving direction and the other bit will
- * indicate the sending direction.
- *
- * @type {Map<string, number>}
- */
-var directionMasks = {
-    'inactive': 0, // 00
-    'recvonly': 1, // 01
-    'sendonly': 2, // 10
-    'sendrecv': 3  // 11
-}
-
-/**
- * Parses a number into direction string.
- *
- * @param {number} direction - The number to be parsed.
- * @returns {string} - The parsed direction string.
- */
-function parseDirection(direction) {
-    // Filter all other bits except the 2 less significant.
-    var directionMask = direction & 3;
-
-    switch (directionMask) {
-    case 0:
-        return 'inactive';
-    case 1:
-        return 'recvonly';
-    case 2:
-        return 'sendonly';
-    case 3:
-        return 'sendrecv';
-    }
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/sdp-interop/lib/transform.js":
-/*!***************************************************!*\
-  !*** ./node_modules/sdp-interop/lib/transform.js ***!
-  \***************************************************/
-/*! no static exports found */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* Copyright @ 2015 Atlassian Pty Ltd
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-var transform = __webpack_require__(/*! sdp-transform */ "./node_modules/sdp-interop/node_modules/sdp-transform/lib/index.js");
-
-exports.write = function(session, opts) {
-
-  if (typeof session !== 'undefined' &&
-      typeof session.media !== 'undefined' &&
-      Array.isArray(session.media)) {
-
-    session.media.forEach(function (mLine) {
-      // expand sources to ssrcs
-      if (typeof mLine.sources !== 'undefined' &&
-        Object.keys(mLine.sources).length !== 0) {
-          mLine.ssrcs = [];
-          Object.keys(mLine.sources).forEach(function (ssrc) {
-            var source = mLine.sources[ssrc];
-            Object.keys(source).forEach(function (attribute) {
-              mLine.ssrcs.push({
-                id: ssrc,
-                attribute: attribute,
-                value: source[attribute]
-              });
-            });
-          });
-          delete mLine.sources;
-        }
-
-      // join ssrcs in ssrc groups
-      if (typeof mLine.ssrcGroups !== 'undefined' &&
-        Array.isArray(mLine.ssrcGroups)) {
-          mLine.ssrcGroups.forEach(function (ssrcGroup) {
-            if (typeof ssrcGroup.ssrcs !== 'undefined' &&
-                Array.isArray(ssrcGroup.ssrcs)) {
-              ssrcGroup.ssrcs = ssrcGroup.ssrcs.join(' ');
-            }
-          });
-        }
-    });
-  }
-
-  // join group mids
-  if (typeof session !== 'undefined' &&
-      typeof session.groups !== 'undefined' && Array.isArray(session.groups)) {
-
-    session.groups.forEach(function (g) {
-      if (typeof g.mids !== 'undefined' && Array.isArray(g.mids)) {
-        g.mids = g.mids.join(' ');
-      }
-    });
-  }
-
-  return transform.write(session, opts);
-};
-
-exports.parse = function(sdp) {
-  var session = transform.parse(sdp);
-
-  if (typeof session !== 'undefined' && typeof session.media !== 'undefined' &&
-      Array.isArray(session.media)) {
-
-    session.media.forEach(function (mLine) {
-      // group sources attributes by ssrc
-      if (typeof mLine.ssrcs !== 'undefined' && Array.isArray(mLine.ssrcs)) {
-        mLine.sources = {};
-        mLine.ssrcs.forEach(function (ssrc) {
-          if (!mLine.sources[ssrc.id])
-          mLine.sources[ssrc.id] = {};
-        mLine.sources[ssrc.id][ssrc.attribute] = ssrc.value;
-        });
-
-        delete mLine.ssrcs;
-      }
-
-      // split ssrcs in ssrc groups
-      if (typeof mLine.ssrcGroups !== 'undefined' &&
-        Array.isArray(mLine.ssrcGroups)) {
-          mLine.ssrcGroups.forEach(function (ssrcGroup) {
-            if (typeof ssrcGroup.ssrcs === 'string') {
-              ssrcGroup.ssrcs = ssrcGroup.ssrcs.split(' ');
-            }
-          });
-        }
-    });
-  }
-  // split group mids
-  if (typeof session !== 'undefined' &&
-      typeof session.groups !== 'undefined' && Array.isArray(session.groups)) {
-
-    session.groups.forEach(function (g) {
-      if (typeof g.mids === 'string') {
-        g.mids = g.mids.split(' ');
-      }
-    });
-  }
-
-  return session;
-};
-
-
-
-/***/ }),
-
-/***/ "./node_modules/sdp-interop/node_modules/sdp-transform/lib/grammar.js":
-/*!****************************************************************************!*\
-  !*** ./node_modules/sdp-interop/node_modules/sdp-transform/lib/grammar.js ***!
-  \****************************************************************************/
-/*! no static exports found */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports) {
-
-var grammar = module.exports = {
-  v: [{
-    name: 'version',
-    reg: /^(\d*)$/
-  }],
-  o: [{ //o=- 20518 0 IN IP4 203.0.113.1
-    // NB: sessionId will be a String in most cases because it is huge
-    name: 'origin',
-    reg: /^(\S*) (\d*) (\d*) (\S*) IP(\d) (\S*)/,
-    names: ['username', 'sessionId', 'sessionVersion', 'netType', 'ipVer', 'address'],
-    format: '%s %s %d %s IP%d %s'
-  }],
-  // default parsing of these only (though some of these feel outdated)
-  s: [{ name: 'name' }],
-  i: [{ name: 'description' }],
-  u: [{ name: 'uri' }],
-  e: [{ name: 'email' }],
-  p: [{ name: 'phone' }],
-  z: [{ name: 'timezones' }], // TODO: this one can actually be parsed properly..
-  r: [{ name: 'repeats' }],   // TODO: this one can also be parsed properly
-  //k: [{}], // outdated thing ignored
-  t: [{ //t=0 0
-    name: 'timing',
-    reg: /^(\d*) (\d*)/,
-    names: ['start', 'stop'],
-    format: '%d %d'
-  }],
-  c: [{ //c=IN IP4 10.47.197.26
-    name: 'connection',
-    reg: /^IN IP(\d) (\S*)/,
-    names: ['version', 'ip'],
-    format: 'IN IP%d %s'
-  }],
-  b: [{ //b=AS:4000
-    push: 'bandwidth',
-    reg: /^(TIAS|AS|CT|RR|RS):(\d*)/,
-    names: ['type', 'limit'],
-    format: '%s:%s'
-  }],
-  m: [{ //m=video 51744 RTP/AVP 126 97 98 34 31
-    // NB: special - pushes to session
-    // TODO: rtp/fmtp should be filtered by the payloads found here?
-    reg: /^(\w*) (\d*) ([\w\/]*)(?: (.*))?/,
-    names: ['type', 'port', 'protocol', 'payloads'],
-    format: '%s %d %s %s'
-  }],
-  a: [
-    { //a=rtpmap:110 opus/48000/2
-      push: 'rtp',
-      reg: /^rtpmap:(\d*) ([\w\-\.]*)(?:\s*\/(\d*)(?:\s*\/(\S*))?)?/,
-      names: ['payload', 'codec', 'rate', 'encoding'],
-      format: function (o) {
-        return (o.encoding) ?
-          'rtpmap:%d %s/%s/%s':
-          o.rate ?
-          'rtpmap:%d %s/%s':
-          'rtpmap:%d %s';
-      }
-    },
-    { //a=fmtp:108 profile-level-id=24;object=23;bitrate=64000
-      //a=fmtp:111 minptime=10; useinbandfec=1
-      push: 'fmtp',
-      reg: /^fmtp:(\d*) ([\S| ]*)/,
-      names: ['payload', 'config'],
-      format: 'fmtp:%d %s'
-    },
-    { //a=control:streamid=0
-      name: 'control',
-      reg: /^control:(.*)/,
-      format: 'control:%s'
-    },
-    { //a=rtcp:65179 IN IP4 193.84.77.194
-      name: 'rtcp',
-      reg: /^rtcp:(\d*)(?: (\S*) IP(\d) (\S*))?/,
-      names: ['port', 'netType', 'ipVer', 'address'],
-      format: function (o) {
-        return (o.address != null) ?
-          'rtcp:%d %s IP%d %s':
-          'rtcp:%d';
-      }
-    },
-    { //a=rtcp-fb:98 trr-int 100
-      push: 'rtcpFbTrrInt',
-      reg: /^rtcp-fb:(\*|\d*) trr-int (\d*)/,
-      names: ['payload', 'value'],
-      format: 'rtcp-fb:%d trr-int %d'
-    },
-    { //a=rtcp-fb:98 nack rpsi
-      push: 'rtcpFb',
-      reg: /^rtcp-fb:(\*|\d*) ([\w-_]*)(?: ([\w-_]*))?/,
-      names: ['payload', 'type', 'subtype'],
-      format: function (o) {
-        return (o.subtype != null) ?
-          'rtcp-fb:%s %s %s':
-          'rtcp-fb:%s %s';
-      }
-    },
-    { //a=extmap:2 urn:ietf:params:rtp-hdrext:toffset
-      //a=extmap:1/recvonly URI-gps-string
-      push: 'ext',
-      reg: /^extmap:(\d+)(?:\/(\w+))? (\S*)(?: (\S*))?/,
-      names: ['value', 'direction', 'uri', 'config'],
-      format: function (o) {
-        return 'extmap:%d' + (o.direction ? '/%s' : '%v') + ' %s' + (o.config ? ' %s' : '');
-      }
-    },
-    { //a=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:PS1uQCVeeCFCanVmcjkpPywjNWhcYD0mXXtxaVBR|2^20|1:32
-      push: 'crypto',
-      reg: /^crypto:(\d*) ([\w_]*) (\S*)(?: (\S*))?/,
-      names: ['id', 'suite', 'config', 'sessionConfig'],
-      format: function (o) {
-        return (o.sessionConfig != null) ?
-          'crypto:%d %s %s %s':
-          'crypto:%d %s %s';
-      }
-    },
-    { //a=setup:actpass
-      name: 'setup',
-      reg: /^setup:(\w*)/,
-      format: 'setup:%s'
-    },
-    { //a=mid:1
-      name: 'mid',
-      reg: /^mid:([^\s]*)/,
-      format: 'mid:%s'
-    },
-    { //a=msid:0c8b064d-d807-43b4-b434-f92a889d8587 98178685-d409-46e0-8e16-7ef0db0db64a
-      name: 'msid',
-      reg: /^msid:(.*)/,
-      format: 'msid:%s'
-    },
-    { //a=ptime:20
-      name: 'ptime',
-      reg: /^ptime:(\d*)/,
-      format: 'ptime:%d'
-    },
-    { //a=maxptime:60
-      name: 'maxptime',
-      reg: /^maxptime:(\d*)/,
-      format: 'maxptime:%d'
-    },
-    { //a=sendrecv
-      name: 'direction',
-      reg: /^(sendrecv|recvonly|sendonly|inactive)/
-    },
-    { //a=ice-lite
-      name: 'icelite',
-      reg: /^(ice-lite)/
-    },
-    { //a=ice-ufrag:F7gI
-      name: 'iceUfrag',
-      reg: /^ice-ufrag:(\S*)/,
-      format: 'ice-ufrag:%s'
-    },
-    { //a=ice-pwd:x9cml/YzichV2+XlhiMu8g
-      name: 'icePwd',
-      reg: /^ice-pwd:(\S*)/,
-      format: 'ice-pwd:%s'
-    },
-    { //a=fingerprint:SHA-1 00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33
-      name: 'fingerprint',
-      reg: /^fingerprint:(\S*) (\S*)/,
-      names: ['type', 'hash'],
-      format: 'fingerprint:%s %s'
-    },
-    { //a=candidate:0 1 UDP 2113667327 203.0.113.1 54400 typ host
-      //a=candidate:1162875081 1 udp 2113937151 192.168.34.75 60017 typ host generation 0 network-id 3 network-cost 10
-      //a=candidate:3289912957 2 udp 1845501695 193.84.77.194 60017 typ srflx raddr 192.168.34.75 rport 60017 generation 0 network-id 3 network-cost 10
-      //a=candidate:229815620 1 tcp 1518280447 192.168.150.19 60017 typ host tcptype active generation 0 network-id 3 network-cost 10
-      //a=candidate:3289912957 2 tcp 1845501695 193.84.77.194 60017 typ srflx raddr 192.168.34.75 rport 60017 tcptype passive generation 0 network-id 3 network-cost 10
-      push:'candidates',
-      reg: /^candidate:(\S*) (\d*) (\S*) (\d*) (\S*) (\d*) typ (\S*)(?: raddr (\S*) rport (\d*))?(?: tcptype (\S*))?(?: generation (\d*))?(?: network-id (\d*))?(?: network-cost (\d*))?/,
-      names: ['foundation', 'component', 'transport', 'priority', 'ip', 'port', 'type', 'raddr', 'rport', 'tcptype', 'generation', 'network-id', 'network-cost'],
-      format: function (o) {
-        var str = 'candidate:%s %d %s %d %s %d typ %s';
-
-        str += (o.raddr != null) ? ' raddr %s rport %d' : '%v%v';
-
-        // NB: candidate has three optional chunks, so %void middles one if it's missing
-        str += (o.tcptype != null) ? ' tcptype %s' : '%v';
-
-        if (o.generation != null) {
-          str += ' generation %d';
-        }
-
-        str += (o['network-id'] != null) ? ' network-id %d' : '%v';
-        str += (o['network-cost'] != null) ? ' network-cost %d' : '%v';
-        return str;
-      }
-    },
-    { //a=end-of-candidates (keep after the candidates line for readability)
-      name: 'endOfCandidates',
-      reg: /^(end-of-candidates)/
-    },
-    { //a=remote-candidates:1 203.0.113.1 54400 2 203.0.113.1 54401 ...
-      name: 'remoteCandidates',
-      reg: /^remote-candidates:(.*)/,
-      format: 'remote-candidates:%s'
-    },
-    { //a=ice-options:google-ice
-      name: 'iceOptions',
-      reg: /^ice-options:(\S*)/,
-      format: 'ice-options:%s'
-    },
-    { //a=ssrc:2566107569 cname:t9YU8M1UxTF8Y1A1
-      push: 'ssrcs',
-      reg: /^ssrc:(\d*) ([\w_]*)(?::(.*))?/,
-      names: ['id', 'attribute', 'value'],
-      format: function (o) {
-        var str = 'ssrc:%d';
-        if (o.attribute != null) {
-          str += ' %s';
-          if (o.value != null) {
-            str += ':%s';
-          }
-        }
-        return str;
-      }
-    },
-    { //a=ssrc-group:FEC 1 2
-      //a=ssrc-group:FEC-FR 3004364195 1080772241
-      push: 'ssrcGroups',
-      // token-char = %x21 / %x23-27 / %x2A-2B / %x2D-2E / %x30-39 / %x41-5A / %x5E-7E
-      reg: /^ssrc-group:([\x21\x23\x24\x25\x26\x27\x2A\x2B\x2D\x2E\w]*) (.*)/,
-      names: ['semantics', 'ssrcs'],
-      format: 'ssrc-group:%s %s'
-    },
-    { //a=msid-semantic: WMS Jvlam5X3SX1OP6pn20zWogvaKJz5Hjf9OnlV
-      name: 'msidSemantic',
-      reg: /^msid-semantic:\s?(\w*) (\S*)/,
-      names: ['semantic', 'token'],
-      format: 'msid-semantic: %s %s' // space after ':' is not accidental
-    },
-    { //a=group:BUNDLE audio video
-      push: 'groups',
-      reg: /^group:(\w*) (.*)/,
-      names: ['type', 'mids'],
-      format: 'group:%s %s'
-    },
-    { //a=rtcp-mux
-      name: 'rtcpMux',
-      reg: /^(rtcp-mux)/
-    },
-    { //a=rtcp-rsize
-      name: 'rtcpRsize',
-      reg: /^(rtcp-rsize)/
-    },
-    { //a=sctpmap:5000 webrtc-datachannel 1024
-      name: 'sctpmap',
-      reg: /^sctpmap:([\w_\/]*) (\S*)(?: (\S*))?/,
-      names: ['sctpmapNumber', 'app', 'maxMessageSize'],
-      format: function (o) {
-        return (o.maxMessageSize != null) ?
-          'sctpmap:%s %s %s' :
-          'sctpmap:%s %s';
-      }
-    },
-    { //a=x-google-flag:conference
-      name: 'xGoogleFlag',
-      reg: /^x-google-flag:([^\s]*)/,
-      format: 'x-google-flag:%s'
-    },
-    { //a=rid:1 send max-width=1280;max-height=720;max-fps=30;depend=0
-      push: 'rids',
-      reg: /^rid:([\d\w]+) (\w+)(?: ([\S| ]*))?/,
-      names: ['id', 'direction', 'params'],
-      format: function (o) {
-        return (o.params) ? 'rid:%s %s %s' : 'rid:%s %s';
-      }
-    },
-    { //a=imageattr:97 send [x=800,y=640,sar=1.1,q=0.6] [x=480,y=320] recv [x=330,y=250]
-      //a=imageattr:* send [x=800,y=640] recv *
-      //a=imageattr:100 recv [x=320,y=240]
-      push: 'imageattrs',
-      reg: new RegExp(
-        //a=imageattr:97
-        '^imageattr:(\\d+|\\*)' +
-        //send [x=800,y=640,sar=1.1,q=0.6] [x=480,y=320]
-        '[\\s\\t]+(send|recv)[\\s\\t]+(\\*|\\[\\S+\\](?:[\\s\\t]+\\[\\S+\\])*)' +
-        //recv [x=330,y=250]
-        '(?:[\\s\\t]+(recv|send)[\\s\\t]+(\\*|\\[\\S+\\](?:[\\s\\t]+\\[\\S+\\])*))?'
-      ),
-      names: ['pt', 'dir1', 'attrs1', 'dir2', 'attrs2'],
-      format: function (o) {
-        return 'imageattr:%s %s %s' + (o.dir2 ? ' %s %s' : '');
-      }
-    },
-    { //a=simulcast:send 1,2,3;~4,~5 recv 6;~7,~8
-      //a=simulcast:recv 1;4,5 send 6;7
-      name: 'simulcast',
-      reg: new RegExp(
-        //a=simulcast:
-        '^simulcast:' +
-        //send 1,2,3;~4,~5
-        '(send|recv) ([a-zA-Z0-9\\-_~;,]+)' +
-        //space + recv 6;~7,~8
-        '(?:\\s?(send|recv) ([a-zA-Z0-9\\-_~;,]+))?' +
-        //end
-        '$'
-      ),
-      names: ['dir1', 'list1', 'dir2', 'list2'],
-      format: function (o) {
-        return 'simulcast:%s %s' + (o.dir2 ? ' %s %s' : '');
-      }
-    },
-    { //Old simulcast draft 03 (implemented by Firefox)
-      //  https://tools.ietf.org/html/draft-ietf-mmusic-sdp-simulcast-03
-      //a=simulcast: recv pt=97;98 send pt=97
-      //a=simulcast: send rid=5;6;7 paused=6,7
-      name: 'simulcast_03',
-      reg: /^simulcast:[\s\t]+([\S+\s\t]+)$/,
-      names: ['value'],
-      format: 'simulcast: %s'
-    },
-    {
-      //a=framerate:25
-      //a=framerate:29.97
-      name: 'framerate',
-      reg: /^framerate:(\d+(?:$|\.\d+))/,
-      format: 'framerate:%s'
-    },
-    { // any a= that we don't understand is kepts verbatim on media.invalid
-      push: 'invalid',
-      names: ['value']
-    }
-  ]
-};
-
-// set sensible defaults to avoid polluting the grammar with boring details
-Object.keys(grammar).forEach(function (key) {
-  var objs = grammar[key];
-  objs.forEach(function (obj) {
-    if (!obj.reg) {
-      obj.reg = /(.*)/;
-    }
-    if (!obj.format) {
-      obj.format = '%s';
-    }
-  });
-});
-
-
-/***/ }),
-
-/***/ "./node_modules/sdp-interop/node_modules/sdp-transform/lib/index.js":
-/*!**************************************************************************!*\
-  !*** ./node_modules/sdp-interop/node_modules/sdp-transform/lib/index.js ***!
-  \**************************************************************************/
-/*! no static exports found */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports, __webpack_require__) {
-
-var parser = __webpack_require__(/*! ./parser */ "./node_modules/sdp-interop/node_modules/sdp-transform/lib/parser.js");
-var writer = __webpack_require__(/*! ./writer */ "./node_modules/sdp-interop/node_modules/sdp-transform/lib/writer.js");
-
-exports.write = writer;
-exports.parse = parser.parse;
-exports.parseFmtpConfig = parser.parseFmtpConfig;
-exports.parseParams = parser.parseParams;
-exports.parsePayloads = parser.parsePayloads;
-exports.parseRemoteCandidates = parser.parseRemoteCandidates;
-exports.parseImageAttributes = parser.parseImageAttributes;
-exports.parseSimulcastStreamList = parser.parseSimulcastStreamList;
-
-
-/***/ }),
-
-/***/ "./node_modules/sdp-interop/node_modules/sdp-transform/lib/parser.js":
-/*!***************************************************************************!*\
-  !*** ./node_modules/sdp-interop/node_modules/sdp-transform/lib/parser.js ***!
-  \***************************************************************************/
-/*! no static exports found */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports, __webpack_require__) {
-
-var toIntIfInt = function (v) {
-  return String(Number(v)) === v ? Number(v) : v;
-};
-
-var attachProperties = function (match, location, names, rawName) {
-  if (rawName && !names) {
-    location[rawName] = toIntIfInt(match[1]);
-  }
-  else {
-    for (var i = 0; i < names.length; i += 1) {
-      if (match[i+1] != null) {
-        location[names[i]] = toIntIfInt(match[i+1]);
-      }
-    }
-  }
-};
-
-var parseReg = function (obj, location, content) {
-  var needsBlank = obj.name && obj.names;
-  if (obj.push && !location[obj.push]) {
-    location[obj.push] = [];
-  }
-  else if (needsBlank && !location[obj.name]) {
-    location[obj.name] = {};
-  }
-  var keyLocation = obj.push ?
-    {} :  // blank object that will be pushed
-    needsBlank ? location[obj.name] : location; // otherwise, named location or root
-
-  attachProperties(content.match(obj.reg), keyLocation, obj.names, obj.name);
-
-  if (obj.push) {
-    location[obj.push].push(keyLocation);
-  }
-};
-
-var grammar = __webpack_require__(/*! ./grammar */ "./node_modules/sdp-interop/node_modules/sdp-transform/lib/grammar.js");
-var validLine = RegExp.prototype.test.bind(/^([a-z])=(.*)/);
-
-exports.parse = function (sdp) {
-  var session = {}
-    , media = []
-    , location = session; // points at where properties go under (one of the above)
-
-  // parse lines we understand
-  sdp.split(/(\r\n|\r|\n)/).filter(validLine).forEach(function (l) {
-    var type = l[0];
-    var content = l.slice(2);
-    if (type === 'm') {
-      media.push({rtp: [], fmtp: []});
-      location = media[media.length-1]; // point at latest media line
-    }
-
-    for (var j = 0; j < (grammar[type] || []).length; j += 1) {
-      var obj = grammar[type][j];
-      if (obj.reg.test(content)) {
-        return parseReg(obj, location, content);
-      }
-    }
-  });
-
-  session.media = media; // link it up
-  return session;
-};
-
-var paramReducer = function (acc, expr) {
-  var s = expr.split(/=(.+)/, 2);
-  if (s.length === 2) {
-    acc[s[0]] = toIntIfInt(s[1]);
-  }
-  return acc;
-};
-
-exports.parseParams = function (str) {
-  return str.split(/\;\s?/).reduce(paramReducer, {});
-};
-
-// For backward compatibility - alias will be removed in 3.0.0
-exports.parseFmtpConfig = exports.parseParams;
-
-exports.parsePayloads = function (str) {
-  return str.split(' ').map(Number);
-};
-
-exports.parseRemoteCandidates = function (str) {
-  var candidates = [];
-  var parts = str.split(' ').map(toIntIfInt);
-  for (var i = 0; i < parts.length; i += 3) {
-    candidates.push({
-      component: parts[i],
-      ip: parts[i + 1],
-      port: parts[i + 2]
-    });
-  }
-  return candidates;
-};
-
-exports.parseImageAttributes = function (str) {
-  return str.split(' ').map(function (item) {
-    return item.substring(1, item.length-1).split(',').reduce(paramReducer, {});
-  });
-};
-
-exports.parseSimulcastStreamList = function (str) {
-  return str.split(';').map(function (stream) {
-    return stream.split(',').map(function (format) {
-      var scid, paused = false;
-
-      if (format[0] !== '~') {
-        scid = toIntIfInt(format);
-      } else {
-        scid = toIntIfInt(format.substring(1, format.length));
-        paused = true;
-      }
-
-      return {
-        scid: scid,
-        paused: paused
-      };
-    });
-  });
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/sdp-interop/node_modules/sdp-transform/lib/writer.js":
-/*!***************************************************************************!*\
-  !*** ./node_modules/sdp-interop/node_modules/sdp-transform/lib/writer.js ***!
-  \***************************************************************************/
-/*! no static exports found */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports, __webpack_require__) {
-
-var grammar = __webpack_require__(/*! ./grammar */ "./node_modules/sdp-interop/node_modules/sdp-transform/lib/grammar.js");
-
-// customized util.format - discards excess arguments and can void middle ones
-var formatRegExp = /%[sdv%]/g;
-var format = function (formatStr) {
-  var i = 1;
-  var args = arguments;
-  var len = args.length;
-  return formatStr.replace(formatRegExp, function (x) {
-    if (i >= len) {
-      return x; // missing argument
-    }
-    var arg = args[i];
-    i += 1;
-    switch (x) {
-    case '%%':
-      return '%';
-    case '%s':
-      return String(arg);
-    case '%d':
-      return Number(arg);
-    case '%v':
-      return '';
-    }
-  });
-  // NB: we discard excess arguments - they are typically undefined from makeLine
-};
-
-var makeLine = function (type, obj, location) {
-  var str = obj.format instanceof Function ?
-    (obj.format(obj.push ? location : location[obj.name])) :
-    obj.format;
-
-  var args = [type + '=' + str];
-  if (obj.names) {
-    for (var i = 0; i < obj.names.length; i += 1) {
-      var n = obj.names[i];
-      if (obj.name) {
-        args.push(location[obj.name][n]);
-      }
-      else { // for mLine and push attributes
-        args.push(location[obj.names[i]]);
-      }
-    }
-  }
-  else {
-    args.push(location[obj.name]);
-  }
-  return format.apply(null, args);
-};
-
-// RFC specified order
-// TODO: extend this with all the rest
-var defaultOuterOrder = [
-  'v', 'o', 's', 'i',
-  'u', 'e', 'p', 'c',
-  'b', 't', 'r', 'z', 'a'
-];
-var defaultInnerOrder = ['i', 'c', 'b', 'a'];
-
-
-module.exports = function (session, opts) {
-  opts = opts || {};
-  // ensure certain properties exist
-  if (session.version == null) {
-    session.version = 0; // 'v=0' must be there (only defined version atm)
-  }
-  if (session.name == null) {
-    session.name = ' '; // 's= ' must be there if no meaningful name set
-  }
-  session.media.forEach(function (mLine) {
-    if (mLine.payloads == null) {
-      mLine.payloads = '';
-    }
-  });
-
-  var outerOrder = opts.outerOrder || defaultOuterOrder;
-  var innerOrder = opts.innerOrder || defaultInnerOrder;
-  var sdp = [];
-
-  // loop through outerOrder for matching properties on session
-  outerOrder.forEach(function (type) {
-    grammar[type].forEach(function (obj) {
-      if (obj.name in session && session[obj.name] != null) {
-        sdp.push(makeLine(type, obj, session));
-      }
-      else if (obj.push in session && session[obj.push] != null) {
-        session[obj.push].forEach(function (el) {
-          sdp.push(makeLine(type, obj, el));
-        });
-      }
-    });
-  });
-
-  // then for each media line, follow the innerOrder
-  session.media.forEach(function (mLine) {
-    sdp.push(makeLine('m', grammar.m[0], mLine));
-
-    innerOrder.forEach(function (type) {
-      grammar[type].forEach(function (obj) {
-        if (obj.name in mLine && mLine[obj.name] != null) {
-          sdp.push(makeLine(type, obj, mLine));
-        }
-        else if (obj.push in mLine && mLine[obj.push] != null) {
-          mLine[obj.push].forEach(function (el) {
-            sdp.push(makeLine(type, obj, el));
-          });
-        }
-      });
-    });
-  });
-
-  return sdp.join('\r\n') + '\r\n';
+	return exports.pick(input, exclusionFilter, options);
 };
 
 
@@ -11235,7 +11355,7 @@ var grammar = module.exports = {
       push: 'rtcpFbTrrInt',
       reg: /^rtcp-fb:(\*|\d*) trr-int (\d*)/,
       names: ['payload', 'value'],
-      format: 'rtcp-fb:%d trr-int %d'
+      format: 'rtcp-fb:%s trr-int %d'
     },
     {
       // a=rtcp-fb:98 nack rpsi
@@ -11308,13 +11428,13 @@ var grammar = module.exports = {
     {
       // a=ptime:20
       name: 'ptime',
-      reg: /^ptime:(\d*)/,
+      reg: /^ptime:(\d*(?:\.\d*)*)/,
       format: 'ptime:%d'
     },
     {
       // a=maxptime:60
       name: 'maxptime',
-      reg: /^maxptime:(\d*)/,
+      reg: /^maxptime:(\d*(?:\.\d*)*)/,
       format: 'maxptime:%d'
     },
     {
@@ -11651,8 +11771,8 @@ var writer = __webpack_require__(/*! ./writer */ "./node_modules/sdp-transform/l
 
 exports.write = writer;
 exports.parse = parser.parse;
-exports.parseFmtpConfig = parser.parseFmtpConfig;
 exports.parseParams = parser.parseParams;
+exports.parseFmtpConfig = parser.parseFmtpConfig; // Alias of parseParams().
 exports.parsePayloads = parser.parsePayloads;
 exports.parseRemoteCandidates = parser.parseRemoteCandidates;
 exports.parseImageAttributes = parser.parseImageAttributes;
@@ -12295,6 +12415,10 @@ Manager.prototype.connect = function (fn, opts) {
     var timeout = this._timeout;
     debug('connect attempt will timeout after %d', timeout);
 
+    if (timeout === 0) {
+      openSub.destroy(); // prevents a race condition with the 'open' event
+    }
+
     // set timer
     var timer = setTimeout(function () {
       debug('connect attempt timed out after %d', timeout);
@@ -12764,7 +12888,7 @@ Socket.prototype.connect = function () {
   if (this.connected) return this;
 
   this.subEvents();
-  this.io.open(); // ensure open
+  if (!this.io.reconnecting) this.io.open(); // ensure open
   if ('open' === this.io.readyState) this.onopen();
   this.emit('connecting');
   return this;
@@ -12992,8 +13116,8 @@ Socket.prototype.onack = function (packet) {
 Socket.prototype.onconnect = function () {
   this.connected = true;
   this.disconnected = false;
-  this.emit('connect');
   this.emitBuffered();
+  this.emit('connect');
 };
 
 /**
@@ -13353,7 +13477,7 @@ exports.removeBlobs = function(data, callback) {
  * Module dependencies.
  */
 
-var debug = __webpack_require__(/*! debug */ "./node_modules/socket.io-parser/node_modules/debug/src/browser.js")('socket.io-parser');
+var debug = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js")('socket.io-parser');
 var Emitter = __webpack_require__(/*! component-emitter */ "./node_modules/component-emitter/index.js");
 var binary = __webpack_require__(/*! ./binary */ "./node_modules/socket.io-parser/binary.js");
 var isArray = __webpack_require__(/*! isarray */ "./node_modules/isarray/index.js");
@@ -13636,11 +13760,9 @@ function decodeString(str) {
 
   // look up attachments if type binary
   if (exports.BINARY_EVENT === p.type || exports.BINARY_ACK === p.type) {
-    var buf = '';
-    while (str.charAt(++i) !== '-') {
-      buf += str.charAt(i);
-      if (i == str.length) break;
-    }
+    var start = i + 1;
+    while (str.charAt(++i) !== '-' && i != str.length) {}
+    var buf = str.substring(start, i);
     if (buf != Number(buf) || str.charAt(i) !== '-') {
       throw new Error('Illegal attachments');
     }
@@ -13649,13 +13771,13 @@ function decodeString(str) {
 
   // look up namespace (if any)
   if ('/' === str.charAt(i + 1)) {
-    p.nsp = '';
+    var start = i + 1;
     while (++i) {
       var c = str.charAt(i);
       if (',' === c) break;
-      p.nsp += c;
       if (i === str.length) break;
     }
+    p.nsp = str.substring(start, i);
   } else {
     p.nsp = '/';
   }
@@ -13663,17 +13785,16 @@ function decodeString(str) {
   // look up id
   var next = str.charAt(i + 1);
   if ('' !== next && Number(next) == next) {
-    p.id = '';
+    var start = i + 1;
     while (++i) {
       var c = str.charAt(i);
       if (null == c || Number(c) != c) {
         --i;
         break;
       }
-      p.id += str.charAt(i);
       if (i === str.length) break;
     }
-    p.id = Number(p.id);
+    p.id = Number(str.substring(start, i + 1));
   }
 
   // look up json data
@@ -13797,615 +13918,6 @@ function isBuf(obj) {
 }
 
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../node-libs-browser/node_modules/buffer/index.js */ "./node_modules/node-libs-browser/node_modules/buffer/index.js").Buffer))
-
-/***/ }),
-
-/***/ "./node_modules/socket.io-parser/node_modules/debug/src/browser.js":
-/*!*************************************************************************!*\
-  !*** ./node_modules/socket.io-parser/node_modules/debug/src/browser.js ***!
-  \*************************************************************************/
-/*! no static exports found */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(process) {/**
- * This is the web browser implementation of `debug()`.
- *
- * Expose `debug()` as the module.
- */
-
-exports = module.exports = __webpack_require__(/*! ./debug */ "./node_modules/socket.io-parser/node_modules/debug/src/debug.js");
-exports.log = log;
-exports.formatArgs = formatArgs;
-exports.save = save;
-exports.load = load;
-exports.useColors = useColors;
-exports.storage = 'undefined' != typeof chrome
-               && 'undefined' != typeof chrome.storage
-                  ? chrome.storage.local
-                  : localstorage();
-
-/**
- * Colors.
- */
-
-exports.colors = [
-  '#0000CC', '#0000FF', '#0033CC', '#0033FF', '#0066CC', '#0066FF', '#0099CC',
-  '#0099FF', '#00CC00', '#00CC33', '#00CC66', '#00CC99', '#00CCCC', '#00CCFF',
-  '#3300CC', '#3300FF', '#3333CC', '#3333FF', '#3366CC', '#3366FF', '#3399CC',
-  '#3399FF', '#33CC00', '#33CC33', '#33CC66', '#33CC99', '#33CCCC', '#33CCFF',
-  '#6600CC', '#6600FF', '#6633CC', '#6633FF', '#66CC00', '#66CC33', '#9900CC',
-  '#9900FF', '#9933CC', '#9933FF', '#99CC00', '#99CC33', '#CC0000', '#CC0033',
-  '#CC0066', '#CC0099', '#CC00CC', '#CC00FF', '#CC3300', '#CC3333', '#CC3366',
-  '#CC3399', '#CC33CC', '#CC33FF', '#CC6600', '#CC6633', '#CC9900', '#CC9933',
-  '#CCCC00', '#CCCC33', '#FF0000', '#FF0033', '#FF0066', '#FF0099', '#FF00CC',
-  '#FF00FF', '#FF3300', '#FF3333', '#FF3366', '#FF3399', '#FF33CC', '#FF33FF',
-  '#FF6600', '#FF6633', '#FF9900', '#FF9933', '#FFCC00', '#FFCC33'
-];
-
-/**
- * Currently only WebKit-based Web Inspectors, Firefox >= v31,
- * and the Firebug extension (any Firefox version) are known
- * to support "%c" CSS customizations.
- *
- * TODO: add a `localStorage` variable to explicitly enable/disable colors
- */
-
-function useColors() {
-  // NB: In an Electron preload script, document will be defined but not fully
-  // initialized. Since we know we're in Chrome, we'll just detect this case
-  // explicitly
-  if (typeof window !== 'undefined' && window.process && window.process.type === 'renderer') {
-    return true;
-  }
-
-  // Internet Explorer and Edge do not support colors.
-  if (typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/(edge|trident)\/(\d+)/)) {
-    return false;
-  }
-
-  // is webkit? http://stackoverflow.com/a/16459606/376773
-  // document is undefined in react-native: https://github.com/facebook/react-native/pull/1632
-  return (typeof document !== 'undefined' && document.documentElement && document.documentElement.style && document.documentElement.style.WebkitAppearance) ||
-    // is firebug? http://stackoverflow.com/a/398120/376773
-    (typeof window !== 'undefined' && window.console && (window.console.firebug || (window.console.exception && window.console.table))) ||
-    // is firefox >= v31?
-    // https://developer.mozilla.org/en-US/docs/Tools/Web_Console#Styling_messages
-    (typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/) && parseInt(RegExp.$1, 10) >= 31) ||
-    // double check webkit in userAgent just in case we are in a worker
-    (typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/applewebkit\/(\d+)/));
-}
-
-/**
- * Map %j to `JSON.stringify()`, since no Web Inspectors do that by default.
- */
-
-exports.formatters.j = function(v) {
-  try {
-    return JSON.stringify(v);
-  } catch (err) {
-    return '[UnexpectedJSONParseError]: ' + err.message;
-  }
-};
-
-
-/**
- * Colorize log arguments if enabled.
- *
- * @api public
- */
-
-function formatArgs(args) {
-  var useColors = this.useColors;
-
-  args[0] = (useColors ? '%c' : '')
-    + this.namespace
-    + (useColors ? ' %c' : ' ')
-    + args[0]
-    + (useColors ? '%c ' : ' ')
-    + '+' + exports.humanize(this.diff);
-
-  if (!useColors) return;
-
-  var c = 'color: ' + this.color;
-  args.splice(1, 0, c, 'color: inherit')
-
-  // the final "%c" is somewhat tricky, because there could be other
-  // arguments passed either before or after the %c, so we need to
-  // figure out the correct index to insert the CSS into
-  var index = 0;
-  var lastC = 0;
-  args[0].replace(/%[a-zA-Z%]/g, function(match) {
-    if ('%%' === match) return;
-    index++;
-    if ('%c' === match) {
-      // we only are interested in the *last* %c
-      // (the user may have provided their own)
-      lastC = index;
-    }
-  });
-
-  args.splice(lastC, 0, c);
-}
-
-/**
- * Invokes `console.log()` when available.
- * No-op when `console.log` is not a "function".
- *
- * @api public
- */
-
-function log() {
-  // this hackery is required for IE8/9, where
-  // the `console.log` function doesn't have 'apply'
-  return 'object' === typeof console
-    && console.log
-    && Function.prototype.apply.call(console.log, console, arguments);
-}
-
-/**
- * Save `namespaces`.
- *
- * @param {String} namespaces
- * @api private
- */
-
-function save(namespaces) {
-  try {
-    if (null == namespaces) {
-      exports.storage.removeItem('debug');
-    } else {
-      exports.storage.debug = namespaces;
-    }
-  } catch(e) {}
-}
-
-/**
- * Load `namespaces`.
- *
- * @return {String} returns the previously persisted debug modes
- * @api private
- */
-
-function load() {
-  var r;
-  try {
-    r = exports.storage.debug;
-  } catch(e) {}
-
-  // If debug isn't set in LS, and we're in Electron, try to load $DEBUG
-  if (!r && typeof process !== 'undefined' && 'env' in process) {
-    r = process.env.DEBUG;
-  }
-
-  return r;
-}
-
-/**
- * Enable namespaces listed in `localStorage.debug` initially.
- */
-
-exports.enable(load());
-
-/**
- * Localstorage attempts to return the localstorage.
- *
- * This is necessary because safari throws
- * when a user disables cookies/localstorage
- * and you attempt to access it.
- *
- * @return {LocalStorage}
- * @api private
- */
-
-function localstorage() {
-  try {
-    return window.localStorage;
-  } catch (e) {}
-}
-
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../../../process/browser.js */ "./node_modules/process/browser.js")))
-
-/***/ }),
-
-/***/ "./node_modules/socket.io-parser/node_modules/debug/src/debug.js":
-/*!***********************************************************************!*\
-  !*** ./node_modules/socket.io-parser/node_modules/debug/src/debug.js ***!
-  \***********************************************************************/
-/*! no static exports found */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports, __webpack_require__) {
-
-
-/**
- * This is the common logic for both the Node.js and web browser
- * implementations of `debug()`.
- *
- * Expose `debug()` as the module.
- */
-
-exports = module.exports = createDebug.debug = createDebug['default'] = createDebug;
-exports.coerce = coerce;
-exports.disable = disable;
-exports.enable = enable;
-exports.enabled = enabled;
-exports.humanize = __webpack_require__(/*! ms */ "./node_modules/socket.io-parser/node_modules/ms/index.js");
-
-/**
- * Active `debug` instances.
- */
-exports.instances = [];
-
-/**
- * The currently active debug mode names, and names to skip.
- */
-
-exports.names = [];
-exports.skips = [];
-
-/**
- * Map of special "%n" handling functions, for the debug "format" argument.
- *
- * Valid key names are a single, lower or upper-case letter, i.e. "n" and "N".
- */
-
-exports.formatters = {};
-
-/**
- * Select a color.
- * @param {String} namespace
- * @return {Number}
- * @api private
- */
-
-function selectColor(namespace) {
-  var hash = 0, i;
-
-  for (i in namespace) {
-    hash  = ((hash << 5) - hash) + namespace.charCodeAt(i);
-    hash |= 0; // Convert to 32bit integer
-  }
-
-  return exports.colors[Math.abs(hash) % exports.colors.length];
-}
-
-/**
- * Create a debugger with the given `namespace`.
- *
- * @param {String} namespace
- * @return {Function}
- * @api public
- */
-
-function createDebug(namespace) {
-
-  var prevTime;
-
-  function debug() {
-    // disabled?
-    if (!debug.enabled) return;
-
-    var self = debug;
-
-    // set `diff` timestamp
-    var curr = +new Date();
-    var ms = curr - (prevTime || curr);
-    self.diff = ms;
-    self.prev = prevTime;
-    self.curr = curr;
-    prevTime = curr;
-
-    // turn the `arguments` into a proper Array
-    var args = new Array(arguments.length);
-    for (var i = 0; i < args.length; i++) {
-      args[i] = arguments[i];
-    }
-
-    args[0] = exports.coerce(args[0]);
-
-    if ('string' !== typeof args[0]) {
-      // anything else let's inspect with %O
-      args.unshift('%O');
-    }
-
-    // apply any `formatters` transformations
-    var index = 0;
-    args[0] = args[0].replace(/%([a-zA-Z%])/g, function(match, format) {
-      // if we encounter an escaped % then don't increase the array index
-      if (match === '%%') return match;
-      index++;
-      var formatter = exports.formatters[format];
-      if ('function' === typeof formatter) {
-        var val = args[index];
-        match = formatter.call(self, val);
-
-        // now we need to remove `args[index]` since it's inlined in the `format`
-        args.splice(index, 1);
-        index--;
-      }
-      return match;
-    });
-
-    // apply env-specific formatting (colors, etc.)
-    exports.formatArgs.call(self, args);
-
-    var logFn = debug.log || exports.log || console.log.bind(console);
-    logFn.apply(self, args);
-  }
-
-  debug.namespace = namespace;
-  debug.enabled = exports.enabled(namespace);
-  debug.useColors = exports.useColors();
-  debug.color = selectColor(namespace);
-  debug.destroy = destroy;
-
-  // env-specific initialization logic for debug instances
-  if ('function' === typeof exports.init) {
-    exports.init(debug);
-  }
-
-  exports.instances.push(debug);
-
-  return debug;
-}
-
-function destroy () {
-  var index = exports.instances.indexOf(this);
-  if (index !== -1) {
-    exports.instances.splice(index, 1);
-    return true;
-  } else {
-    return false;
-  }
-}
-
-/**
- * Enables a debug mode by namespaces. This can include modes
- * separated by a colon and wildcards.
- *
- * @param {String} namespaces
- * @api public
- */
-
-function enable(namespaces) {
-  exports.save(namespaces);
-
-  exports.names = [];
-  exports.skips = [];
-
-  var i;
-  var split = (typeof namespaces === 'string' ? namespaces : '').split(/[\s,]+/);
-  var len = split.length;
-
-  for (i = 0; i < len; i++) {
-    if (!split[i]) continue; // ignore empty strings
-    namespaces = split[i].replace(/\*/g, '.*?');
-    if (namespaces[0] === '-') {
-      exports.skips.push(new RegExp('^' + namespaces.substr(1) + '$'));
-    } else {
-      exports.names.push(new RegExp('^' + namespaces + '$'));
-    }
-  }
-
-  for (i = 0; i < exports.instances.length; i++) {
-    var instance = exports.instances[i];
-    instance.enabled = exports.enabled(instance.namespace);
-  }
-}
-
-/**
- * Disable debug output.
- *
- * @api public
- */
-
-function disable() {
-  exports.enable('');
-}
-
-/**
- * Returns true if the given mode name is enabled, false otherwise.
- *
- * @param {String} name
- * @return {Boolean}
- * @api public
- */
-
-function enabled(name) {
-  if (name[name.length - 1] === '*') {
-    return true;
-  }
-  var i, len;
-  for (i = 0, len = exports.skips.length; i < len; i++) {
-    if (exports.skips[i].test(name)) {
-      return false;
-    }
-  }
-  for (i = 0, len = exports.names.length; i < len; i++) {
-    if (exports.names[i].test(name)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-/**
- * Coerce `val`.
- *
- * @param {Mixed} val
- * @return {Mixed}
- * @api private
- */
-
-function coerce(val) {
-  if (val instanceof Error) return val.stack || val.message;
-  return val;
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/socket.io-parser/node_modules/ms/index.js":
-/*!****************************************************************!*\
-  !*** ./node_modules/socket.io-parser/node_modules/ms/index.js ***!
-  \****************************************************************/
-/*! no static exports found */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports) {
-
-/**
- * Helpers.
- */
-
-var s = 1000;
-var m = s * 60;
-var h = m * 60;
-var d = h * 24;
-var y = d * 365.25;
-
-/**
- * Parse or format the given `val`.
- *
- * Options:
- *
- *  - `long` verbose formatting [false]
- *
- * @param {String|Number} val
- * @param {Object} [options]
- * @throws {Error} throw an error if val is not a non-empty string or a number
- * @return {String|Number}
- * @api public
- */
-
-module.exports = function(val, options) {
-  options = options || {};
-  var type = typeof val;
-  if (type === 'string' && val.length > 0) {
-    return parse(val);
-  } else if (type === 'number' && isNaN(val) === false) {
-    return options.long ? fmtLong(val) : fmtShort(val);
-  }
-  throw new Error(
-    'val is not a non-empty string or a valid number. val=' +
-      JSON.stringify(val)
-  );
-};
-
-/**
- * Parse the given `str` and return milliseconds.
- *
- * @param {String} str
- * @return {Number}
- * @api private
- */
-
-function parse(str) {
-  str = String(str);
-  if (str.length > 100) {
-    return;
-  }
-  var match = /^((?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|years?|yrs?|y)?$/i.exec(
-    str
-  );
-  if (!match) {
-    return;
-  }
-  var n = parseFloat(match[1]);
-  var type = (match[2] || 'ms').toLowerCase();
-  switch (type) {
-    case 'years':
-    case 'year':
-    case 'yrs':
-    case 'yr':
-    case 'y':
-      return n * y;
-    case 'days':
-    case 'day':
-    case 'd':
-      return n * d;
-    case 'hours':
-    case 'hour':
-    case 'hrs':
-    case 'hr':
-    case 'h':
-      return n * h;
-    case 'minutes':
-    case 'minute':
-    case 'mins':
-    case 'min':
-    case 'm':
-      return n * m;
-    case 'seconds':
-    case 'second':
-    case 'secs':
-    case 'sec':
-    case 's':
-      return n * s;
-    case 'milliseconds':
-    case 'millisecond':
-    case 'msecs':
-    case 'msec':
-    case 'ms':
-      return n;
-    default:
-      return undefined;
-  }
-}
-
-/**
- * Short format for `ms`.
- *
- * @param {Number} ms
- * @return {String}
- * @api private
- */
-
-function fmtShort(ms) {
-  if (ms >= d) {
-    return Math.round(ms / d) + 'd';
-  }
-  if (ms >= h) {
-    return Math.round(ms / h) + 'h';
-  }
-  if (ms >= m) {
-    return Math.round(ms / m) + 'm';
-  }
-  if (ms >= s) {
-    return Math.round(ms / s) + 's';
-  }
-  return ms + 'ms';
-}
-
-/**
- * Long format for `ms`.
- *
- * @param {Number} ms
- * @return {String}
- * @api private
- */
-
-function fmtLong(ms) {
-  return plural(ms, d, 'day') ||
-    plural(ms, h, 'hour') ||
-    plural(ms, m, 'minute') ||
-    plural(ms, s, 'second') ||
-    ms + ' ms';
-}
-
-/**
- * Pluralization helper.
- */
-
-function plural(ms, n, name) {
-  if (ms < n) {
-    return;
-  }
-  if (ms < n * 1.5) {
-    return Math.floor(ms / n) + ' ' + name;
-  }
-  return Math.ceil(ms / n) + ' ' + name + 's';
-}
-
 
 /***/ }),
 
@@ -14601,11 +14113,11 @@ module.exports = yeast;
 /*!**********************!*\
   !*** ./package.json ***!
   \**********************/
-/*! exports provided: name, version, description, main, module, types, scripts, repository, files, author, license, devDependencies, dependencies, default */
+/*! exports provided: name, version, description, main, types, scripts, repository, files, author, license, devDependencies, dependencies, default */
 /*! ModuleConcatenation bailout: Module is not an ECMAScript module */
 /***/ (function(module) {
 
-module.exports = JSON.parse("{\"name\":\"skyway-js\",\"version\":\"2.0.5\",\"description\":\"The official JavaScript SDK for SkyWay\",\"main\":\"dist/skyway.js\",\"module\":\"src/peer.js\",\"types\":\"skyway-js.d.ts\",\"scripts\":{\"test\":\"karma start ./karma.conf.js\",\"clean\":\"del ./dist\",\"lint\":\"eslint .\",\"build\":\"NODE_ENV=production webpack\",\"dev\":\"webpack -w\"},\"repository\":{\"type\":\"git\",\"url\":\"git+https://github.com/skyway/skyway-js-sdk\"},\"files\":[\"dist/skyway.js\",\"skyway-js.d.ts\",\"LICENSE\",\"CHANGELOG.md\",\"README.md\"],\"author\":\"NTT Communications Corp.\",\"license\":\"Apache-2.0\",\"devDependencies\":{\"babel-loader\":\"7.1.5\",\"babel-plugin-espower\":\"2.4.0\",\"babel-plugin-istanbul\":\"4.1.6\",\"babel-preset-es2015\":\"^6.24.1\",\"del-cli\":\"^2.0.0\",\"eslint\":\"^6.1.0\",\"eslint-config-prettier\":\"^6.0.0\",\"eslint-plugin-prettier\":\"^3.1.0\",\"inject-loader\":\"^4.0.1\",\"karma\":\"^4.2.0\",\"karma-chrome-launcher\":\"^3.0.0\",\"karma-coverage\":\"^1.1.2\",\"karma-mocha\":\"^1.3.0\",\"karma-mocha-reporter\":\"^2.2.5\",\"karma-sourcemap-loader\":\"^0.3.7\",\"karma-webpack\":\"^4.0.2\",\"mocha\":\"^6.2.0\",\"power-assert\":\"^1.6.1\",\"prettier\":\"^1.18.2\",\"sinon\":\"^7.3.2\",\"webpack\":\"^4.38.0\",\"webpack-cli\":\"^3.3.6\"},\"dependencies\":{\"@types/node\":\"^12.6.8\",\"detect-browser\":\"^4.6.0\",\"enum\":\"git+https://github.com/eastandwest/enum.git#react-native\",\"events\":\"^3.0.0\",\"js-binarypack\":\"0.0.9\",\"object-sizeof\":\"^1.4.0\",\"query-string\":\"^6.8.2\",\"sdp-interop\":\"^0.1.13\",\"sdp-transform\":\"^2.11.0\",\"socket.io-client\":\"^2.2.0\"}}");
+module.exports = JSON.parse("{\"name\":\"skyway-js\",\"version\":\"4.4.5\",\"description\":\"The official JavaScript SDK for SkyWay\",\"main\":\"dist/skyway.js\",\"types\":\"skyway-js.d.ts\",\"scripts\":{\"test\":\"karma start ./karma.conf.js\",\"clean\":\"del ./dist\",\"lint\":\"eslint .\",\"build\":\"NODE_ENV=production webpack\",\"dev\":\"webpack -w\"},\"repository\":{\"type\":\"git\",\"url\":\"git+https://github.com/skyway/skyway-js-sdk\"},\"files\":[\"dist/skyway.js\",\"skyway-js.d.ts\",\"LICENSE\",\"CHANGELOG.md\",\"README.md\"],\"author\":\"NTT Communications Corp.\",\"license\":\"Apache-2.0\",\"devDependencies\":{\"babel-loader\":\"7.1.5\",\"babel-plugin-espower\":\"2.4.0\",\"babel-plugin-istanbul\":\"4.1.6\",\"babel-preset-es2015\":\"^6.24.1\",\"del-cli\":\"^2.0.0\",\"eslint\":\"^6.1.0\",\"eslint-config-prettier\":\"^6.0.0\",\"eslint-plugin-prettier\":\"^3.1.0\",\"inject-loader\":\"^4.0.1\",\"karma\":\"^4.2.0\",\"karma-chrome-launcher\":\"^3.0.0\",\"karma-coverage\":\"^1.1.2\",\"karma-mocha\":\"^1.3.0\",\"karma-mocha-reporter\":\"^2.2.5\",\"karma-sourcemap-loader\":\"^0.3.7\",\"karma-webpack\":\"^4.0.2\",\"mocha\":\"^6.2.0\",\"power-assert\":\"^1.6.1\",\"prettier\":\"^1.18.2\",\"sinon\":\"^7.3.2\",\"webpack\":\"^4.38.0\",\"webpack-cli\":\"^3.3.6\"},\"dependencies\":{\"@jitsi/sdp-interop\":\"^0.1.13\",\"@types/node\":\"^12.6.8\",\"detect-browser\":\"^4.6.0\",\"enum\":\"^3.0.4\",\"events\":\"^3.0.0\",\"js-binarypack\":\"0.0.9\",\"object-sizeof\":\"^1.4.0\",\"query-string\":\"^6.8.2\",\"sdp-transform\":\"^2.11.0\",\"socket.io-client\":\"^2.2.0\",\"socket.io-parser\":\"~3.3.0\"}}");
 
 /***/ }),
 
@@ -14614,28 +14126,30 @@ module.exports = JSON.parse("{\"name\":\"skyway-js\",\"version\":\"2.0.5\",\"des
   !*** ./src/peer.js + 12 modules ***!
   \**********************************/
 /*! exports provided: default */
+/*! ModuleConcatenation bailout: Cannot concat with ./node_modules/@jitsi/sdp-interop/lib/index.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with ./node_modules/detect-browser/index.js (<- Module is not an ECMAScript module) */
-/*! ModuleConcatenation bailout: Cannot concat with ./node_modules/enum/index.js (<- Module is not an ECMAScript module) */
+/*! ModuleConcatenation bailout: Cannot concat with ./node_modules/enum/lib/enum.js (<- Module uses injected variables (global)) */
 /*! ModuleConcatenation bailout: Cannot concat with ./node_modules/events/events.js (<- Module is not an ECMAScript module) */
+/*! ModuleConcatenation bailout: Cannot concat with ./node_modules/has-binary2/index.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with ./node_modules/js-binarypack/lib/binarypack.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with ./node_modules/object-sizeof/index.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with ./node_modules/query-string/index.js (<- Module is not an ECMAScript module) */
-/*! ModuleConcatenation bailout: Cannot concat with ./node_modules/sdp-interop/lib/index.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with ./node_modules/sdp-transform/lib/index.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with ./node_modules/socket.io-client/lib/index.js (<- Module is not an ECMAScript module) */
+/*! ModuleConcatenation bailout: Cannot concat with ./node_modules/socket.io-parser/index.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with ./package.json (<- Module is not an ECMAScript module) */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+// ESM COMPAT FLAG
 __webpack_require__.r(__webpack_exports__);
 
 // EXTERNAL MODULE: ./node_modules/events/events.js
 var events = __webpack_require__("./node_modules/events/events.js");
 var events_default = /*#__PURE__*/__webpack_require__.n(events);
 
-// EXTERNAL MODULE: ./node_modules/enum/index.js
-var node_modules_enum = __webpack_require__("./node_modules/enum/index.js");
-var enum_default = /*#__PURE__*/__webpack_require__.n(node_modules_enum);
+// EXTERNAL MODULE: ./node_modules/enum/lib/enum.js
+var lib_enum = __webpack_require__("./node_modules/enum/lib/enum.js");
 
 // EXTERNAL MODULE: ./node_modules/socket.io-client/lib/index.js
 var lib = __webpack_require__("./node_modules/socket.io-client/lib/index.js");
@@ -14657,7 +14171,7 @@ const TURN_HOST = 'turn.webrtc.ecl.ntt.com';
 const TURN_PORT = 443;
 
 const MESSAGE_TYPES = {
-  CLIENT: new enum_default.a([
+  CLIENT: new lib_enum["default"]([
     'SEND_OFFER',
     'SEND_ANSWER',
     'SEND_CANDIDATE',
@@ -14674,7 +14188,7 @@ const MESSAGE_TYPES = {
     'UPDATE_CREDENTIAL',
     'SEND_FORCE_CLOSE',
   ]),
-  SERVER: new enum_default.a([
+  SERVER: new lib_enum["default"]([
     'OPEN',
     'ERROR',
     'OFFER',
@@ -14697,6 +14211,15 @@ const MESSAGE_TYPES = {
 // The actual chunk size is adjusted in dataChannel to accomodate metaData
 const maxChunkSize = 16300;
 
+// The maximum size of data that can be sent at one time by using Room.send() is 20 MB
+const config_maxDataSize = 20 * 1024 * 1024;
+
+// The minimum interval of using Room.send() is 100 ms
+const minBroadcastIntervalMs = 100;
+
+// max number of attempts to get a new server from the dispatcher.
+const maxNumberOfAttempts = 10;
+
 // Number of reconnection attempts to the same server before giving up
 const reconnectionAttempts = 2;
 
@@ -14704,7 +14227,7 @@ const reconnectionAttempts = 2;
 const numberServersToTry = 3;
 
 // Send loop interval in milliseconds
-const sendInterval = 1;
+const config_sendInterval = 1;
 
 // Ping interval in milliseconds
 const pingInterval = 25000;
@@ -14728,9 +14251,12 @@ const defaultConfig = {
   TURN_PORT,
   MESSAGE_TYPES,
   maxChunkSize,
+  maxDataSize: config_maxDataSize,
+  minBroadcastIntervalMs,
+  maxNumberOfAttempts,
   reconnectionAttempts,
   numberServersToTry,
-  sendInterval,
+  sendInterval: config_sendInterval,
   pingInterval,
   defaultConfig,
 });
@@ -14739,7 +14265,7 @@ const defaultConfig = {
 
 
 const LOG_PREFIX = 'SkyWay: ';
-const LogLevel = new enum_default.a({
+const LogLevel = new lib_enum["default"]({
   NONE: 0,
   ERROR: 1,
   WARN: 2,
@@ -14823,10 +14349,148 @@ class Logger {
 
 /* harmony default export */ var logger = (new Logger());
 
+// EXTERNAL MODULE: ./node_modules/detect-browser/index.js
+var detect_browser = __webpack_require__("./node_modules/detect-browser/index.js");
+
+// CONCATENATED MODULE: ./src/shared/util.js
+
+
+/**
+ * Validate the Peer ID format.
+ * @param {string} [id] - A Peer ID.
+ * @return {boolean} True if the peerId format is valid. False if not.
+ */
+function validateId(id) {
+  // Allow empty ids
+  return !id || /^[A-Za-z0-9_-]+(?:[ _-][A-Za-z0-9]+)*$/.exec(id);
+}
+
+/**
+ * Validate the API key.
+ * @param {string} [key] A SkyWay API key.
+ * @return {boolean} True if the API key format is valid. False if not.
+ */
+function validateKey(key) {
+  // Allow empty keys
+  return !key || /^[a-z0-9]{8}(-[a-z0-9]{4}){3}-[a-z0-9]{12}$/.exec(key);
+}
+
+/**
+ * Return random ID.
+ * @return {string} A text consisting of 16 chars.
+ */
+function randomId() {
+  const keyLength = 16;
+  // '36' means that we want to convert the number to a string using chars in
+  // the range of '0-9a-z'. The concatenated 0's are for padding the key,
+  // as Math.random() may produce a key shorter than 16 chars in length
+  const randString = Math.random().toString(36) + '0000000000000000000';
+  return randString.substr(2, keyLength);
+}
+
+/**
+ * Generate random token.
+ * @return {string} A token consisting of random alphabet and integer.
+ */
+function randomToken() {
+  return Math.random()
+    .toString(36)
+    .substr(2);
+}
+
+/**
+ * Combine the sliced ArrayBuffers.
+ * @param {Array} buffers - An Array of ArrayBuffer.
+ * @return {ArrayBuffer} The combined ArrayBuffer.
+ */
+function joinArrayBuffers(buffers) {
+  const size = buffers.reduce((sum, buffer) => {
+    return sum + buffer.byteLength;
+  }, 0);
+  const tmpArray = new Uint8Array(size);
+  let currPos = 0;
+  for (const buffer of buffers) {
+    tmpArray.set(new Uint8Array(buffer), currPos);
+    currPos += buffer.byteLength;
+  }
+  return tmpArray.buffer;
+}
+
+/**
+ * Convert Blob to ArrayBuffer.
+ * @param {Blob} blob - The Blob to be read as ArrayBuffer.
+ * @param {Function} cb - Callback function that called after load event fired.
+ */
+function blobToArrayBuffer(blob, cb) {
+  const fr = new FileReader();
+  fr.onload = event => {
+    cb(event.target.result);
+  };
+  fr.readAsArrayBuffer(blob);
+}
+
+/**
+ * Whether the protocol is https or not.
+ * @return {boolean} Whether the protocol is https or not.
+ */
+function isSecure() {
+  return location.protocol === 'https:';
+}
+
+/**
+ * Detect browser name and version.
+ * @return {Object} Browser name and major, minor and patch versions. Object is empty if info can't be obtained.
+ */
+function detectBrowser() {
+  const { name, version } = Object(detect_browser["detect"])();
+  const [major, minor, patch] = version.split('.').map(i => parseInt(i));
+  return {
+    name,
+    major,
+    minor,
+    patch,
+  };
+}
+
+/**
+ * Safari 12.1 may use plan-b sdp and also unified-plan sdp.
+ * It depends on user settings.
+ * See https://webkit.org/blog/8672/on-the-road-to-webrtc-1-0-including-vp8/
+ *
+ * @return {boolean} Browser is plan-b Safari or NOT
+ */
+function isPlanBSafari() {
+  const { name } = Object(detect_browser["detect"])();
+
+  // safari for macOS, ios for iOS
+  if (!(name === 'safari' || name === 'ios')) {
+    return false;
+  }
+  // supports unified-plan
+  if (RTCRtpTransceiver.prototype.hasOwnProperty('currentDirection')) {
+    return false;
+  }
+
+  return true;
+}
+
+/* harmony default export */ var util = ({
+  validateId,
+  validateKey,
+  randomId,
+  randomToken,
+  joinArrayBuffers,
+  blobToArrayBuffer,
+  isSecure,
+  detectBrowser,
+  isPlanBSafari,
+});
+
 // EXTERNAL MODULE: ./package.json
 var package_0 = __webpack_require__("./package.json");
 
 // CONCATENATED MODULE: ./src/peer/socket.js
+
 
 
 
@@ -14891,8 +14555,8 @@ class socket_Socket extends events_default.a {
    * @param {string} token - Token to identify the session.
    * @param {object} credential - The credential used to authenticate peer.
    * @param {number} [credential.timestamp] - Current UNIX timestamp.
-   + @param {number} [credential.ttl] - Time to live; The credential expires at timestamp + ttl.
-   + @param {string} [credential.authToken] - Credential token calculated with HMAC.
+   * @param {number} [credential.ttl] - Time to live; The credential expires at timestamp + ttl.
+   * @param {string} [credential.authToken] - Credential token calculated with HMAC.
    * @return {Promise<void>} Promise that resolves when starting is done.
    * @fires Socket#error
    */
@@ -14914,21 +14578,28 @@ class socket_Socket extends events_default.a {
     }
 
     if (this._dispatcherUrl) {
-      let serverInfo;
       try {
-        serverInfo = await this._getSignalingServer();
+        this.signalingServerUrl = await this._fetchSignalingServerUrlWithRetry();
       } catch (err) {
         this.emit('error', err);
         return;
       }
-      const httpProtocol = serverInfo.secure ? 'https://' : 'http://';
-      this.signalingServerUrl = `${httpProtocol}${serverInfo.host}:${serverInfo.port}`;
     }
+
+    // Due to a bug in Safari 15,
+    // WebSocket cannot send data properly, so we only use XHR temporarily.
+    const brower = util.detectBrowser();
+    const isSafari15OrOver =
+      (brower.name === 'ios' || brower.name === 'safari') && brower.major >= 15;
+    const transports = isSafari15OrOver
+      ? ['polling']
+      : ['polling', 'websocket'];
 
     this._io = lib_default()(this.signalingServerUrl, {
       'force new connection': true,
       query: query,
       reconnectionAttempts: config.reconnectionAttempts,
+      transports,
     });
 
     this._io.on('reconnect_failed', () => {
@@ -14944,41 +14615,48 @@ class socket_Socket extends events_default.a {
   }
 
   /**
-   * Connect to "new" signaling server. Attempts up to 10 times before giving up and emitting an error on the socket.
-   * @param {number} [numAttempts=0] - Current number of attempts.
+   * Connect to "new" signaling server.
    * @return {Promise<void>} A promise that resolves with new connection has done.
    * @private
    */
-  async _connectToNewServer(numAttempts = 0) {
-    // max number of attempts to get a new server from the dispatcher.
-    const maxNumberOfAttempts = 10;
-    if (
-      numAttempts >= maxNumberOfAttempts ||
-      this._reconnectAttempts >= config.numberServersToTry
-    ) {
+  async _connectToNewServer() {
+    if (this._reconnectAttempts >= config.numberServersToTry) {
       this.emit('error', 'Could not connect to server.');
       return;
     }
 
-    // Keep trying until we connect to a new server because consul can take some time to remove from the active list.
-    let serverInfo;
     try {
-      serverInfo = await this._getSignalingServer();
+      this.signalingServerUrl = await this._fetchSignalingServerUrlWithRetry();
     } catch (err) {
       this.emit('error', err);
       return;
     }
+    this._io.io.uri = this.signalingServerUrl;
+    this._io.connect();
+    this._reconnectAttempts++;
+  }
 
-    if (this.signalingServerUrl.indexOf(serverInfo.host) === -1) {
-      const httpProtocol = serverInfo.secure ? 'https://' : 'http://';
-      this.signalingServerUrl = `${httpProtocol}${serverInfo.host}:${serverInfo.port}`;
-
-      this._io.io.uri = this.signalingServerUrl;
-      this._io.connect();
-      this._reconnectAttempts++;
-    } else {
-      this._connectToNewServer(++numAttempts);
+  /**
+   * Return signaling server url. This attempts trying up to maxNumberOfAttempts times before giving up then throw error.
+   * @return {String} A string of signaling server url.
+   */
+  async _fetchSignalingServerUrlWithRetry() {
+    for (let attempts = 0; attempts < config.maxNumberOfAttempts; attempts++) {
+      const serverInfo = await this._fetchSignalingServer().catch(err => {
+        logger.warn(err);
+      });
+      if (
+        serverInfo &&
+        serverInfo.port &&
+        serverInfo.host &&
+        (!this.signalingServerUrl ||
+          this.signalingServerUrl.indexOf(serverInfo.host) === -1)
+      ) {
+        const httpProtocol = serverInfo.secure ? 'https://' : 'http://';
+        return `${httpProtocol}${serverInfo.host}:${serverInfo.port}`;
+      }
     }
+    throw new Error('Could not get signaling server url.');
   }
 
   /**
@@ -14986,7 +14664,7 @@ class socket_Socket extends events_default.a {
    * @return {Promise<Object>} A promise that resolves with signaling server info
    and rejects if there's no response or status code isn't 200.
    */
-  _getSignalingServer() {
+  _fetchSignalingServer() {
     return new Promise((resolve, reject) => {
       const http = new XMLHttpRequest();
 
@@ -15087,8 +14765,8 @@ class socket_Socket extends events_default.a {
    * Also set the new one to the Socket.io.opts's query string for reconnection.
    * @param {object} newCredential - The new credential generated by user.
    * @param {number} [newCredential.timestamp] - Current UNIX timestamp.
-   + @param {number} [newCredential.ttl] - Time to live; The credential expires at timestamp + ttl.
-   + @param {string} [newCredential.authToken] - Credential token calculated with HMAC.
+   * @param {number} [newCredential.ttl] - Time to live; The credential expires at timestamp + ttl.
+   * @param {string} [newCredential.authToken] - Credential token calculated with HMAC.
    */
   updateCredential(newCredential) {
     // Parse the current queryString and replace the new credential with old one
@@ -15312,8 +14990,8 @@ class socket_Socket extends events_default.a {
 var sdp_transform_lib = __webpack_require__("./node_modules/sdp-transform/lib/index.js");
 var sdp_transform_lib_default = /*#__PURE__*/__webpack_require__.n(sdp_transform_lib);
 
-// EXTERNAL MODULE: ./node_modules/sdp-interop/lib/index.js
-var sdp_interop_lib = __webpack_require__("./node_modules/sdp-interop/lib/index.js");
+// EXTERNAL MODULE: ./node_modules/@jitsi/sdp-interop/lib/index.js
+var sdp_interop_lib = __webpack_require__("./node_modules/@jitsi/sdp-interop/lib/index.js");
 
 // CONCATENATED MODULE: ./src/shared/sdpUtil.js
 
@@ -15540,7 +15218,7 @@ class sdpUtil_SdpUtil {
 
 
 
-const NegotiatorEvents = new enum_default.a([
+const NegotiatorEvents = new lib_enum["default"]([
   'addStream',
   'dcCreated',
   'offerCreated',
@@ -15564,8 +15242,8 @@ class negotiator_Negotiator extends events_default.a {
     super();
     this._offerQueue = [];
     this._isExpectingAnswer = false;
-    this._replaceStreamCalled = false;
     this._isNegotiationAllowed = true;
+    this._isExecutingHandleOffer = false;
     this.hasRemoteDescription = false;
   }
 
@@ -15716,21 +15394,34 @@ class negotiator_Negotiator extends events_default.a {
 
     this._isNegotiationAllowed = true;
 
-    if (!offerSdp) {
-      offerSdp = this._lastOffer;
-    }
-
-    this._lastOffer = offerSdp;
-
-    // Enqueue and skip while signalingState is wrong state.
+    // Enqueue and skip while signalingState is wrong state or executing handleOffer.
     // (when room is SFU and there are multiple conns in a same time, it happens)
-    if (this._pc.signalingState === 'have-remote-offer') {
+    if (
+      this._pc.signalingState === 'have-remote-offer' ||
+      this._isExecutingHandleOffer
+    ) {
       this._offerQueue.push(offerSdp);
       return;
     }
 
-    await this._setRemoteDescription(offerSdp);
-    const answer = await this._makeAnswerSdp().catch(err => logger.error(err));
+    this._lastOffer = offerSdp;
+    this._isExecutingHandleOffer = true;
+    let answer;
+    try {
+      await this._setRemoteDescription(offerSdp);
+      answer = await this._makeAnswerSdp().catch(err => logger.error(err));
+    } finally {
+      this._isExecutingHandleOffer = false;
+    }
+
+    // Apply pended remote offer which was stored when signalingState is wrong state or executing handleOffer.
+    if (this._pc.signalingState === 'stable') {
+      const offer = this._offerQueue.shift();
+      if (offer) {
+        this.handleOffer(offer);
+      }
+    }
+
     this.emit(negotiator_Negotiator.EVENTS.answerCreated.key, answer);
   }
 
@@ -15756,6 +15447,10 @@ class negotiator_Negotiator extends events_default.a {
    * @return {Promise<void>} Promise that resolves when handling candidate is done.
    */
   async handleCandidate(candidate) {
+    if (!this._pc) {
+      return;
+    }
+
     await this._pc
       .addIceCandidate(new RTCIceCandidate(candidate))
       .then(() => logger.log('Successfully added ICE candidate'))
@@ -15883,11 +15578,7 @@ class negotiator_Negotiator extends events_default.a {
           const offer = await this._makeOfferSdp();
           this._setLocalDescription(offer);
           this.emit(negotiator_Negotiator.EVENTS.negotiationNeeded.key);
-        } else if (this._replaceStreamCalled) {
-          this.handleOffer();
         }
-
-        this._replaceStreamCalled = false;
       }
     };
 
@@ -15895,11 +15586,14 @@ class negotiator_Negotiator extends events_default.a {
       logger.log(`signalingState is ${pc.signalingState}`);
 
       // After signaling state is getting back to 'stable',
+      // If _isExecutingHandleOffer is false,
       // apply pended remote offer, which was stored when simultaneous multiple conns happened in SFU room,
-      // Note that this code very rarely applies the old remote offer.
-      // E.g. "Offer A -> Offer B" should be the right order but for some reason like NW unstablity,
-      //      offerQueue might keep "Offer B" first and handle "Offer A" later.
-      if (pc.signalingState === 'stable') {
+      //
+      // This event is fired the moment setLD completes.
+      // Therefore, _isExecutingHandleOffer is basically considered to be True.
+      // Normally, handleOffer reexecution using queued offer is performed
+      // after setting _isExecutingHandleOffer to false in handleOffer.
+      if (pc.signalingState === 'stable' && !this._isExecutingHandleOffer) {
         const offer = this._offerQueue.shift();
         if (offer) {
           this.handleOffer(offer);
@@ -16162,143 +15856,6 @@ class negotiator_Negotiator extends events_default.a {
 
 /* harmony default export */ var negotiator = (negotiator_Negotiator);
 
-// EXTERNAL MODULE: ./node_modules/detect-browser/index.js
-var detect_browser = __webpack_require__("./node_modules/detect-browser/index.js");
-
-// CONCATENATED MODULE: ./src/shared/util.js
-
-
-/**
- * Validate the Peer ID format.
- * @param {string} [id] - A Peer ID.
- * @return {boolean} True if the peerId format is valid. False if not.
- */
-function validateId(id) {
-  // Allow empty ids
-  return !id || /^[A-Za-z0-9_-]+(?:[ _-][A-Za-z0-9]+)*$/.exec(id);
-}
-
-/**
- * Validate the API key.
- * @param {string} [key] A SkyWay API key.
- * @return {boolean} True if the API key format is valid. False if not.
- */
-function validateKey(key) {
-  // Allow empty keys
-  return !key || /^[a-z0-9]{8}(-[a-z0-9]{4}){3}-[a-z0-9]{12}$/.exec(key);
-}
-
-/**
- * Return random ID.
- * @return {string} A text consisting of 16 chars.
- */
-function randomId() {
-  const keyLength = 16;
-  // '36' means that we want to convert the number to a string using chars in
-  // the range of '0-9a-z'. The concatenated 0's are for padding the key,
-  // as Math.random() may produce a key shorter than 16 chars in length
-  const randString = Math.random().toString(36) + '0000000000000000000';
-  return randString.substr(2, keyLength);
-}
-
-/**
- * Generate random token.
- * @return {string} A token consisting of random alphabet and integer.
- */
-function randomToken() {
-  return Math.random()
-    .toString(36)
-    .substr(2);
-}
-
-/**
- * Combine the sliced ArrayBuffers.
- * @param {Array} buffers - An Array of ArrayBuffer.
- * @return {ArrayBuffer} The combined ArrayBuffer.
- */
-function joinArrayBuffers(buffers) {
-  const size = buffers.reduce((sum, buffer) => {
-    return sum + buffer.byteLength;
-  }, 0);
-  const tmpArray = new Uint8Array(size);
-  let currPos = 0;
-  for (const buffer of buffers) {
-    tmpArray.set(new Uint8Array(buffer), currPos);
-    currPos += buffer.byteLength;
-  }
-  return tmpArray.buffer;
-}
-
-/**
- * Convert Blob to ArrayBuffer.
- * @param {Blob} blob - The Blob to be read as ArrayBuffer.
- * @param {Function} cb - Callback function that called after load event fired.
- */
-function blobToArrayBuffer(blob, cb) {
-  const fr = new FileReader();
-  fr.onload = event => {
-    cb(event.target.result);
-  };
-  fr.readAsArrayBuffer(blob);
-}
-
-/**
- * Whether the protocol is https or not.
- * @return {boolean} Whether the protocol is https or not.
- */
-function isSecure() {
-  return location.protocol === 'https:';
-}
-
-/**
- * Detect browser name and version.
- * @return {Object} Browser name and major, minor and patch versions. Object is empty if info can't be obtained.
- */
-function detectBrowser() {
-  const { name, version } = Object(detect_browser["detect"])();
-  const [major, minor, patch] = version.split('.').map(i => parseInt(i));
-  return {
-    name,
-    major,
-    minor,
-    patch,
-  };
-}
-
-/**
- * Safari 12.1 may use plan-b sdp and also unified-plan sdp.
- * It depends on user settings.
- * See https://webkit.org/blog/8672/on-the-road-to-webrtc-1-0-including-vp8/
- *
- * @return {boolean} Browser is plan-b Safari or NOT
- */
-function isPlanBSafari() {
-  const { name } = Object(detect_browser["detect"])();
-
-  // safari for macOS, ios for iOS
-  if (!(name === 'safari' || name === 'ios')) {
-    return false;
-  }
-  // supports unified-plan
-  if (RTCRtpTransceiver.prototype.hasOwnProperty('currentDirection')) {
-    return false;
-  }
-
-  return true;
-}
-
-/* harmony default export */ var util = ({
-  validateId,
-  validateKey,
-  randomId,
-  randomToken,
-  joinArrayBuffers,
-  blobToArrayBuffer,
-  isSecure,
-  detectBrowser,
-  isPlanBSafari,
-});
-
 // CONCATENATED MODULE: ./src/peer/connection.js
 
 
@@ -16308,7 +15865,7 @@ function isPlanBSafari() {
 
 
 
-const ConnectionEvents = new enum_default.a([
+const ConnectionEvents = new lib_enum["default"]([
   'candidate',
   'offer',
   'answer',
@@ -16478,8 +16035,9 @@ class connection_Connection extends events_default.a {
   /**
    * Disconnect from remote peer.
    * @fires Connection#close
+   * @deprecated Default value of forceClose may be changed to true from a future version.
    */
-  close(forceClose = false) {
+  close(forceClose = undefined) {
     if (!this.open) {
       return;
     }
@@ -16490,6 +16048,10 @@ class connection_Connection extends events_default.a {
 
     if (forceClose) {
       this.emit(connection_Connection.EVENTS.forceClose.key);
+    } else if (forceClose === undefined) {
+      logger.warn(
+        `Default value of the forceClose parameter will change false to true from future versions.`
+      );
     }
   }
 
@@ -16539,7 +16101,7 @@ class connection_Connection extends events_default.a {
     });
 
     this._negotiator.on(negotiator.EVENTS.iceConnectionFailed.key, () => {
-      this.close();
+      this.close(false);
     });
   }
 
@@ -16632,11 +16194,11 @@ var object_sizeof_default = /*#__PURE__*/__webpack_require__.n(object_sizeof);
 
 
 
-const DCEvents = new enum_default.a(['open', 'data', 'error']);
+const DCEvents = new lib_enum["default"](['open', 'data', 'error']);
 
 DCEvents.extend(peer_connection.EVENTS.enums);
 
-const DCSerializations = new enum_default.a(['binary', 'binary-utf8', 'json', 'none']);
+const DCSerializations = new lib_enum["default"](['binary', 'binary-utf8', 'json', 'none']);
 
 /**
  * Class that manages data connections to other peers.
@@ -16756,7 +16318,7 @@ class dataConnection_DataConnection extends peer_connection {
 
     this._dc.onclose = () => {
       logger.log('DataChannel closed for:', this.id);
-      this.close();
+      this.close(false);
     };
 
     this._dc.onerror = err => {
@@ -16901,11 +16463,34 @@ class dataConnection_DataConnection extends peer_connection {
   /**
    * Disconnect from remote peer.
    * @fires DataConnection#close
+   * @deprecated Default value of forceClose may be changed to true from a future version.
    */
   close(forceClose) {
-    super.close(forceClose);
+    const cleanup = forceClose => {
+      super.close(forceClose);
+      this._isOnOpenCalled = false;
+    };
 
-    this._isOnOpenCalled = false;
+    if (!this._dc) {
+      cleanup(forceClose);
+      return;
+    }
+
+    // Close RTCPeerConnection after RTCDataChannel is closed.
+    this._dc.onclose = () => {
+      logger.log('DataChannel closed for:', this.id);
+      cleanup(forceClose);
+    };
+
+    if (this._dc.readyState === 'closing') {
+      // Do nothing here because the onclose event fires after RTCDataChannel is closed.
+      return;
+    } else if (this._dc.readyState === 'closed') {
+      // Close RTCPeerConnection if the RTCDataChannel was already closed.
+      cleanup(forceClose);
+    } else {
+      this._dc.close();
+    }
   }
 
   /**
@@ -16999,7 +16584,7 @@ class dataConnection_DataConnection extends peer_connection {
 
 
 
-const MCEvents = new enum_default.a(['stream']);
+const MCEvents = new lib_enum["default"](['stream']);
 
 MCEvents.extend(peer_connection.EVENTS.enums);
 
@@ -17154,7 +16739,18 @@ class mediaConnection_MediaConnection extends peer_connection {
 
 /* harmony default export */ var mediaConnection = (mediaConnection_MediaConnection);
 
+// EXTERNAL MODULE: ./node_modules/socket.io-parser/index.js
+var socket_io_parser = __webpack_require__("./node_modules/socket.io-parser/index.js");
+var socket_io_parser_default = /*#__PURE__*/__webpack_require__.n(socket_io_parser);
+
+// EXTERNAL MODULE: ./node_modules/has-binary2/index.js
+var has_binary2 = __webpack_require__("./node_modules/has-binary2/index.js");
+var has_binary2_default = /*#__PURE__*/__webpack_require__.n(has_binary2);
+
 // CONCATENATED MODULE: ./src/peer/room.js
+
+
+
 
 
 
@@ -17179,8 +16775,8 @@ const MessageEvents = [
   'broadcast',
 ];
 
-const RoomEvents = new enum_default.a(Events);
-const RoomMessageEvents = new enum_default.a(MessageEvents);
+const RoomEvents = new lib_enum["default"](Events);
+const RoomMessageEvents = new lib_enum["default"](MessageEvents);
 
 /**
  * Class to manage rooms where one or more users can participate
@@ -17215,6 +16811,76 @@ class room_Room extends events_default.a {
     this._localStream = this._options.stream;
 
     this._pcConfig = this._options.pcConfig;
+
+    this.lastSent = 0;
+    this.messageQueue = [];
+    this.sendIntervalID = null;
+  }
+
+  /**
+   * Validate whether the size of data to send is over the limits or not.
+   * @param {object} data - The data to Validate.
+   */
+  validateSendDataSize(data) {
+    const isBin = has_binary2_default()([data]);
+    const packet = {
+      type: isBin ? socket_io_parser_default.a.BINARY_EVENT : socket_io_parser_default.a.EVENT,
+      data: [data],
+    };
+    const encoder = new socket_io_parser_default.a.Encoder();
+    let dataSize;
+    encoder.encode(packet, encodedPackets => {
+      dataSize = isBin
+        ? encodedPackets[1].byteLength
+        : encodedPackets[0].length;
+    });
+    const maxDataSize = config.maxDataSize;
+    if (dataSize > maxDataSize) {
+      throw new Error('The size of data to send must be less than 20 MB');
+    }
+    return true;
+  }
+
+  /**
+   * Send a message to the room with a delay so that the transmission interval does not exceed the limit.
+   * @param {object} msg - The data to send to this room.
+   * @param {string} key - The key of broadcast event.
+   */
+  _sendData(msg, key) {
+    const sendInterval = config.minBroadcastIntervalMs;
+
+    const now = Date.now();
+    const diff = now - this.lastsend;
+
+    // When no queued message and last message is enough old
+    if (this.messageQueue.length == 0 && diff >= sendInterval) {
+      // Update last send time and send message without queueing.
+      this.lastsend = now;
+      this.emit(key, msg);
+      return;
+    }
+
+    // Send a message to the room with a delay because the transmission interval exceeds the limit.
+
+    // Push this message into a queue.
+    this.messageQueue.push({ msg, key });
+
+    // Return if setInterval is already set.
+    if (this.sendIntervalID !== null) {
+      return;
+    }
+    this.sendIntervalID = setInterval(() => {
+      // If all message are sent, remove this interval ID.
+      if (this.messageQueue.length === 0) {
+        clearInterval(this.sendIntervalID);
+        this.sendIntervalID = null;
+        return;
+      }
+      // Update last send time send message.
+      const message = this.messageQueue.shift();
+      this.lastsend = Date.now();
+      this.emit(message.key, message.msg);
+    }, sendInterval);
   }
 
   /**
@@ -17393,9 +17059,9 @@ class room_Room extends events_default.a {
 
 const sfuRoom_MessageEvents = ['offerRequest', 'candidate'];
 
-const SFUEvents = new enum_default.a([]);
+const SFUEvents = new lib_enum["default"]([]);
 SFUEvents.extend(peer_room.EVENTS.enums);
-const SFUMessageEvents = new enum_default.a(sfuRoom_MessageEvents);
+const SFUMessageEvents = new lib_enum["default"](sfuRoom_MessageEvents);
 SFUMessageEvents.extend(peer_room.MESSAGE_EVENTS.enums);
 
 /**
@@ -17621,12 +17287,14 @@ class sfuRoom_SFURoom extends peer_room {
     if (!this._open) {
       return;
     }
-
+    if (!this.validateSendDataSize(data)) {
+      return;
+    }
     const message = {
       roomName: this.name,
       data: data,
     };
-    this.emit(sfuRoom_SFURoom.MESSAGE_EVENTS.broadcast.key, message);
+    this._sendData(message, sfuRoom_SFURoom.MESSAGE_EVENTS.broadcast.key);
   }
 
   /**
@@ -17684,6 +17352,16 @@ class sfuRoom_SFURoom extends peer_room {
   }
 
   /**
+   * Get a RTCPeerConnection.
+   */
+  getPeerConnection() {
+    if (!this._connectionStarted) {
+      return null;
+    }
+    return this._negotiator._pc;
+  }
+
+  /**
    * Events the SFURoom class can emit.
    * @type {Enum}
    */
@@ -17732,9 +17410,9 @@ class sfuRoom_SFURoom extends peer_room {
 
 const meshRoom_MessageEvents = ['broadcastByDC', 'getPeers'];
 
-const MeshEvents = new enum_default.a([]);
+const MeshEvents = new lib_enum["default"]([]);
 MeshEvents.extend(peer_room.EVENTS.enums);
-const MeshMessageEvents = new enum_default.a(meshRoom_MessageEvents);
+const MeshMessageEvents = new lib_enum["default"](meshRoom_MessageEvents);
 MeshMessageEvents.extend(peer_room.MESSAGE_EVENTS.enums);
 
 /**
@@ -17883,6 +17561,11 @@ class meshRoom_MeshRoom extends peer_room {
     }
 
     if (offerMessage.connectionType === 'media') {
+      if (this._hasConnection(offerMessage.src)) {
+        // When two or more users join at the same time, they send each other an offer.
+        // In order to prevent two connections between peerA and peerB, only the one with a small ID will be processed.
+        if (this._peerId > offerMessage.src) return;
+      }
       connection = new mediaConnection(offerMessage.src, {
         connectionId: connectionId,
         payload: offerMessage,
@@ -17968,11 +17651,14 @@ class meshRoom_MeshRoom extends peer_room {
    * @param {*} data - The data to send.
    */
   send(data) {
+    if (!this.validateSendDataSize(data)) {
+      return;
+    }
     const message = {
       roomName: this.name,
       data: data,
     };
-    this.emit(meshRoom_MeshRoom.MESSAGE_EVENTS.broadcast.key, message);
+    this._sendData(message, meshRoom_MeshRoom.MESSAGE_EVENTS.broadcast.key);
   }
 
   /**
@@ -17982,7 +17668,7 @@ class meshRoom_MeshRoom extends peer_room {
     for (const peerId in this.connections) {
       if (this.connections.hasOwnProperty(peerId)) {
         this.connections[peerId].forEach(connection => {
-          connection.close();
+          connection.close(false);
         });
       }
     }
@@ -18011,6 +17697,20 @@ class meshRoom_MeshRoom extends peer_room {
   }
 
   /**
+   * Get all of each peer's RTCPeerConnection.
+   */
+  getPeerConnections() {
+    const peerConnections = {};
+    for (const [peerId, [connection]] of Object.entries(this.connections)) {
+      const pc = connection.getPeerConnection();
+      if (pc) {
+        peerConnections[peerId] = pc;
+      }
+    }
+    return peerConnections;
+  }
+
+  /**
    * Append a connection to peer's array of connections, stored in room.connections.
    * @param {string} peerId - User's peerID.
    * @param {MediaConnection|DataConnection} connection - An instance of MediaConnection or DataConnection.
@@ -18034,6 +17734,9 @@ class meshRoom_MeshRoom extends peer_room {
     peerIds
       .filter(peerId => {
         return peerId !== this._peerId;
+      })
+      .filter(peerId => {
+        return !this._hasConnection(peerId);
       })
       .forEach(peerId => {
         let connection;
@@ -18064,6 +17767,9 @@ class meshRoom_MeshRoom extends peer_room {
    */
   _deleteConnections(peerId) {
     if (this.connections[peerId]) {
+      this.connections[peerId].forEach(connection => {
+        connection.close(false);
+      });
       delete this.connections[peerId];
     }
   }
@@ -18083,6 +17789,16 @@ class meshRoom_MeshRoom extends peer_room {
       return conn[0];
     }
     return null;
+  }
+
+  /**
+   * Return whether peer has already made a connection to 'peerId' or not
+   * @param {string} peerId - User's PeerId.
+   * @return {boolean} - Whether peer has already made a connection to 'peerId' or not
+   * @private
+   */
+  _hasConnection(peerId) {
+    return this.connections[peerId] && this.connections[peerId].length > 0;
   }
 
   /**
@@ -18174,7 +17890,7 @@ class meshRoom_MeshRoom extends peer_room {
 
 
 
-const PeerEvents = new enum_default.a([
+const PeerEvents = new lib_enum["default"]([
   'open',
   'error',
   'call',
@@ -18204,9 +17920,9 @@ class peer_Peer extends events_default.a {
    * @param {object} [options.config=config.defaultConfig] - A RTCConfiguration dictionary for the RTCPeerConnection.
    * @param {boolean} [options.turn=true] - Whether using TURN or not.
    * @param {object} [options.credential] - The credential used to authenticate peer.
-   + @param {number} [options.credential.timestamp] - Current UNIX timestamp.
-   + @param {number} [options.credential.ttl] - Time to live; The credential expires at timestamp + ttl.
-   + @param {string} [options.credential.authToken] - Credential token calculated with HMAC.
+   * @param {number} [options.credential.timestamp] - Current UNIX timestamp.
+   * @param {number} [options.credential.ttl] - Time to live; The credential expires at timestamp + ttl.
+   * @param {string} [options.credential.authToken] - Credential token calculated with HMAC.
    */
   constructor(id, options) {
     super();
@@ -18388,13 +18104,19 @@ class peer_Peer extends events_default.a {
    */
   destroy() {
     this._cleanup();
-    this.disconnect();
+    this.disconnect(true);
   }
 
   /**
    * Close socket and clean up some properties, then emit disconnect event.
+   * @deprecated Use peer's destroy method instead. This method may be removed in future versions.
    */
-  disconnect() {
+  disconnect(suppressWarning = false) {
+    if (!suppressWarning) {
+      logger.warn(
+        `Use peer's destroy method instead. This method may be removed in future versions.`
+      );
+    }
     if (this.open) {
       this.socket.close();
       this.emit(peer_Peer.EVENTS.disconnected.key, this.id);
@@ -18402,9 +18124,13 @@ class peer_Peer extends events_default.a {
   }
 
   /**
-   * Reconnect to SkyWay server. Does not work after a peer.destroy().
+   * Reconnect to SkyWay server.
+   * @deprecated Recreate peer instance instead. This method may be removed in future versions.
    */
   reconnect() {
+    logger.warn(
+      `Recreate peer instance instead. This method may be removed in future versions.`
+    );
     if (!this.open) {
       this.socket.reconnect();
     }
@@ -18414,8 +18140,8 @@ class peer_Peer extends events_default.a {
    * Update server-side credential by sending a request in order to extend TTL.
    * @param {object} newCredential - The new credential generated by user.
    * @param {number} [newCredential.timestamp] - Current UNIX timestamp.
-   + @param {number} [newCredential.ttl] - Time to live; The credential expires at timestamp + ttl.
-   + @param {string} [newCredential.authToken] - Credential token calculated with HMAC.
+   * @param {number} [newCredential.ttl] - Time to live; The credential expires at timestamp + ttl.
+   * @param {string} [newCredential.authToken] - Credential token calculated with HMAC.
    */
   updateCredential(newCredential) {
     this.socket.updateCredential(newCredential);
@@ -18464,6 +18190,36 @@ class peer_Peer extends events_default.a {
       }
     };
     http.send(null);
+  }
+
+  /**
+   * Fetch whether peer exists from signaling server
+   * @param {string} peerId - The PeerId that want to fetch.
+   * @return {Promise<boolean>} A Promise that resolves if fetch is done.
+   */
+  async fetchPeerExists(peerId) {
+    if (!this.open) {
+      throw new Error('Peer is not yet connected to signaling server');
+    }
+
+    const currentTimestamp = new Date().getTime();
+    if (
+      this._lastFetchPeerExistsTime !== undefined &&
+      currentTimestamp - this._lastFetchPeerExistsTime < 1000
+    ) {
+      throw new Error('fetchPeerExists can only be called once per second');
+    }
+    this._lastFetchPeerExistsTime = currentTimestamp;
+
+    const url = `${this.socket.signalingServerUrl}/api/apikeys/${this.options.key}/peers/${peerId}/exists`;
+    const response = await fetch(url);
+    if (response.status === 200) {
+      const body = await response.json();
+      return body.exists;
+    } else {
+      const body = await response.text();
+      throw new Error(body);
+    }
   }
 
   /**
@@ -18519,7 +18275,7 @@ class peer_Peer extends events_default.a {
 
     this.socket.on('disconnect', () => {
       // If we haven't explicitly disconnected, emit error and disconnect.
-      this.disconnect();
+      this.disconnect(true);
 
       const err = new Error('Lost connection to server.');
       err.type = 'socket-error';
@@ -19014,7 +18770,7 @@ class peer_Peer extends events_default.a {
    */
   _abort(type, message) {
     logger.error('Aborting!');
-    this.disconnect();
+    this.disconnect(true);
 
     const err = new Error(message);
     err.type = type;
@@ -19074,7 +18830,7 @@ class peer_Peer extends events_default.a {
   _cleanupPeer(peer) {
     if (this.connections[peer]) {
       for (const connection of this.connections[peer]) {
-        connection.close();
+        connection.close(false);
       }
     }
   }
@@ -19126,6 +18882,7 @@ class peer_Peer extends events_default.a {
    *
    * @event Peer#disconnected
    * @type {string}
+   * @deprecated Use peer's close event instead. This event may be removed in future versions.
    */
 }
 
