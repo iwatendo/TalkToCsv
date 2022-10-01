@@ -48,9 +48,6 @@ export default class ChatOwnerReceiver extends AbstractServiceReceiver<ChatOwner
         //  チャットメッセージ通知
         if (sender.type === ChatMessageSender.ID) {
             let chatMessage = sender as ChatMessageSender;
-
-            //  chatMessage.name = this.ToDispID(chatMessage.aid, conn.remoteId);
-
             this.Controller.Manager.Chat.SetMessage(chatMessage);
         }
 

@@ -116,6 +116,16 @@ export default class ChatOwnerModel extends AbstractServiceModel<ChatOwnerContro
 
 
     /**
+     * タイムラインメッセージの取得
+     * @param mid 
+     * @param callback 
+     */
+     public GetTimeline(mid:string,callback: OnRead<Timeline.Message>) {
+        this._timelineDB.Read(Timeline.DB.Message, mid, callback);
+    }
+
+
+    /**
      * タイムラインメッセージの全文取得
      * @param callback 
      */
