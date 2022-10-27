@@ -43,16 +43,27 @@ export default class ChatManager {
             return;
         }
 
-        let tlmsg = this.ToTimelineMessage(chm);
 
-        //  DBへの登録
-        this._controller.Model.UpdateTimelineMessage(tlmsg, () => {
+        //  事前の登録メッセージ取得
+        this._controller.Model.GetTimeline(chm.mid,(preMsg)=>{
 
-            //  各Visitorへの通知処理
-            this.SendMessage(tlmsg);
+            let tlmsg = this.ToTimelineMessage(chm);
 
-            //  キャッシュ
-            this._tlmsgs.push(tlmsg);
+            //  CTIMEは変更しない
+            if(preMsg){
+                tlmsg.ctime = preMsg.ctime;
+            }
+
+            //  DB登録
+            this._controller.Model.UpdateTimelineMessage(tlmsg, () => {
+    
+                //  各Visitorへの通知処理
+                this.SendMessage(tlmsg);
+    
+                //  キャッシュ
+                this._tlmsgs.push(tlmsg);
+            });
+
         });
 
     }
